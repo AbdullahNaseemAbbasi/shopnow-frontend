@@ -28,7 +28,7 @@ function ProductImage({ imageUrl, emoji, name }: { imageUrl?: string; emoji: str
       {imageUrl && !imgError && (
         <img
           src={imageUrl}
-          alt=""
+          alt={name}
           onLoad={() => setImgLoaded(true)}
           onError={() => setImgError(true)}
           className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
@@ -63,7 +63,7 @@ export default function FeaturedProducts() {
     setAddingId(product.id);
     try {
       await addToCart(product.id, 1);
-      toast.success('Added to cart! 🛒');
+      toast.success('Added to cart!');
     } catch {
       toast.error('Please try again');
     } finally {
@@ -77,7 +77,7 @@ export default function FeaturedProducts() {
     try {
       await api.post(`/api/wishlist/${id}`);
       setWishlisted(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-      toast.success(wishlisted.includes(id) ? 'Removed from wishlist' : 'Added to wishlist! ❤️');
+      toast.success(wishlisted.includes(id) ? 'Removed from wishlist' : 'Added to wishlist!');
     } catch { toast.error('Please try again'); }
   };
 

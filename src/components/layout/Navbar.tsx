@@ -64,7 +64,6 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Top bar — user only */}
       {!isAdmin && (
         <div className="bg-gray-900 text-white text-xs py-2 hidden md:block">
           <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
@@ -80,7 +79,6 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16 gap-4">
 
-            {/* Logo */}
             <Link href={isAdmin ? '/admin' : '/'} className="flex items-center gap-1 flex-shrink-0">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-black text-sm">S</span>
@@ -88,7 +86,6 @@ export default function Navbar() {
               <span className="text-xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
             </Link>
 
-            {/* Search — user only */}
             {!isAdmin && (
               <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl">
                 <div className="flex w-full rounded-xl overflow-hidden border-2 border-blue-600 focus-within:shadow-lg transition-shadow">
@@ -106,7 +103,6 @@ export default function Navbar() {
               </form>
             )}
 
-            {/* ===== ADMIN RIGHT SIDE ===== */}
             {isAdmin && (
               <div className="hidden md:flex items-center gap-3 ml-auto">
                 <Link href="/admin" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors">
@@ -139,16 +135,13 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* ===== USER RIGHT SIDE ===== */}
             {!isAdmin && (
               <div className="hidden md:flex items-center gap-1">
-                {/* Wishlist */}
                 <Link href="/wishlist" className="flex flex-col items-center p-2 hover:text-blue-600 transition-colors group">
                   <Heart size={22} className="group-hover:scale-110 transition-transform" />
                   <span className="text-xs mt-0.5">Wishlist</span>
                 </Link>
 
-                {/* Account */}
                 <div className="relative">
                   <button onClick={() => setAccountOpen(!accountOpen)}
                     className="flex flex-col items-center p-2 hover:text-blue-600 transition-colors group">
@@ -193,7 +186,6 @@ export default function Navbar() {
                   )}
                 </div>
 
-                {/* Cart */}
                 <Link href="/cart" className="flex flex-col items-center p-2 hover:text-blue-600 transition-colors group relative">
                   <div className="relative">
                     <ShoppingCart size={22} className="group-hover:scale-110 transition-transform" />
@@ -208,16 +200,13 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Mobile hamburger */}
             <button onClick={() => setMobileOpen(!mobileOpen)} className="flex md:hidden p-2 hover:text-blue-600">
               {mobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
-          {/* Category bar — user only */}
           {!isAdmin && (
             <div className="hidden md:flex items-center py-2 border-t border-gray-100 text-sm relative">
-              {/* All Categories dropdown */}
               <div className="relative flex-shrink-0 pr-6 border-r border-gray-200 mr-6">
                 <button
                   onClick={() => setCategoriesOpen(o => !o)}
@@ -251,7 +240,6 @@ export default function Navbar() {
                 )}
               </div>
 
-              {/* Quick category links — show 9 */}
               <div className="flex items-center gap-5 overflow-x-auto no-scrollbar">
                 {categories.slice(0, 9).map((cat) => (
                   <Link key={cat.id} href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`}
@@ -264,12 +252,10 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu */}
         {mobileOpen && (
           <div className="md:hidden bg-white border-t border-gray-100">
             <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
 
-              {/* Admin mobile */}
               {isAdmin ? (
                 <>
                   <div className="flex items-center gap-3 py-2 px-2 bg-blue-50 rounded-xl mb-3">
@@ -290,7 +276,6 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  {/* User mobile search */}
                   <form onSubmit={handleSearch} className="flex rounded-xl overflow-hidden border-2 border-blue-600 mb-3">
                     <input type="text" placeholder="Search..." className="flex-1 px-4 py-2 text-sm outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
                     <button type="submit" className="bg-blue-600 px-4 text-white"><Search size={18} /></button>

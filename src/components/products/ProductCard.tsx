@@ -56,19 +56,15 @@ export default function ProductCard({ product }: Props) {
     <Link href={`/products/${product.slug}`} className="block h-full">
       <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden group cursor-pointer h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-blue-200">
 
-        {/* ── Image Area ── */}
         <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>
           <div className="absolute inset-0">
-            {/* Fallback — always rendered, hidden once image loads */}
             {(!imgLoaded || imgError) && (
               <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-100 to-slate-200">
                 <ShoppingCart size={32} className="text-slate-300" />
                 <span className="text-xs text-slate-400 font-medium px-3 text-center line-clamp-2">{product.name}</span>
               </div>
             )}
-            {/* Image — invisible until loaded, hidden on error */}
             {product.imageUrl && !imgError && (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={product.imageUrl}
                 alt=""
@@ -79,21 +75,18 @@ export default function ProductCard({ product }: Props) {
             )}
           </div>
 
-          {/* Discount badge — top left */}
           {discount > 0 && (
             <span className="absolute top-2.5 left-2.5 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg z-10 shadow-sm">
               -{discount}%
             </span>
           )}
 
-          {/* Out of stock badge */}
           {product.stock === 0 && (
             <span className="absolute top-2.5 left-2.5 bg-slate-700 text-white text-xs font-bold px-2.5 py-1 rounded-lg z-10">
               Out of Stock
             </span>
           )}
 
-          {/* Wishlist — top right, visible on hover */}
           <button
             onClick={handleWishlist}
             className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200
@@ -104,14 +97,12 @@ export default function ProductCard({ product }: Props) {
           </button>
         </div>
 
-        {/* ── Product Info ── */}
         <div className="p-3 flex flex-col flex-1">
           <p className="text-xs text-slate-400 font-medium mb-1 truncate">{product.categoryName}</p>
           <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 flex-1 leading-snug mb-2">
             {product.name}
           </h3>
 
-          {/* Rating */}
           {product.totalReviews > 0 && (
             <div className="flex items-center gap-1 mb-2">
               <div className="flex">
@@ -125,7 +116,6 @@ export default function ProductCard({ product }: Props) {
             </div>
           )}
 
-          {/* Price row */}
           <div className="flex items-center gap-2 mb-3">
             <span className="text-sm font-bold text-blue-600">{formatPrice(displayPrice)}</span>
             {product.salePrice && (
@@ -133,7 +123,6 @@ export default function ProductCard({ product }: Props) {
             )}
           </div>
 
-          {/* Add to Cart button — always visible at bottom */}
           <button
             onClick={handleAddToCart}
             disabled={addingToCart || product.stock === 0}

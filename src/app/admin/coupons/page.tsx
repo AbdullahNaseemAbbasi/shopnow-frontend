@@ -94,7 +94,6 @@ export default function AdminCouponsPage() {
         </button>
       </div>
 
-      {/* Create Form */}
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
@@ -163,7 +162,6 @@ export default function AdminCouponsPage() {
         </div>
       )}
 
-      {/* Coupons List */}
       {loading ? (
         <div className="space-y-3">
           {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-24 rounded-2xl" />)}

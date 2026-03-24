@@ -7,7 +7,6 @@ const api = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-// Har request pe token automatically lagao
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("shopnow_token");
@@ -18,14 +17,12 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 401 pe logout karo
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       if (typeof window !== "undefined") {
         localStorage.removeItem("shopnow_token");
-        localStorage.removeItem("shopnow_user");
         window.location.href = "/auth/login";
       }
     }

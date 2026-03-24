@@ -87,7 +87,6 @@ export default function AdminPage() {
 
   return (
     <div className="space-y-6">
-      {/* Welcome */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-black text-gray-900">Dashboard</h1>
@@ -96,7 +95,6 @@ export default function AdminPage() {
         <span className="text-xs bg-red-100 text-red-700 font-black px-3 py-1.5 rounded-full">ADMIN</span>
       </div>
 
-      {/* Today's Stats */}
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-gradient-to-br from-red-500 to-red-700 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-2 mb-2">
@@ -114,7 +112,6 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Main Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: 'Total Revenue',  value: formatPrice(stats.totalRevenue),  icon: DollarSign,  color: 'bg-green-50 text-green-600' },
@@ -132,7 +129,6 @@ export default function AdminPage() {
         ))}
       </div>
 
-      {/* Order Status Breakdown */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
         <h2 className="font-black text-gray-900 mb-4 flex items-center gap-2">
           <TrendingUp size={18} className="text-red-600" /> Order Status Breakdown
@@ -154,10 +150,8 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Recent Orders + Best Sellers */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
-        {/* Recent Orders */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-gray-900 flex items-center gap-2">
@@ -188,7 +182,6 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* Best Sellers */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-gray-900 flex items-center gap-2">
@@ -220,7 +213,6 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* Quick Actions */}
       <div>
         <h2 className="font-black text-gray-900 mb-4">Quick Actions</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

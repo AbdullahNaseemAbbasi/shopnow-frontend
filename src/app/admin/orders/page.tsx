@@ -80,7 +80,6 @@ export default function AdminOrdersPage() {
         </button>
       </div>
 
-      {/* Filter tabs */}
       <div className="flex gap-2 flex-wrap mb-6">
         {['ALL', 'PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(s => (
           <button key={s} onClick={() => setFilter(s)}
@@ -132,7 +131,7 @@ export default function AdminOrdersPage() {
                             <button key={ns} onClick={() => handleStatusUpdate(order.id, ns)}
                               disabled={updatingId === order.id}
                               className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-colors disabled:opacity-60 ${ns === 'CANCELLED' ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200' : 'btn-primary text-white'}`}>
-                              {updatingId === order.id ? '...' : ns === 'CONFIRMED' ? '✓ Confirm' : ns === 'SHIPPED' ? '🚚 Ship' : ns === 'DELIVERED' ? '✅ Deliver' : '✕ Cancel'}
+                              {updatingId === order.id ? '...' : ns === 'CONFIRMED' ? 'Confirm' : ns === 'SHIPPED' ? 'Ship' : ns === 'DELIVERED' ? 'Deliver' : 'Cancel'}
                             </button>
                           ))}
                         </div>

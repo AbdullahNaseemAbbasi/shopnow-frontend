@@ -148,7 +148,6 @@ export default function AdminProductsPage() {
         </button>
       </div>
 
-      {/* Add/Edit Form */}
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
@@ -195,7 +194,6 @@ export default function AdminProductsPage() {
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Product Image</label>
                 <div className="flex gap-3 items-start">
-                  {/* Image Preview */}
                   <div className="w-20 h-20 rounded-xl border-2 border-gray-200 flex-shrink-0 overflow-hidden bg-gray-50 flex items-center justify-center">
                     {form.imageUrl ? (
                       <img src={form.imageUrl} alt="preview" className="w-full h-full object-cover" />
@@ -204,13 +202,11 @@ export default function AdminProductsPage() {
                     )}
                   </div>
                   <div className="flex-1 space-y-2">
-                    {/* Upload Button */}
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                     <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
                       className="flex items-center gap-2 w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
                       <Upload size={15} /> {uploading ? 'Uploading...' : 'Upload from Computer'}
                     </button>
-                    {/* Or paste URL */}
                     <div className="flex items-center gap-2">
                       <Link size={13} className="text-gray-400 flex-shrink-0" />
                       <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
@@ -247,7 +243,6 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      {/* Search */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-4">
         <div className="flex items-center gap-3 border-2 border-gray-200 rounded-xl px-3 py-2 focus-within:border-red-500 transition-colors">
           <Search size={16} className="text-gray-400" />
@@ -256,7 +251,6 @@ export default function AdminProductsPage() {
         </div>
       </div>
 
-      {/* Products Table */}
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-3">
@@ -329,7 +323,6 @@ export default function AdminProductsPage() {
           </div>
         )}
 
-        {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 p-4 border-t border-gray-100">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}

@@ -116,7 +116,6 @@ export default function HeroBanner() {
         </div>
       </div>
 
-      {/* Controls */}
       {categories.length > 1 && (
         <>
           <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all">
@@ -128,7 +127,6 @@ export default function HeroBanner() {
         </>
       )}
 
-      {/* Dots */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
         {categories.map((_, i) => (
           <button key={i} onClick={() => setCurrent(i)}

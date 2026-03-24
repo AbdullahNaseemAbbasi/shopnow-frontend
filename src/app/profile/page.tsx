@@ -105,7 +105,6 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
 
-        {/* Profile Info */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-black text-2xl">
@@ -121,7 +120,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Addresses */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-black text-gray-900 flex items-center gap-2">
@@ -134,7 +132,6 @@ export default function ProfilePage() {
             )}
           </div>
 
-          {/* Add/Edit Form */}
           {showForm && (
             <form onSubmit={handleSave} className="bg-gray-50 rounded-2xl p-5 mb-6 border border-gray-200">
               <h3 className="font-bold text-gray-900 mb-4">{editId ? 'Edit Address' : 'Add New Address'}</h3>
@@ -186,7 +183,6 @@ export default function ProfilePage() {
             </form>
           )}
 
-          {/* Address List */}
           {loading ? (
             <div className="space-y-3">
               {[1, 2].map(i => <div key={i} className="skeleton h-24 rounded-2xl" />)}
@@ -200,7 +196,7 @@ export default function ProfilePage() {
           ) : (
             <div className="space-y-3">
               {addresses.map(addr => (
-                <div key={addr.id} className={`border-2 rounded-2xl p-4 transition-colors ${addr.isDefault ? 'border-red-300 bg-blue-50' : 'border-gray-100 bg-white'}`}>
+                <div key={addr.id} className={`border-2 rounded-2xl p-4 transition-colors ${addr.isDefault ? 'border-blue-300 bg-blue-50' : 'border-gray-100 bg-white'}`}>
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-1">

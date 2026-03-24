@@ -84,12 +84,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
-      {/* Desktop Sidebar */}
       <aside className="hidden lg:flex flex-col w-60 bg-gray-900 fixed top-0 left-0 h-full z-40">
         <Sidebar />
       </aside>
 
-      {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
           <div className="w-60 bg-gray-900 flex flex-col">
@@ -99,9 +97,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       )}
 
-      {/* Main Content */}
       <div className="flex-1 lg:ml-60 flex flex-col min-h-screen">
-        {/* Top bar */}
         <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:hidden">
           <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-gray-100">
             <Menu size={20} />

@@ -13,7 +13,7 @@ const STATUS_CONFIG = {
   CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700',     icon: CheckCircle },
   SHIPPED:   { label: 'Shipped',   color: 'bg-purple-100 text-purple-700', icon: Truck },
   DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700',   icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-blue-100 text-blue-700',       icon: XCircle },
+  CANCELLED: { label: 'Cancelled', color: 'bg-blue-100 text-blue-700',     icon: XCircle },
 };
 
 export default function DashboardPage() {
@@ -39,14 +39,13 @@ export default function DashboardPage() {
   const stats = [
     { label: 'Total Orders',  value: orders.length,    icon: Package,    color: 'bg-blue-50 text-blue-600',   href: '/orders' },
     { label: 'Total Spent',   value: formatPrice(totalSpent), icon: ShoppingBag, color: 'bg-green-50 text-green-600', href: '/orders' },
-    { label: 'Wishlist Items',value: wishlist.length,  icon: Heart,      color: 'bg-blue-50 text-blue-600',     href: '/wishlist' },
+    { label: 'Wishlist Items', value: wishlist.length,  icon: Heart,      color: 'bg-blue-50 text-blue-600',   href: '/wishlist' },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
 
-        {/* Welcome */}
         <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-6 mb-6 text-white">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-black">
@@ -59,7 +58,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-6">
           {loading ? (
             [...Array(3)].map((_, i) => <div key={i} className="skeleton h-24 rounded-2xl" />)
@@ -76,7 +74,6 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Quick Links */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
             { href: '/products',  label: 'Shop Now',     icon: ShoppingBag, bg: 'bg-blue-600 text-white' },
@@ -86,13 +83,12 @@ export default function DashboardPage() {
           ].map(({ href, label, icon: Icon, bg }) => (
             <Link key={href} href={href}
               className={`${bg} rounded-2xl p-4 flex flex-col items-center text-center gap-2 shadow-sm hover:shadow-md transition-shadow`}>
-              <Icon size={22} className={bg.includes('red-600') ? 'text-white' : 'text-blue-600'} />
-              <span className={`text-xs font-bold ${bg.includes('red-600') ? 'text-white' : 'text-gray-700'}`}>{label}</span>
+              <Icon size={22} className={bg.includes('blue-600') ? 'text-white' : 'text-blue-600'} />
+              <span className={`text-xs font-bold ${bg.includes('blue-600') ? 'text-white' : 'text-gray-700'}`}>{label}</span>
             </Link>
           ))}
         </div>
 
-        {/* Recent Orders */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-gray-900 flex items-center gap-2">

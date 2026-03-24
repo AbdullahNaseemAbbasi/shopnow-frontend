@@ -77,12 +77,10 @@ export default function OrderDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        {/* Back */}
         <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6 text-sm font-medium transition-colors">
           <ArrowLeft size={16} /> Go Back
         </button>
 
-        {/* Header */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
@@ -104,7 +102,6 @@ export default function OrderDetailPage() {
             </div>
           </div>
 
-          {/* Progress */}
           {order.status !== 'CANCELLED' && (
             <div className="mt-6">
               <div className="flex items-center">
@@ -128,7 +125,6 @@ export default function OrderDetailPage() {
           )}
         </div>
 
-        {/* Items */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-4">
           <h2 className="font-black text-gray-900 mb-4">Order Items ({order.totalItems})</h2>
           <div className="space-y-3">
@@ -149,7 +145,6 @@ export default function OrderDetailPage() {
           </div>
         </div>
 
-        {/* Summary + Address */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="font-black text-gray-900 mb-4">Order Summary</h2>

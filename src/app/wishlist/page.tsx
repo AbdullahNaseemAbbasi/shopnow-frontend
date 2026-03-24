@@ -39,7 +39,7 @@ export default function WishlistPage() {
     setAddingId(item.productId);
     try {
       await addToCart(item.productId, 1);
-      toast.success('Added to cart! 🛒');
+      toast.success('Added to cart!');
     } catch { toast.error('Please try again'); }
     finally { setAddingId(null); }
   };

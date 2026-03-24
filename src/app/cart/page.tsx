@@ -75,7 +75,6 @@ export default function CartPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Items */}
             <div className="lg:col-span-2 space-y-3">
               {cart.items.map((item) => (
                 <div key={item.cartItemId} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex gap-4">
@@ -115,9 +114,7 @@ export default function CartPage() {
               ))}
             </div>
 
-            {/* Summary */}
             <div className="space-y-4">
-              {/* Coupon */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                 <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2"><Tag size={16} className="text-blue-600" /> Coupon Code</h3>
                 {couponApplied ? (
@@ -140,7 +137,6 @@ export default function CartPage() {
                 )}
               </div>
 
-              {/* Order Summary */}
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
                 <h3 className="font-bold text-gray-900 mb-4">Order Summary</h3>
                 <div className="space-y-3 text-sm">

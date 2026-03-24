@@ -51,7 +51,7 @@ export default function ProductDetailPage() {
     setAdding(true);
     try {
       await addToCart(product.id, quantity);
-      toast.success(`${product.name} added to cart! 🛒`);
+      toast.success(`${product.name} added to cart!`);
     } catch {
       toast.error('Please try again');
     } finally {
@@ -69,7 +69,7 @@ export default function ProductDetailPage() {
     try {
       await api.post(`/api/wishlist/${product?.id}`);
       setWishlisted(w => !w);
-      toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist! ❤️');
+      toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist!');
     } catch { toast.error('Please try again'); }
   };
 
@@ -122,7 +122,6 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-6xl mx-auto px-4 py-6">
-        {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-blue-600">Home</Link>
           <span>/</span>
@@ -137,10 +136,8 @@ export default function ProductDetailPage() {
           <ArrowLeft size={16} /> Go Back
         </button>
 
-        {/* Main Product Section */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Image */}
             <div className="relative">
               <div className="bg-gray-50 rounded-2xl h-80 md:h-96 flex items-center justify-center overflow-hidden">
                 {product.imageUrl ? (
@@ -161,12 +158,10 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            {/* Info */}
             <div className="flex flex-col">
               <p className="text-blue-600 font-semibold text-sm mb-1">{product.categoryName}</p>
               <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-3 leading-tight">{product.name}</h1>
 
-              {/* Rating */}
               {product.totalReviews > 0 && (
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex">
@@ -179,7 +174,6 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Price */}
               <div className="flex items-baseline gap-3 mb-4">
                 <span className="text-3xl font-black text-blue-600">{formatPrice(product.salePrice || product.price)}</span>
                 {product.salePrice && (
@@ -192,7 +186,6 @@ export default function ProductDetailPage() {
                 )}
               </div>
 
-              {/* Stock */}
               <div className="mb-6">
                 {inStock ? (
                   <span className="text-green-600 font-semibold text-sm flex items-center gap-1">
@@ -204,7 +197,6 @@ export default function ProductDetailPage() {
                 )}
               </div>
 
-              {/* Quantity */}
               {inStock && (
                 <div className="flex items-center gap-4 mb-6">
                   <span className="text-sm font-semibold text-gray-700">Quantity:</span>
@@ -220,7 +212,6 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              {/* Buttons */}
               <div className="flex gap-3 mb-6">
                 <button onClick={handleAddToCart} disabled={adding || !inStock}
                   className="flex-1 btn-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-60 text-sm">
@@ -243,7 +234,6 @@ export default function ProductDetailPage() {
                 </button>
               )}
 
-              {/* Trust badges */}
               <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-3 gap-3">
                 <div className="flex flex-col items-center text-center gap-1">
                   <Truck size={20} className="text-blue-600" />
@@ -262,7 +252,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex border-b border-gray-100">
             <button onClick={() => setActiveTab('details')}
@@ -291,7 +280,6 @@ export default function ProductDetailPage() {
               </div>
             ) : (
               <div>
-                {/* Write Review */}
                 {isLoggedIn && (
                   <form onSubmit={handleSubmitReview} className="mb-8 p-5 bg-gray-50 rounded-2xl">
                     <h3 className="font-bold text-gray-900 mb-4">Write a Review</h3>
@@ -313,7 +301,6 @@ export default function ProductDetailPage() {
                   </form>
                 )}
 
-                {/* Reviews List */}
                 {reviews.length === 0 ? (
                   <div className="text-center py-10 text-gray-400">
                     <Star size={40} className="mx-auto mb-3 opacity-30" />

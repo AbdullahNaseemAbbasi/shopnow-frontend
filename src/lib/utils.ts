@@ -13,11 +13,6 @@ export function formatPrice(price: number): string {
   }).format(price);
 }
 
-export function calculateDiscount(price: number, salePrice: number): number {
-  return Math.round(((price - salePrice) / price) * 100);
-}
-
-// Alias used in ProductCard
 export function getDiscountPercent(price: number, salePrice: number): number {
-  return calculateDiscount(price, salePrice);
+  return Math.round(((price - salePrice) / price) * 100);
 }

@@ -115,7 +115,6 @@ export default function AdminCategoriesPage() {
         </button>
       </div>
 
-      {/* Form */}
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
@@ -145,7 +144,7 @@ export default function AdminCategoriesPage() {
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                     <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
                       className="flex items-center gap-2 w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-3 py-2 text-xs font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
-                      <Upload size={13} /> {uploading ? 'Upload...' : 'Upload'}
+                      <Upload size={13} /> {uploading ? 'Uploading...' : 'Upload'}
                     </button>
                     <div className="flex items-center gap-2">
                       <Link size={12} className="text-gray-400 flex-shrink-0" />
@@ -173,7 +172,6 @@ export default function AdminCategoriesPage() {
         </div>
       )}
 
-      {/* Categories Grid */}
       {loading ? (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />)}

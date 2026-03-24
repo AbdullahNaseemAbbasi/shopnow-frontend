@@ -32,7 +32,6 @@ function ProductItem({
   return (
     <Link href={`/products/${product.slug}`} className="block h-full">
       <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden group cursor-pointer h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-blue-200">
-        {/* Image */}
         <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>
           <div className="absolute inset-0">
             {(!imgLoaded || imgError) && (
@@ -57,7 +56,6 @@ function ProductItem({
             <Heart size={14} fill={isWished ? 'currentColor' : 'none'} />
           </button>
         </div>
-        {/* Info */}
         <div className="p-3 flex flex-col flex-1">
           <p className="text-xs text-slate-400 mb-1 truncate">{product.categoryName}</p>
           <h3 className="font-semibold text-slate-800 text-sm line-clamp-2 flex-1 mb-2">{product.name}</h3>

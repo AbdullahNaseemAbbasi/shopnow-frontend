@@ -23,7 +23,6 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 pt-12 pb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
 
-          {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -43,7 +42,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Quick Links */}
           <div>
             <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Quick Links</h4>
             <ul className="space-y-2.5">
@@ -58,7 +56,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Customer Service */}
           <div>
             <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Customer Service</h4>
             <ul className="space-y-2.5">
@@ -73,7 +70,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact */}
           <div>
             <h4 className="text-white font-bold mb-4 text-sm uppercase tracking-wider">Contact Us</h4>
             <ul className="space-y-3">
@@ -100,7 +96,6 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div className="border-t border-slate-800 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-slate-500">© 2026 ShopNow. All rights reserved.</p>
           <div className="flex gap-5 text-xs">
