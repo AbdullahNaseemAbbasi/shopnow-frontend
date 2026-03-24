@@ -1,6 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { Plus, Pencil, Trash2, Search, X, Check, PackageSearch } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
+import { Plus, Pencil, Trash2, Search, X, Check, PackageSearch, Upload, Link } from 'lucide-react';
 import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
 import { Product, Category } from '@/types';
@@ -20,6 +20,8 @@ export default function AdminProductsPage() {
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -110,6 +112,25 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { toast.error('Image 10MB se chhoti honi chahiye'); return; }
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await api.post('/api/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+      setForm(f => ({ ...f, imageUrl: res.data.url }));
+      toast.success('Image upload ho gayi!');
+    } catch {
+      toast.error('Image upload nahi hui');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   const filtered = products.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
     p.categoryName.toLowerCase().includes(search.toLowerCase())
@@ -171,10 +192,32 @@ export default function AdminProductsPage() {
                 <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
                   placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" required />
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Image URL</label>
-                <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
-                  placeholder="https://..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" />
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Product Image</label>
+                <div className="flex gap-3 items-start">
+                  {/* Image Preview */}
+                  <div className="w-20 h-20 rounded-xl border-2 border-gray-200 flex-shrink-0 overflow-hidden bg-gray-50 flex items-center justify-center">
+                    {form.imageUrl ? (
+                      <img src={form.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-2xl">📦</span>
+                    )}
+                  </div>
+                  <div className="flex-1 space-y-2">
+                    {/* Upload Button */}
+                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                    <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
+                      className="flex items-center gap-2 w-full border-2 border-dashed border-gray-300 hover:border-red-400 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 hover:text-red-600 transition-colors disabled:opacity-60">
+                      <Upload size={15} /> {uploading ? 'Upload ho raha hai...' : 'Computer se Upload Karein'}
+                    </button>
+                    {/* Or paste URL */}
+                    <div className="flex items-center gap-2">
+                      <Link size={13} className="text-gray-400 flex-shrink-0" />
+                      <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
+                        placeholder="ya URL paste karein..." className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-red-500" />
+                    </div>
+                  </div>
+                </div>
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
