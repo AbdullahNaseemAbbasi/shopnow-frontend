@@ -6,14 +6,14 @@ import api from '@/lib/axios';
 import { Category } from '@/types';
 
 const GRADIENTS = [
-  'from-slate-900 via-red-950 to-slate-900',
-  'from-purple-900 via-red-900 to-purple-900',
-  'from-blue-900 via-red-950 to-blue-900',
-  'from-green-900 via-emerald-900 to-slate-900',
-  'from-orange-900 via-red-900 to-slate-900',
+  'from-slate-900 via-blue-950 to-slate-900',
+  'from-blue-900 via-indigo-900 to-slate-900',
+  'from-slate-900 via-blue-900 to-indigo-900',
+  'from-indigo-900 via-blue-900 to-slate-900',
+  'from-slate-900 via-indigo-950 to-blue-900',
 ];
 
-const ACCENTS = ['bg-red-600', 'bg-purple-600', 'bg-blue-600', 'bg-emerald-600', 'bg-orange-600'];
+const ACCENTS = ['bg-blue-600', 'bg-indigo-600', 'bg-blue-700', 'bg-indigo-700', 'bg-blue-600'];
 
 const EMOJIS: Record<string, string> = {
   'Electronics': '📱', 'Fashion': '👗', 'Ladies Fashion': '👗',
@@ -50,7 +50,7 @@ export default function HeroBanner() {
 
   if (loading) {
     return (
-      <div className="h-64 md:h-80 bg-gradient-to-r from-slate-900 via-red-950 to-slate-900 animate-pulse" />
+      <div className="h-64 md:h-80 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 animate-pulse" />
     );
   }
 
@@ -74,18 +74,18 @@ export default function HeroBanner() {
             <h1 className="text-4xl md:text-6xl font-black leading-tight">
               {cat.name}
               {cat.description && (
-                <span className="block text-red-400 text-lg md:text-2xl font-light mt-2 leading-relaxed max-w-md">
+                <span className="block text-blue-300 text-lg md:text-2xl font-light mt-2 leading-relaxed max-w-md">
                   {cat.description}
                 </span>
               )}
             </h1>
             {!cat.description && (
               <p className="text-gray-300 text-lg max-w-md">
-                Behtareen quality ke products, sab se behtar damo par. Abhi shop karein!
+                Best quality products at the best prices. Shop now!
               </p>
             )}
             <div className="flex items-center gap-3">
-              <span className="bg-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
+              <span className="bg-blue-600 text-white text-sm font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
                 <ShoppingBag size={14} /> {tag}
               </span>
             </div>
@@ -97,7 +97,7 @@ export default function HeroBanner() {
                 Shop {cat.name}
               </Link>
               <Link href="/products" className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all inline-block">
-                Sab Dekhein
+                View All
               </Link>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function HeroBanner() {
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
         {categories.map((_, i) => (
           <button key={i} onClick={() => setCurrent(i)}
-            className={`transition-all rounded-full ${i === current ? 'w-8 h-2 bg-red-500' : 'w-2 h-2 bg-white/50'}`} />
+            className={`transition-all rounded-full ${i === current ? 'w-8 h-2 bg-blue-400' : 'w-2 h-2 bg-white/40'}`} />
         ))}
       </div>
     </div>

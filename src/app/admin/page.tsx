@@ -82,7 +82,7 @@ export default function AdminPage() {
   );
 
   if (!stats) return (
-    <div className="text-center py-20 text-gray-400">Stats load nahi hue. Backend check karein.</div>
+    <div className="text-center py-20 text-gray-400">Failed to load stats. Please check the backend.</div>
   );
 
   return (
@@ -101,14 +101,14 @@ export default function AdminPage() {
         <div className="bg-gradient-to-br from-red-500 to-red-700 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-2 mb-2">
             <Package size={16} className="text-red-200" />
-            <span className="text-red-200 text-xs font-semibold uppercase tracking-wide">Aaj ke Orders</span>
+            <span className="text-red-200 text-xs font-semibold uppercase tracking-wide">Today's Orders</span>
           </div>
           <p className="text-3xl font-black">{stats.todayOrders}</p>
         </div>
         <div className="bg-gradient-to-br from-green-500 to-green-700 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-2 mb-2">
             <DollarSign size={16} className="text-green-200" />
-            <span className="text-green-200 text-xs font-semibold uppercase tracking-wide">Aaj ki Revenue</span>
+            <span className="text-green-200 text-xs font-semibold uppercase tracking-wide">Today's Revenue</span>
           </div>
           <p className="text-3xl font-black">{formatPrice(stats.todayRevenue)}</p>
         </div>
@@ -166,7 +166,7 @@ export default function AdminPage() {
             <Link href="/admin/orders" className="text-red-600 text-xs font-semibold hover:underline">View All</Link>
           </div>
           {stats.recentOrders.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">Koi order nahi abhi</p>
+            <p className="text-gray-400 text-sm text-center py-8">No orders yet</p>
           ) : (
             <div className="space-y-3">
               {stats.recentOrders.map(order => (
@@ -197,7 +197,7 @@ export default function AdminPage() {
             <Link href="/admin/products" className="text-red-600 text-xs font-semibold hover:underline">View All</Link>
           </div>
           {stats.bestSellers.length === 0 ? (
-            <p className="text-gray-400 text-sm text-center py-8">Koi data nahi abhi</p>
+            <p className="text-gray-400 text-sm text-center py-8">No data available yet</p>
           ) : (
             <div className="space-y-3">
               {stats.bestSellers.map((product, i) => (

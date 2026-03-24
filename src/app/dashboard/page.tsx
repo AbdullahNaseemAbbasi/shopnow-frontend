@@ -13,7 +13,7 @@ const STATUS_CONFIG = {
   CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700',     icon: CheckCircle },
   SHIPPED:   { label: 'Shipped',   color: 'bg-purple-100 text-purple-700', icon: Truck },
   DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700',   icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-red-100 text-red-700',       icon: XCircle },
+  CANCELLED: { label: 'Cancelled', color: 'bg-blue-100 text-blue-700',       icon: XCircle },
 };
 
 export default function DashboardPage() {
@@ -39,7 +39,7 @@ export default function DashboardPage() {
   const stats = [
     { label: 'Total Orders',  value: orders.length,    icon: Package,    color: 'bg-blue-50 text-blue-600',   href: '/orders' },
     { label: 'Total Spent',   value: formatPrice(totalSpent), icon: ShoppingBag, color: 'bg-green-50 text-green-600', href: '/orders' },
-    { label: 'Wishlist Items',value: wishlist.length,  icon: Heart,      color: 'bg-red-50 text-red-600',     href: '/wishlist' },
+    { label: 'Wishlist Items',value: wishlist.length,  icon: Heart,      color: 'bg-blue-50 text-blue-600',     href: '/wishlist' },
   ];
 
   return (
@@ -53,7 +53,7 @@ export default function DashboardPage() {
               {user?.firstName?.[0]?.toUpperCase()}
             </div>
             <div>
-              <h1 className="text-xl font-black">Assalam-o-Alaikum, {user?.firstName}!</h1>
+              <h1 className="text-xl font-black">Welcome back, {user?.firstName}!</h1>
               <p className="text-red-100 text-sm mt-0.5">{user?.email}</p>
             </div>
           </div>
@@ -79,14 +79,14 @@ export default function DashboardPage() {
         {/* Quick Links */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
-            { href: '/products',  label: 'Shop Now',     icon: ShoppingBag, bg: 'bg-red-600 text-white' },
+            { href: '/products',  label: 'Shop Now',     icon: ShoppingBag, bg: 'bg-blue-600 text-white' },
             { href: '/orders',    label: 'My Orders',    icon: Package,     bg: 'bg-white border border-gray-100' },
             { href: '/wishlist',  label: 'Wishlist',     icon: Heart,       bg: 'bg-white border border-gray-100' },
             { href: '/profile',   label: 'My Addresses', icon: MapPin,      bg: 'bg-white border border-gray-100' },
           ].map(({ href, label, icon: Icon, bg }) => (
             <Link key={href} href={href}
               className={`${bg} rounded-2xl p-4 flex flex-col items-center text-center gap-2 shadow-sm hover:shadow-md transition-shadow`}>
-              <Icon size={22} className={bg.includes('red-600') ? 'text-white' : 'text-red-600'} />
+              <Icon size={22} className={bg.includes('red-600') ? 'text-white' : 'text-blue-600'} />
               <span className={`text-xs font-bold ${bg.includes('red-600') ? 'text-white' : 'text-gray-700'}`}>{label}</span>
             </Link>
           ))}
@@ -96,9 +96,9 @@ export default function DashboardPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-gray-900 flex items-center gap-2">
-              <Package size={18} className="text-red-600" /> Recent Orders
+              <Package size={18} className="text-blue-600" /> Recent Orders
             </h2>
-            <Link href="/orders" className="text-red-600 text-sm font-semibold hover:underline flex items-center gap-1">
+            <Link href="/orders" className="text-blue-600 text-sm font-semibold hover:underline flex items-center gap-1">
               View All <ChevronRight size={14} />
             </Link>
           </div>
@@ -110,9 +110,9 @@ export default function DashboardPage() {
           ) : recentOrders.length === 0 ? (
             <div className="text-center py-8">
               <div className="text-4xl mb-2">📦</div>
-              <p className="text-gray-500 text-sm">Abhi koi order nahi hai</p>
+              <p className="text-gray-500 text-sm">No orders yet</p>
               <Link href="/products" className="btn-primary text-white px-5 py-2 rounded-xl text-sm font-bold inline-block mt-3">
-                Shopping Karein
+                Start Shopping
               </Link>
             </div>
           ) : (
@@ -136,8 +136,8 @@ export default function DashboardPage() {
                       <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${status.color}`}>
                         <StatusIcon size={10} /> {status.label}
                       </span>
-                      <span className="font-black text-red-600 text-sm">{formatPrice(order.totalAmount)}</span>
-                      <ChevronRight size={14} className="text-gray-300 group-hover:text-red-600 transition-colors" />
+                      <span className="font-black text-blue-600 text-sm">{formatPrice(order.totalAmount)}</span>
+                      <ChevronRight size={14} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
                     </div>
                   </Link>
                 );

@@ -42,7 +42,7 @@ export default function AdminOrdersPage() {
     setLoading(true);
     api.get('/api/admin/orders')
       .then(res => setOrders(res.data || []))
-      .catch(() => toast.error('Orders load nahi hue'))
+      .catch(() => toast.error('Failed to load orders'))
       .finally(() => setLoading(false));
   };
 
@@ -53,9 +53,9 @@ export default function AdminOrdersPage() {
     try {
       await api.put(`/api/orders/${orderId}/status?status=${newStatus}`);
       setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
-      toast.success(`Order ${STATUS_CONFIG[newStatus]?.label || newStatus} ho gaya!`);
+      toast.success(`Order marked as ${STATUS_CONFIG[newStatus]?.label || newStatus}!`);
     } catch {
-      toast.error('Status update nahi hua');
+      toast.error('Status update failed');
     } finally {
       setUpdatingId(null);
     }
@@ -73,7 +73,7 @@ export default function AdminOrdersPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-black text-gray-900">Orders</h1>
-          <p className="text-gray-500 text-sm">Saare orders manage karein</p>
+          <p className="text-gray-500 text-sm">Manage all orders</p>
         </div>
         <button onClick={fetchOrders} className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-xl text-sm font-semibold hover:border-red-400 hover:text-red-600 transition-colors">
           <RefreshCw size={14} /> Refresh
@@ -96,7 +96,7 @@ export default function AdminOrdersPage() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 text-center py-16">
-          <p className="text-gray-500 font-medium">Koi order nahi mila</p>
+          <p className="text-gray-500 font-medium">No orders found</p>
         </div>
       ) : (
         <div className="space-y-3">

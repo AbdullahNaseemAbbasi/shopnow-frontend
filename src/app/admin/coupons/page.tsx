@@ -34,13 +34,13 @@ export default function AdminCouponsPage() {
   useEffect(() => {
     api.get('/api/coupons')
       .then(res => setCoupons(res.data || []))
-      .catch(() => toast.error('Coupons load nahi hue'))
+      .catch(() => toast.error('Failed to load coupons'))
       .finally(() => setLoading(false));
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.code || !form.discountValue) { toast.error('Code aur discount value zaroor bharein!'); return; }
+    if (!form.code || !form.discountValue) { toast.error('Please fill in the code and discount value!'); return; }
     setSaving(true);
     const payload = {
       code: form.code.toUpperCase(),
@@ -55,26 +55,26 @@ export default function AdminCouponsPage() {
     try {
       const res = await api.post('/api/coupons', payload);
       setCoupons(prev => [res.data, ...prev]);
-      toast.success('Coupon create ho gaya!');
+      toast.success('Coupon created successfully!');
       setShowForm(false);
       setForm(EMPTY_FORM);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error?.response?.data?.message || 'Coupon nahi bana');
+      toast.error(error?.response?.data?.message || 'Failed to create coupon');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Yeh coupon delete karein?')) return;
+    if (!confirm('Delete this coupon?')) return;
     setDeletingId(id);
     try {
       await api.delete(`/api/coupons/${id}`);
       setCoupons(prev => prev.filter(c => c.id !== id));
-      toast.success('Coupon delete ho gaya!');
+      toast.success('Coupon deleted!');
     } catch {
-      toast.error('Delete nahi hua');
+      toast.error('Delete failed');
     } finally {
       setDeletingId(null);
     }
@@ -90,7 +90,7 @@ export default function AdminCouponsPage() {
           <p className="text-gray-500 text-sm">{coupons.length} coupons</p>
         </div>
         <button onClick={() => setShowForm(true)} className="flex items-center gap-2 btn-primary text-white px-4 py-2.5 rounded-xl text-sm font-bold">
-          <Plus size={16} /> Naya Coupon
+          <Plus size={16} /> New Coupon
         </button>
       </div>
 
@@ -98,7 +98,7 @@ export default function AdminCouponsPage() {
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-black text-gray-900">Naya Coupon Banayein</h2>
+            <h2 className="font-black text-gray-900">Create New Coupon</h2>
             <button onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 rounded-xl">
               <X size={18} />
             </button>
@@ -108,12 +108,12 @@ export default function AdminCouponsPage() {
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Coupon Code *</label>
                 <input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
-                  placeholder="EID2026" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500 uppercase font-mono font-bold tracking-widest" required />
+                  placeholder="EID2026" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 uppercase font-mono font-bold tracking-widest" required />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Discount Type *</label>
                 <select value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value as 'PERCENTAGE' | 'FIXED' }))}
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500">
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500">
                   <option value="PERCENTAGE">Percentage (%)</option>
                   <option value="FIXED">Fixed Amount (Rs.)</option>
                 </select>
@@ -123,37 +123,37 @@ export default function AdminCouponsPage() {
                   Discount Value * {form.discountType === 'PERCENTAGE' ? '(%)' : '(Rs.)'}
                 </label>
                 <input type="number" value={form.discountValue} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))}
-                  placeholder={form.discountType === 'PERCENTAGE' ? '20' : '500'} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" required />
+                  placeholder={form.discountType === 'PERCENTAGE' ? '20' : '500'} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Minimum Order Amount (Rs.)</label>
                 <input type="number" value={form.minimumAmount} onChange={e => setForm(f => ({ ...f, minimumAmount: e.target.value }))}
-                  placeholder="1000" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" />
+                  placeholder="1000" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Max Discount (Rs.) — Percentage ke liye</label>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Max Discount (Rs.) — For percentage type</label>
                 <input type="number" value={form.maximumDiscount} onChange={e => setForm(f => ({ ...f, maximumDiscount: e.target.value }))}
-                  placeholder="2000" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" />
+                  placeholder="2000" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Usage Limit</label>
                 <input type="number" value={form.usageLimit} onChange={e => setForm(f => ({ ...f, usageLimit: e.target.value }))}
-                  placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" />
+                  placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Expires At</label>
                 <input type="datetime-local" value={form.expiresAt} onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))}
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" />
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
                 <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="EID sale - 20% off on all products" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" />
+                  placeholder="EID sale - 20% off on all products" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
               </div>
             </div>
             <div className="flex gap-3">
               <button type="submit" disabled={saving} className="flex items-center gap-1.5 btn-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60">
-                <Check size={15} /> {saving ? 'Bana raha hai...' : 'Coupon Banayein'}
+                <Check size={15} /> {saving ? 'Creating...' : 'Create Coupon'}
               </button>
               <button type="button" onClick={() => setShowForm(false)} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold">
                 Cancel
@@ -171,7 +171,7 @@ export default function AdminCouponsPage() {
       ) : coupons.length === 0 ? (
         <div className="bg-white rounded-2xl border border-gray-100 text-center py-16">
           <Ticket size={48} className="mx-auto text-gray-300 mb-3" />
-          <p className="text-gray-500 font-medium">Koi coupon nahi hai</p>
+          <p className="text-gray-500 font-medium">No coupons found</p>
         </div>
       ) : (
         <div className="space-y-3">

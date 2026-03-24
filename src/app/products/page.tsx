@@ -15,6 +15,76 @@ const EMOJIS: Record<string, string> = {
   'Beauty': '✨', 'Home & Living': '🏠', 'Sports': '⚽', 'Books': '📚', 'Kids': '🧸', 'Groceries': '🛒',
 };
 
+function ProductItem({
+  product, isWished, addingId, onAddToCart, onWishlist,
+}: {
+  product: Product;
+  isWished: boolean;
+  addingId: number | null;
+  onAddToCart: (e: React.MouseEvent, p: Product) => void;
+  onWishlist: (e: React.MouseEvent, id: number) => void;
+}) {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [imgError, setImgError] = useState(false);
+  const disc = product.salePrice ? getDiscountPercent(product.price, product.salePrice) : 0;
+  const emoji = EMOJIS[product.categoryName] || '🛍️';
+
+  return (
+    <Link href={`/products/${product.slug}`} className="block h-full">
+      <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden group cursor-pointer h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-blue-200">
+        {/* Image */}
+        <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>
+          <div className="absolute inset-0">
+            {(!imgLoaded || imgError) && (
+              <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
+                <span className="text-5xl select-none">{emoji}</span>
+              </div>
+            )}
+            {product.imageUrl && !imgError && (
+              <img
+                src={product.imageUrl}
+                alt=""
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgError(true)}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+              />
+            )}
+          </div>
+          {disc > 0 && <span className="absolute top-2.5 left-2.5 z-10 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg">-{disc}%</span>}
+          {product.stock === 0 && <span className="absolute top-2.5 left-2.5 z-10 bg-slate-700 text-white text-xs font-bold px-2.5 py-1 rounded-lg">Out of Stock</span>}
+          <button onClick={(e) => onWishlist(e, product.id)}
+            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all opacity-0 group-hover:opacity-100 ${isWished ? 'bg-blue-600 text-white' : 'bg-white text-slate-400 hover:text-blue-600'}`}>
+            <Heart size={14} fill={isWished ? 'currentColor' : 'none'} />
+          </button>
+        </div>
+        {/* Info */}
+        <div className="p-3 flex flex-col flex-1">
+          <p className="text-xs text-slate-400 mb-1 truncate">{product.categoryName}</p>
+          <h3 className="font-semibold text-slate-800 text-sm line-clamp-2 flex-1 mb-2">{product.name}</h3>
+          {product.totalReviews > 0 && (
+            <div className="flex items-center gap-1 mb-2">
+              <Star size={11} className="text-amber-400 fill-amber-400" />
+              <span className="text-xs font-bold">{product.averageRating}</span>
+              <span className="text-xs text-slate-400">({product.totalReviews})</span>
+            </div>
+          )}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="font-bold text-blue-600 text-sm">{formatPrice(product.salePrice || product.price)}</span>
+            {product.salePrice && <span className="text-slate-400 line-through text-xs">{formatPrice(product.price)}</span>}
+          </div>
+          <button
+            onClick={(e) => onAddToCart(e, product)}
+            disabled={addingId === product.id || product.stock === 0}
+            className="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-blue-600 text-slate-600 hover:text-white text-xs font-semibold py-2.5 rounded-xl border border-gray-200 transition-all duration-200 disabled:opacity-50">
+            <ShoppingCart size={14} />
+            {addingId === product.id ? 'Adding...' : product.stock === 0 ? 'Out of Stock' : 'Add to Cart'}
+          </button>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 function ProductsContent() {
   const searchParams = useSearchParams();
   const keyword = searchParams.get('keyword') || '';
@@ -61,29 +131,29 @@ function ProductsContent() {
 
   const handleAddToCart = async (e: React.MouseEvent, product: Product) => {
     e.preventDefault();
-    if (!isLoggedIn) { toast.error('Pehle login karein!'); return; }
+    if (!isLoggedIn) { toast.error('Please login first!'); return; }
     setAddingId(product.id);
     try {
       await addToCart(product.id, 1);
-      toast.success('Cart mein add ho gaya!');
-    } catch { toast.error('Dobara try karein'); }
+      toast.success('Added to cart!');
+    } catch { toast.error('Please try again'); }
     finally { setAddingId(null); }
   };
 
   const handleWishlist = async (e: React.MouseEvent, id: number) => {
     e.preventDefault();
-    if (!isLoggedIn) { toast.error('Pehle login karein!'); return; }
+    if (!isLoggedIn) { toast.error('Please login first!'); return; }
     try {
       await api.post(`/api/wishlist/${id}`);
       setWishlisted(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-    } catch { toast.error('Dobara try karein'); }
+    } catch { toast.error('Please try again'); }
   };
 
   const pageTitle = search
-    ? `"${search}" ke results`
+    ? `Results for "${search}"`
     : categoryName
       ? `${categoryName}`
-      : 'Saare Products';
+      : 'All Products';
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -91,13 +161,13 @@ function ProductsContent() {
         <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div>
             <h1 className="text-xl font-black text-gray-900">{pageTitle}</h1>
-            {!loading && <p className="text-sm text-gray-500">{totalElements} products mile</p>}
+            {!loading && <p className="text-sm text-gray-500">{totalElements} products found</p>}
           </div>
-          <div className="flex rounded-xl overflow-hidden border-2 border-gray-200 focus-within:border-red-500 transition-colors w-full md:w-72">
-            <input type="text" placeholder="Search karein..." value={search}
+          <div className="flex rounded-xl overflow-hidden border-2 border-gray-200 focus-within:border-blue-500 transition-colors w-full md:w-72">
+            <input type="text" placeholder="Search products..." value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(0); }}
               className="flex-1 px-4 py-2.5 text-sm outline-none" />
-            <button className="bg-red-600 px-4 text-white"><Search size={16} /></button>
+            <button className="bg-blue-600 px-4 text-white"><Search size={16} /></button>
           </div>
         </div>
       </div>
@@ -119,78 +189,45 @@ function ProductsContent() {
         ) : products.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🔍</div>
-            <h3 className="text-xl font-bold text-gray-700 mb-2">Koi product nahi mila</h3>
-            <p className="text-gray-400 mb-6">Alag keywords try karein</p>
+            <h3 className="text-xl font-bold text-gray-700 mb-2">No products found</h3>
+            <p className="text-gray-400 mb-6">Try different keywords</p>
             <button onClick={() => { setSearch(''); setPage(0); }}
               className="btn-primary text-white px-6 py-3 rounded-xl font-semibold text-sm">
-              Saare Products Dekhein
+              View All Products
             </button>
           </div>
         ) : (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-              {products.map((product) => {
-                const disc = product.salePrice ? getDiscountPercent(product.price, product.salePrice) : 0;
-                const emoji = EMOJIS[product.categoryName] || '🛍️';
-                const isWished = wishlisted.includes(product.id);
-                return (
-                  <Link key={product.id} href={`/products/${product.slug}`}>
-                    <div className="product-card bg-white rounded-2xl border border-gray-100 overflow-hidden group cursor-pointer h-full flex flex-col">
-                      <div className="relative bg-gray-50 h-48 flex items-center justify-center overflow-hidden">
-                        {product.imageUrl ? (
-                          <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                        ) : (
-                          <span className="text-5xl group-hover:scale-110 transition-transform duration-500 select-none">{emoji}</span>
-                        )}
-                        {disc > 0 && <span className="absolute top-2 left-2 bg-red-600 text-white text-xs font-black px-2 py-0.5 rounded-full">-{disc}%</span>}
-                        {product.stock === 0 && <span className="absolute top-2 left-2 bg-gray-700 text-white text-xs font-black px-2 py-0.5 rounded-full">Out of Stock</span>}
-                        <button onClick={(e) => handleWishlist(e, product.id)}
-                          className={`absolute top-2 right-2 p-1.5 rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 ${isWished ? 'bg-red-600 text-white' : 'bg-white text-gray-400'}`}>
-                          <Heart size={14} fill={isWished ? 'currentColor' : 'none'} />
-                        </button>
-                        <button onClick={(e) => handleAddToCart(e, product)} disabled={addingId === product.id || product.stock === 0}
-                          className="absolute bottom-0 left-0 right-0 bg-red-600 text-white text-xs font-bold py-2.5 flex items-center justify-center gap-1 translate-y-full group-hover:translate-y-0 transition-transform duration-300 disabled:opacity-60">
-                          <ShoppingCart size={14} /> {addingId === product.id ? 'Adding...' : 'Add to Cart'}
-                        </button>
-                      </div>
-                      <div className="p-3 flex flex-col flex-1">
-                        <p className="text-xs text-gray-400 mb-1">{product.categoryName}</p>
-                        <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 flex-1 mb-2">{product.name}</h3>
-                        {product.totalReviews > 0 && (
-                          <div className="flex items-center gap-1 mb-1.5">
-                            <Star size={11} className="text-yellow-400 fill-yellow-400" />
-                            <span className="text-xs font-bold">{product.averageRating}</span>
-                            <span className="text-xs text-gray-400">({product.totalReviews})</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-2">
-                          <span className="font-black text-red-600 text-sm">{formatPrice(product.salePrice || product.price)}</span>
-                          {product.salePrice && <span className="text-gray-400 line-through text-xs">{formatPrice(product.price)}</span>}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
+              {products.map((product) => (
+                <ProductItem
+                  key={product.id}
+                  product={product}
+                  isWished={wishlisted.includes(product.id)}
+                  addingId={addingId}
+                  onAddToCart={handleAddToCart}
+                  onWishlist={handleWishlist}
+                />
+              ))}
             </div>
             {totalPages > 1 && (
               <div className="flex justify-center gap-2 mt-10">
                 <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-                  className="px-4 py-2 rounded-xl border-2 border-gray-200 text-sm font-semibold disabled:opacity-40 hover:border-red-500 hover:text-red-600 transition-colors">
-                  Pehle
+                  className="px-4 py-2 rounded-xl border-2 border-gray-200 text-sm font-semibold disabled:opacity-40 hover:border-blue-500 hover:text-blue-600 transition-colors">
+                  Previous
                 </button>
                 {[...Array(Math.min(5, totalPages))].map((_, i) => {
                   const pageNum = Math.max(0, Math.min(page - 2, totalPages - 5)) + i;
                   return (
                     <button key={pageNum} onClick={() => setPage(pageNum)}
-                      className={`w-10 h-10 rounded-xl text-sm font-bold transition-colors ${page === pageNum ? 'bg-red-600 text-white' : 'border-2 border-gray-200 hover:border-red-500 hover:text-red-600'}`}>
+                      className={`w-10 h-10 rounded-xl text-sm font-bold transition-colors ${page === pageNum ? 'bg-blue-600 text-white' : 'border-2 border-gray-200 hover:border-blue-500 hover:text-blue-600'}`}>
                       {pageNum + 1}
                     </button>
                   );
                 })}
                 <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
-                  className="px-4 py-2 rounded-xl border-2 border-gray-200 text-sm font-semibold disabled:opacity-40 hover:border-red-500 hover:text-red-600 transition-colors">
-                  Agla
+                  className="px-4 py-2 rounded-xl border-2 border-gray-200 text-sm font-semibold disabled:opacity-40 hover:border-blue-500 hover:text-blue-600 transition-colors">
+                  Next
                 </button>
               </div>
             )}
@@ -203,7 +240,7 @@ function ProductsContent() {
 
 export default function ProductsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" /></div>}>
       <ProductsContent />
     </Suspense>
   );

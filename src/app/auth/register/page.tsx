@@ -20,17 +20,17 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.firstName || !form.email || !form.password) { toast.error('Sab fields bharein!'); return; }
-    if (form.password.length < 6) { toast.error('Password kam az kam 6 characters ka hona chahiye!'); return; }
+    if (!form.firstName || !form.email || !form.password) { toast.error('Please fill all required fields!'); return; }
+    if (form.password.length < 6) { toast.error('Password must be at least 6 characters!'); return; }
     setLoading(true);
     try {
       const res = await api.post('/api/auth/register', form);
       login(res.data);
-      toast.success(`Welcome, ${res.data.firstName}! Account ban gaya!`);
+      toast.success(`Welcome, ${res.data.firstName}! Account created successfully!`);
       router.push(res.data.role === 'ADMIN' ? '/admin' : '/');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error?.response?.data?.message || 'Dobara try karein!');
+      toast.error(error?.response?.data?.message || 'Please try again!');
     } finally {
       setLoading(false);
     }
@@ -41,39 +41,39 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-12 h-12 bg-red-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
               <ShoppingBag size={24} className="text-white" />
             </div>
-            <span className="text-3xl font-black text-gray-900">Shop<span className="text-red-600">Now</span></span>
+            <span className="text-3xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
           </Link>
-          <p className="text-gray-500 mt-2">Pakistan ka #1 Online Store</p>
+          <p className="text-gray-500 mt-2">Pakistan's #1 Online Store</p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Account banayein</h1>
-          <p className="text-gray-500 text-sm mb-6">Free registration — abhi join karein</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Account</h1>
+          <p className="text-gray-500 text-sm mb-6">Free registration — join now</p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
-                <input name="firstName" value={form.firstName} onChange={handleChange} placeholder="Abdullah" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all text-sm" required />
+                <input name="firstName" value={form.firstName} onChange={handleChange} placeholder="Abdullah" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm" required />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
-                <input name="lastName" value={form.lastName} onChange={handleChange} placeholder="Naseem" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all text-sm" />
+                <input name="lastName" value={form.lastName} onChange={handleChange} placeholder="Naseem" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm" />
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-              <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="aapki@email.com" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all text-sm" required />
+              <input name="email" type="email" value={form.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm" required />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
               <div className="relative">
-                <input name="password" type={showPass ? 'text' : 'password'} value={form.password} onChange={handleChange} placeholder="••••••••" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-100 transition-all text-sm pr-12" required />
+                <input name="password" type={showPass ? 'text' : 'password'} value={form.password} onChange={handleChange} placeholder="••••••••" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm pr-12" required />
                 <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -84,16 +84,16 @@ export default function RegisterPage() {
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  Account ban raha hai...
+                  Creating account...
                 </span>
-              ) : 'Register karein'}
+              ) : 'Register'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-sm">
-              Pehle se account hai?{' '}
-              <Link href="/auth/login" className="text-red-600 font-semibold hover:underline">Login karein</Link>
+              Already have an account?{' '}
+              <Link href="/auth/login" className="text-blue-600 font-semibold hover:underline">Login</Link>
             </p>
           </div>
         </div>

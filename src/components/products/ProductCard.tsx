@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState } from "react";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Product } from "@/types";
@@ -20,30 +19,22 @@ export default function ProductCard({ product }: Props) {
   const { isLoggedIn } = useAuthStore();
   const [wishlisted, setWishlisted] = useState(false);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
 
-  const discount = product.salePrice
-    ? getDiscountPercent(product.price, product.salePrice)
-    : 0;
-
+  const discount = product.salePrice ? getDiscountPercent(product.price, product.salePrice) : 0;
   const displayPrice = product.salePrice || product.price;
 
   const handleAddToCart = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!isLoggedIn) {
-      toast.error("Pehle login karein!");
-      return;
-    }
-    if (product.stock === 0) {
-      toast.error("Out of stock!");
-      return;
-    }
+    if (!isLoggedIn) { toast.error("Please login first!"); return; }
+    if (product.stock === 0) { toast.error("Out of stock!"); return; }
     setAddingToCart(true);
     try {
       await addToCart(product.id, 1);
-      toast.success("Cart mein add ho gaya! 🛒");
+      toast.success("Added to cart!");
     } catch {
-      toast.error("Dobara try karein");
+      toast.error("Please try again");
     } finally {
       setAddingToCart(false);
     }
@@ -51,110 +42,106 @@ export default function ProductCard({ product }: Props) {
 
   const handleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
-    if (!isLoggedIn) {
-      toast.error("Pehle login karein!");
-      return;
-    }
+    if (!isLoggedIn) { toast.error("Please login first!"); return; }
     try {
       await api.post(`/api/wishlist/${product.id}`);
       setWishlisted(!wishlisted);
-      toast.success(wishlisted ? "Wishlist se hata diya" : "Wishlist mein add ho gaya! ❤️");
+      toast.success(wishlisted ? "Removed from wishlist" : "Added to wishlist!");
     } catch {
-      toast.error("Dobara try karein");
+      toast.error("Please try again");
     }
   };
 
   return (
-    <Link href={`/products/${product.slug}`}>
-      <div className="product-card bg-white rounded-2xl overflow-hidden border border-gray-100 group cursor-pointer h-full flex flex-col">
+    <Link href={`/products/${product.slug}`} className="block h-full">
+      <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden group cursor-pointer h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-blue-200">
 
-        {/* Image */}
-        <div className="relative aspect-square overflow-hidden bg-gray-50">
-          {!imgError && product.imageUrl ? (
-            <Image
-              src={product.imageUrl}
-              alt={product.name}
-              fill
-              className="object-cover group-hover:scale-110 transition-transform duration-500"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-              <ShoppingCart size={40} className="text-gray-300" />
-            </div>
-          )}
-
-          {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
-            {discount > 0 && (
-              <span className="bg-[#E40046] text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                -{discount}%
-              </span>
+        {/* ── Image Area ── */}
+        <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>
+          <div className="absolute inset-0">
+            {/* Fallback — always rendered, hidden once image loads */}
+            {(!imgLoaded || imgError) && (
+              <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-slate-100 to-slate-200">
+                <ShoppingCart size={32} className="text-slate-300" />
+                <span className="text-xs text-slate-400 font-medium px-3 text-center line-clamp-2">{product.name}</span>
+              </div>
             )}
-            {product.stock === 0 && (
-              <span className="bg-gray-700 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                Out of Stock
-              </span>
+            {/* Image — invisible until loaded, hidden on error */}
+            {product.imageUrl && !imgError && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={product.imageUrl}
+                alt=""
+                onLoad={() => setImgLoaded(true)}
+                onError={() => setImgError(true)}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
+              />
             )}
           </div>
 
-          {/* Wishlist Button */}
+          {/* Discount badge — top left */}
+          {discount > 0 && (
+            <span className="absolute top-2.5 left-2.5 bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded-lg z-10 shadow-sm">
+              -{discount}%
+            </span>
+          )}
+
+          {/* Out of stock badge */}
+          {product.stock === 0 && (
+            <span className="absolute top-2.5 left-2.5 bg-slate-700 text-white text-xs font-bold px-2.5 py-1 rounded-lg z-10">
+              Out of Stock
+            </span>
+          )}
+
+          {/* Wishlist — top right, visible on hover */}
           <button
             onClick={handleWishlist}
-            className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 ${
-              wishlisted
-                ? "bg-[#E40046] text-white"
-                : "bg-white text-gray-400 hover:bg-red-50 hover:text-[#E40046]"
-            } shadow-md opacity-0 group-hover:opacity-100`}
+            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200
+              ${wishlisted ? "bg-blue-600 text-white" : "bg-white text-slate-400 hover:text-blue-600"}
+              opacity-0 group-hover:opacity-100`}
           >
-            <Heart size={15} fill={wishlisted ? "currentColor" : "none"} />
-          </button>
-
-          {/* Add to Cart Overlay */}
-          <button
-            onClick={handleAddToCart}
-            disabled={addingToCart || product.stock === 0}
-            className="absolute bottom-0 left-0 right-0 btn-primary text-white text-sm font-medium py-2.5 flex items-center justify-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300 disabled:opacity-60"
-          >
-            <ShoppingCart size={16} />
-            {addingToCart ? "Adding..." : "Add to Cart"}
+            <Heart size={14} fill={wishlisted ? "currentColor" : "none"} />
           </button>
         </div>
 
-        {/* Info */}
+        {/* ── Product Info ── */}
         <div className="p-3 flex flex-col flex-1">
-          <p className="text-xs text-gray-400 mb-1">{product.categoryName}</p>
-          <h3 className="text-sm font-medium text-gray-900 line-clamp-2 flex-1 leading-snug">
+          <p className="text-xs text-slate-400 font-medium mb-1 truncate">{product.categoryName}</p>
+          <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 flex-1 leading-snug mb-2">
             {product.name}
           </h3>
 
           {/* Rating */}
           {product.totalReviews > 0 && (
-            <div className="flex items-center gap-1 mt-1.5">
+            <div className="flex items-center gap-1 mb-2">
               <div className="flex">
                 {[1,2,3,4,5].map((s) => (
-                  <Star
-                    key={s}
-                    size={11}
-                    className={s <= Math.round(product.averageRating) ? "text-yellow-400 fill-yellow-400" : "text-gray-200 fill-gray-200"}
+                  <Star key={s} size={11}
+                    className={s <= Math.round(product.averageRating) ? "text-amber-400 fill-amber-400" : "text-slate-200 fill-slate-200"}
                   />
                 ))}
               </div>
-              <span className="text-xs text-gray-400">({product.totalReviews})</span>
+              <span className="text-xs text-slate-400">({product.totalReviews})</span>
             </div>
           )}
 
-          {/* Price */}
-          <div className="mt-2 flex items-center gap-2">
-            <span className="text-base font-bold text-[#E40046]">
-              {formatPrice(displayPrice)}
-            </span>
+          {/* Price row */}
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-sm font-bold text-blue-600">{formatPrice(displayPrice)}</span>
             {product.salePrice && (
-              <span className="text-xs text-gray-400 line-through">
-                {formatPrice(product.price)}
-              </span>
+              <span className="text-xs text-slate-400 line-through">{formatPrice(product.price)}</span>
             )}
           </div>
+
+          {/* Add to Cart button — always visible at bottom */}
+          <button
+            onClick={handleAddToCart}
+            disabled={addingToCart || product.stock === 0}
+            className="w-full flex items-center justify-center gap-2 bg-slate-100 hover:bg-blue-600 text-slate-600 hover:text-white text-xs font-semibold py-2.5 rounded-xl border border-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group/btn"
+          >
+            <ShoppingCart size={14} />
+            {addingToCart ? "Adding..." : product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+          </button>
         </div>
       </div>
     </Link>

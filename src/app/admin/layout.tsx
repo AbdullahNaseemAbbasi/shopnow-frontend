@@ -23,14 +23,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (!isLoggedIn) { router.push('/auth/login'); return; }
     if (user?.role !== 'ADMIN') {
-      toast.error('Admin access chahiye!');
+      toast.error('Admin access required!');
       router.push('/');
     }
   }, [isLoggedIn, user, router]);
 
   const handleLogout = () => {
     logout();
-    toast.success('Logout ho gaye!');
+    toast.success('Logged out successfully!');
     router.push('/');
   };
 

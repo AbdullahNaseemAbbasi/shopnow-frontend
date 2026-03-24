@@ -30,8 +30,8 @@ export default function WishlistPage() {
     try {
       await api.post(`/api/wishlist/${productId}`);
       setItems(prev => prev.filter(item => item.productId !== productId));
-      toast.success('Wishlist se hata diya');
-    } catch { toast.error('Dobara try karein'); }
+      toast.success('Removed from wishlist');
+    } catch { toast.error('Please try again'); }
   };
 
   const handleAddToCart = async (item: WishlistItem) => {
@@ -39,8 +39,8 @@ export default function WishlistPage() {
     setAddingId(item.productId);
     try {
       await addToCart(item.productId, 1);
-      toast.success('Cart mein add ho gaya! 🛒');
-    } catch { toast.error('Dobara try karein'); }
+      toast.success('Added to cart! 🛒');
+    } catch { toast.error('Please try again'); }
     finally { setAddingId(null); }
   };
 
@@ -50,7 +50,7 @@ export default function WishlistPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-5xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-          <Heart size={24} className="text-red-600 fill-red-600" /> Meri Wishlist
+          <Heart size={24} className="text-blue-600 fill-red-600" /> My Wishlist
           {items.length > 0 && <span className="text-sm font-normal text-gray-500 ml-1">({items.length} items)</span>}
         </h1>
 
@@ -69,10 +69,10 @@ export default function WishlistPage() {
         ) : items.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
             <div className="text-7xl mb-4">❤️</div>
-            <h3 className="text-xl font-bold text-gray-700 mb-2">Wishlist khali hai!</h3>
-            <p className="text-gray-400 mb-8">Products pe dil ka button dabao wishlist mein add karne ke liye</p>
+            <h3 className="text-xl font-bold text-gray-700 mb-2">Your wishlist is empty!</h3>
+            <p className="text-gray-400 mb-8">Click the heart button on products to add them to your wishlist</p>
             <Link href="/products" className="btn-primary text-white px-8 py-3 rounded-xl font-bold text-sm inline-block">
-              Products Dekhein
+              Browse Products
             </Link>
           </div>
         ) : (
@@ -95,10 +95,10 @@ export default function WishlistPage() {
                 </Link>
                 <div className="p-3">
                   <Link href={item.productSlug ? `/products/${item.productSlug}` : '/products'}>
-                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 hover:text-red-600 transition-colors mb-2">{item.productName}</h3>
+                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 hover:text-blue-600 transition-colors mb-2">{item.productName}</h3>
                   </Link>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="font-black text-red-600 text-sm">{formatPrice(item.salePrice || item.price)}</span>
+                    <span className="font-black text-blue-600 text-sm">{formatPrice(item.salePrice || item.price)}</span>
                     {item.salePrice && <span className="text-gray-400 line-through text-xs">{formatPrice(item.price)}</span>}
                   </div>
                   <div className="flex gap-2">
@@ -108,7 +108,7 @@ export default function WishlistPage() {
                       {addingId === item.productId ? '...' : 'Add'}
                     </button>
                     <button onClick={() => handleRemove(item.productId)}
-                      className="p-2 rounded-xl border border-gray-200 text-gray-400 hover:text-red-600 hover:border-red-300 transition-colors">
+                      className="p-2 rounded-xl border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-red-300 transition-colors">
                       <Trash2 size={14} />
                     </button>
                   </div>

@@ -46,14 +46,14 @@ export default function ProductDetailPage() {
   }, [slug, router]);
 
   const handleAddToCart = async () => {
-    if (!isLoggedIn) { toast.error('Pehle login karein!'); router.push('/auth/login'); return; }
+    if (!isLoggedIn) { toast.error('Please login first!'); router.push('/auth/login'); return; }
     if (!product) return;
     setAdding(true);
     try {
       await addToCart(product.id, quantity);
-      toast.success(`${product.name} cart mein add ho gaya! 🛒`);
+      toast.success(`${product.name} added to cart! 🛒`);
     } catch {
-      toast.error('Dobara try karein');
+      toast.error('Please try again');
     } finally {
       setAdding(false);
     }
@@ -65,18 +65,18 @@ export default function ProductDetailPage() {
   };
 
   const handleWishlist = async () => {
-    if (!isLoggedIn) { toast.error('Pehle login karein!'); return; }
+    if (!isLoggedIn) { toast.error('Please login first!'); return; }
     try {
       await api.post(`/api/wishlist/${product?.id}`);
       setWishlisted(w => !w);
-      toast.success(wishlisted ? 'Wishlist se hata diya' : 'Wishlist mein add! ❤️');
-    } catch { toast.error('Dobara try karein'); }
+      toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist! ❤️');
+    } catch { toast.error('Please try again'); }
   };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isLoggedIn) { toast.error('Pehle login karein!'); return; }
-    if (!reviewComment.trim()) { toast.error('Review likhein!'); return; }
+    if (!isLoggedIn) { toast.error('Please login first!'); return; }
+    if (!reviewComment.trim()) { toast.error('Please write a review!'); return; }
     setSubmittingReview(true);
     try {
       const res = await api.post(`/api/reviews/product/${product?.id}`, {
@@ -86,10 +86,10 @@ export default function ProductDetailPage() {
       setReviews(prev => [res.data, ...prev]);
       setReviewComment('');
       setReviewRating(5);
-      toast.success('Review submit ho gaya! Shukriya!');
+      toast.success('Review submitted! Thank you!');
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error?.response?.data?.message || 'Review submit nahi hua');
+      toast.error(error?.response?.data?.message || 'Failed to submit review');
     } finally {
       setSubmittingReview(false);
     }
@@ -124,17 +124,17 @@ export default function ProductDetailPage() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-red-600">Home</Link>
+          <Link href="/" className="hover:text-blue-600">Home</Link>
           <span>/</span>
-          <Link href="/products" className="hover:text-red-600">Products</Link>
+          <Link href="/products" className="hover:text-blue-600">Products</Link>
           <span>/</span>
-          <Link href={`/products?category=${encodeURIComponent(product.categoryName)}`} className="hover:text-red-600">{product.categoryName}</Link>
+          <Link href={`/products?category=${encodeURIComponent(product.categoryName)}`} className="hover:text-blue-600">{product.categoryName}</Link>
           <span>/</span>
           <span className="text-gray-900 font-medium line-clamp-1">{product.name}</span>
         </div>
 
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-red-600 mb-4 text-sm font-medium transition-colors">
-          <ArrowLeft size={16} /> Wapas Jaein
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-4 text-sm font-medium transition-colors">
+          <ArrowLeft size={16} /> Go Back
         </button>
 
         {/* Main Product Section */}
@@ -150,7 +150,7 @@ export default function ProductDetailPage() {
                 )}
               </div>
               {disc > 0 && (
-                <span className="absolute top-4 left-4 bg-red-600 text-white text-sm font-black px-3 py-1.5 rounded-xl">
+                <span className="absolute top-4 left-4 bg-blue-600 text-white text-sm font-black px-3 py-1.5 rounded-xl">
                   -{disc}% OFF
                 </span>
               )}
@@ -163,7 +163,7 @@ export default function ProductDetailPage() {
 
             {/* Info */}
             <div className="flex flex-col">
-              <p className="text-red-600 font-semibold text-sm mb-1">{product.categoryName}</p>
+              <p className="text-blue-600 font-semibold text-sm mb-1">{product.categoryName}</p>
               <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-3 leading-tight">{product.name}</h1>
 
               {/* Rating */}
@@ -181,12 +181,12 @@ export default function ProductDetailPage() {
 
               {/* Price */}
               <div className="flex items-baseline gap-3 mb-4">
-                <span className="text-3xl font-black text-red-600">{formatPrice(product.salePrice || product.price)}</span>
+                <span className="text-3xl font-black text-blue-600">{formatPrice(product.salePrice || product.price)}</span>
                 {product.salePrice && (
                   <>
                     <span className="text-xl text-gray-400 line-through">{formatPrice(product.price)}</span>
                     <span className="text-green-600 font-bold text-sm">
-                      Rs. {formatPrice(product.price - product.salePrice)} bachein!
+                      Save Rs. {formatPrice(product.price - product.salePrice)}!
                     </span>
                   </>
                 )}
@@ -197,10 +197,10 @@ export default function ProductDetailPage() {
                 {inStock ? (
                   <span className="text-green-600 font-semibold text-sm flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full" />
-                    {product.stock <= 10 ? `Sirf ${product.stock} bachi hain!` : 'Stock Mein Hai'}
+                    {product.stock <= 10 ? `Only ${product.stock} left in stock!` : 'In Stock'}
                   </span>
                 ) : (
-                  <span className="text-red-600 font-semibold text-sm">Out of Stock</span>
+                  <span className="text-blue-600 font-semibold text-sm">Out of Stock</span>
                 )}
               </div>
 
@@ -227,34 +227,34 @@ export default function ProductDetailPage() {
                   {adding ? (
                     <><span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> Adding...</>
                   ) : (
-                    <><ShoppingCart size={18} /> Cart Mein Daalein</>
+                    <><ShoppingCart size={18} /> Add to Cart</>
                   )}
                 </button>
                 <button onClick={handleWishlist}
-                  className={`p-4 rounded-xl border-2 transition-all ${wishlisted ? 'bg-red-600 border-red-600 text-white' : 'border-gray-200 text-gray-500 hover:border-red-500 hover:text-red-600'}`}>
+                  className={`p-4 rounded-xl border-2 transition-all ${wishlisted ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-600'}`}>
                   <Heart size={20} fill={wishlisted ? 'currentColor' : 'none'} />
                 </button>
               </div>
 
               {inStock && (
                 <button onClick={handleBuyNow}
-                  className="w-full border-2 border-red-600 text-red-600 hover:bg-red-600 hover:text-white py-4 rounded-xl font-bold transition-all text-sm">
-                  Abhi Khareedein
+                  className="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white py-4 rounded-xl font-bold transition-all text-sm">
+                  Buy Now
                 </button>
               )}
 
               {/* Trust badges */}
               <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-3 gap-3">
                 <div className="flex flex-col items-center text-center gap-1">
-                  <Truck size={20} className="text-red-600" />
+                  <Truck size={20} className="text-blue-600" />
                   <span className="text-xs text-gray-600 font-medium">Free Delivery<br />Rs. 2000+</span>
                 </div>
                 <div className="flex flex-col items-center text-center gap-1">
-                  <RotateCcw size={20} className="text-red-600" />
+                  <RotateCcw size={20} className="text-blue-600" />
                   <span className="text-xs text-gray-600 font-medium">7 Day<br />Return</span>
                 </div>
                 <div className="flex flex-col items-center text-center gap-1">
-                  <Shield size={20} className="text-red-600" />
+                  <Shield size={20} className="text-blue-600" />
                   <span className="text-xs text-gray-600 font-medium">100%<br />Original</span>
                 </div>
               </div>
@@ -266,11 +266,11 @@ export default function ProductDetailPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex border-b border-gray-100">
             <button onClick={() => setActiveTab('details')}
-              className={`flex-1 py-4 font-bold text-sm transition-colors ${activeTab === 'details' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-500 hover:text-gray-700'}`}>
+              className={`flex-1 py-4 font-bold text-sm transition-colors ${activeTab === 'details' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
               Product Details
             </button>
             <button onClick={() => setActiveTab('reviews')}
-              className={`flex-1 py-4 font-bold text-sm transition-colors ${activeTab === 'reviews' ? 'text-red-600 border-b-2 border-red-600' : 'text-gray-500 hover:text-gray-700'}`}>
+              className={`flex-1 py-4 font-bold text-sm transition-colors ${activeTab === 'reviews' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
               Reviews ({reviews.length})
             </button>
           </div>
@@ -285,7 +285,7 @@ export default function ProductDetailPage() {
                 ) : (
                   <div className="text-center py-8 text-gray-400">
                     <Package size={40} className="mx-auto mb-3 opacity-50" />
-                    <p>Koi description nahi hai abhi</p>
+                    <p>No description available yet</p>
                   </div>
                 )}
               </div>
@@ -294,7 +294,7 @@ export default function ProductDetailPage() {
                 {/* Write Review */}
                 {isLoggedIn && (
                   <form onSubmit={handleSubmitReview} className="mb-8 p-5 bg-gray-50 rounded-2xl">
-                    <h3 className="font-bold text-gray-900 mb-4">Review Likhein</h3>
+                    <h3 className="font-bold text-gray-900 mb-4">Write a Review</h3>
                     <div className="flex items-center gap-2 mb-4">
                       <span className="text-sm text-gray-600 font-medium">Rating:</span>
                       {[1,2,3,4,5].map(s => (
@@ -304,11 +304,11 @@ export default function ProductDetailPage() {
                       ))}
                     </div>
                     <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)}
-                      placeholder="Is product ke baare mein apna tajurba likhein..."
-                      rows={3} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-red-500 resize-none mb-3" />
+                      placeholder="Share your experience with this product..."
+                      rows={3} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 resize-none mb-3" />
                     <button type="submit" disabled={submittingReview || !reviewComment.trim()}
                       className="btn-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm disabled:opacity-60">
-                      {submittingReview ? 'Submit ho raha hai...' : 'Review Submit Karein'}
+                      {submittingReview ? 'Submitting...' : 'Submit Review'}
                     </button>
                   </form>
                 )}
@@ -317,8 +317,8 @@ export default function ProductDetailPage() {
                 {reviews.length === 0 ? (
                   <div className="text-center py-10 text-gray-400">
                     <Star size={40} className="mx-auto mb-3 opacity-30" />
-                    <p className="font-medium">Abhi koi review nahi hai</p>
-                    <p className="text-sm">Pehle review likhein!</p>
+                    <p className="font-medium">No reviews yet</p>
+                    <p className="text-sm">Be the first to write a review!</p>
                   </div>
                 ) : (
                   <div className="space-y-4">

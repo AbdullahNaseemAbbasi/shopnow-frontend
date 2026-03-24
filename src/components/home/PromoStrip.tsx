@@ -1,7 +1,7 @@
 import { Truck, Shield, RotateCcw, Headphones } from 'lucide-react';
 
 const promos = [
-  { icon: Truck, title: 'Free Delivery', desc: 'On orders above Rs. 2,000', color: 'text-red-600' },
+  { icon: Truck, title: 'Free Delivery', desc: 'On orders above Rs. 2,000', color: 'text-blue-600' },
   { icon: Shield, title: '100% Secure', desc: 'Safe & secure payments', color: 'text-green-600' },
   { icon: RotateCcw, title: 'Easy Returns', desc: '7-day return policy', color: 'text-blue-600' },
   { icon: Headphones, title: '24/7 Support', desc: 'Always here to help', color: 'text-purple-600' },

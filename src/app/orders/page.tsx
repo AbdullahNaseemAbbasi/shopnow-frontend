@@ -13,7 +13,7 @@ const STATUS_CONFIG = {
   CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700', icon: CheckCircle },
   SHIPPED: { label: 'Shipped', color: 'bg-purple-100 text-purple-700', icon: Truck },
   DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-red-100 text-red-700', icon: XCircle },
+  CANCELLED: { label: 'Cancelled', color: 'bg-blue-100 text-blue-700', icon: XCircle },
 };
 
 export default function OrdersPage() {
@@ -36,7 +36,7 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-          <Package size={24} className="text-red-600" /> Mere Orders
+          <Package size={24} className="text-blue-600" /> My Orders
         </h1>
 
         {loading ? (
@@ -51,10 +51,10 @@ export default function OrdersPage() {
         ) : orders.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
             <div className="text-7xl mb-4">📦</div>
-            <h3 className="text-xl font-bold text-gray-700 mb-2">Koi order nahi hai</h3>
-            <p className="text-gray-400 mb-8">Abhi shopping karein!</p>
+            <h3 className="text-xl font-bold text-gray-700 mb-2">No orders yet</h3>
+            <p className="text-gray-400 mb-8">Start shopping now!</p>
             <Link href="/products" className="btn-primary text-white px-8 py-3 rounded-xl font-bold text-sm inline-block">
-              Shopping Karein
+              Start Shopping
             </Link>
           </div>
         ) : (
@@ -78,7 +78,7 @@ export default function OrdersPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-black text-lg text-red-600">{formatPrice(order.totalAmount)}</p>
+                        <p className="font-black text-lg text-blue-600">{formatPrice(order.totalAmount)}</p>
                         <p className="text-xs text-gray-400">{order.totalItems} item{order.totalItems > 1 ? 's' : ''}</p>
                       </div>
                     </div>
@@ -99,11 +99,11 @@ export default function OrdersPage() {
                         ))}
                         {order.items.length > 2 && (
                           <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-lg">
-                            +{order.items.length - 2} aur
+                            +{order.items.length - 2} more
                           </span>
                         )}
                       </div>
-                      <Link href={`/orders/${order.id}`} className="flex items-center gap-1 text-red-600 text-sm font-semibold hover:underline">
+                      <Link href={`/orders/${order.id}`} className="flex items-center gap-1 text-blue-600 text-sm font-semibold hover:underline">
                         Details <ChevronRight size={14} />
                       </Link>
                     </div>
@@ -119,8 +119,8 @@ export default function OrdersPage() {
                           const active = i <= currentIdx;
                           return (
                             <div key={s} className="flex items-center flex-1">
-                              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${active ? 'bg-red-600' : 'bg-gray-200'}`} />
-                              {i < 3 && <div className={`flex-1 h-0.5 ${i < currentIdx ? 'bg-red-600' : 'bg-gray-200'}`} />}
+                              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${active ? 'bg-blue-600' : 'bg-gray-200'}`} />
+                              {i < 3 && <div className={`flex-1 h-0.5 ${i < currentIdx ? 'bg-blue-600' : 'bg-gray-200'}`} />}
                             </div>
                           );
                         })}

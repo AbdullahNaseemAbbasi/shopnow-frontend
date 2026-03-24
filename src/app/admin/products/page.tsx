@@ -38,7 +38,7 @@ export default function AdminProductsPage() {
         setProducts(res.data.content || []);
         setTotalPages(res.data.totalPages || 0);
       })
-      .catch(() => toast.error('Products load nahi hue'))
+      .catch(() => toast.error('Failed to load products'))
       .finally(() => setLoading(false));
   };
 
@@ -66,7 +66,7 @@ export default function AdminProductsPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.price || !form.stock || !form.categoryId) {
-      toast.error('Sab zaruri fields bharein!');
+      toast.error('Please fill all required fields!');
       return;
     }
     setSaving(true);
@@ -81,32 +81,32 @@ export default function AdminProductsPage() {
       if (editId) {
         const res = await api.put(`/api/products/${editId}`, payload);
         setProducts(prev => prev.map(p => p.id === editId ? res.data : p));
-        toast.success('Product update ho gaya!');
+        toast.success('Product updated successfully!');
       } else {
         const res = await api.post('/api/products', payload);
         setProducts(prev => [res.data, ...prev]);
-        toast.success('Naya product add ho gaya!');
+        toast.success('Product added successfully!');
       }
       setShowForm(false);
       setEditId(null);
       setForm(EMPTY_FORM);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
-      toast.error(error?.response?.data?.message || 'Save nahi hua');
+      toast.error(error?.response?.data?.message || 'Failed to save');
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Yeh product delete karein?')) return;
+    if (!confirm('Delete this product?')) return;
     setDeletingId(id);
     try {
       await api.delete(`/api/products/${id}`);
       setProducts(prev => prev.filter(p => p.id !== id));
-      toast.success('Product delete ho gaya!');
+      toast.success('Product deleted!');
     } catch {
-      toast.error('Delete nahi hua');
+      toast.error('Delete failed');
     } finally {
       setDeletingId(null);
     }
@@ -115,16 +115,16 @@ export default function AdminProductsPage() {
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { toast.error('Image 10MB se chhoti honi chahiye'); return; }
+    if (file.size > 10 * 1024 * 1024) { toast.error('Image must be smaller than 10MB'); return; }
     setUploading(true);
     try {
       const formData = new FormData();
       formData.append('file', file);
       const res = await api.post('/api/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
       setForm(f => ({ ...f, imageUrl: res.data.url }));
-      toast.success('Image upload ho gayi!');
+      toast.success('Image uploaded successfully!');
     } catch {
-      toast.error('Image upload nahi hui');
+      toast.error('Image upload failed');
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -144,7 +144,7 @@ export default function AdminProductsPage() {
           <p className="text-gray-500 text-sm">{products.length} products</p>
         </div>
         <button onClick={handleOpenAdd} className="flex items-center gap-2 btn-primary text-white px-4 py-2.5 rounded-xl text-sm font-bold">
-          <Plus size={16} /> Naya Product
+          <Plus size={16} /> New Product
         </button>
       </div>
 
@@ -152,7 +152,7 @@ export default function AdminProductsPage() {
       {showForm && (
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="font-black text-gray-900">{editId ? 'Product Edit Karein' : 'Naya Product Add Karein'}</h2>
+            <h2 className="font-black text-gray-900">{editId ? 'Edit Product' : 'Add New Product'}</h2>
             <button onClick={() => { setShowForm(false); setEditId(null); }} className="p-2 hover:bg-gray-100 rounded-xl">
               <X size={18} />
             </button>
@@ -162,35 +162,35 @@ export default function AdminProductsPage() {
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
                 <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value, slug: generateSlug(e.target.value) }))}
-                  placeholder="Samsung Galaxy S24" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" required />
+                  placeholder="Samsung Galaxy S24" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Slug (auto-generated)</label>
                 <input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500 font-mono text-xs" />
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 font-mono text-xs" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Category *</label>
                 <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" required>
-                  <option value="">Category chunein</option>
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required>
+                  <option value="">Select a category</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Price (Rs.) *</label>
                 <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                  placeholder="29999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" required />
+                  placeholder="29999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Sale Price (optional)</label>
                 <input type="number" value={form.salePrice} onChange={e => setForm(f => ({ ...f, salePrice: e.target.value }))}
-                  placeholder="24999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" />
+                  placeholder="24999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Stock *</label>
                 <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
-                  placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" required />
+                  placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Product Image</label>
@@ -207,14 +207,14 @@ export default function AdminProductsPage() {
                     {/* Upload Button */}
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                     <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                      className="flex items-center gap-2 w-full border-2 border-dashed border-gray-300 hover:border-red-400 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 hover:text-red-600 transition-colors disabled:opacity-60">
-                      <Upload size={15} /> {uploading ? 'Upload ho raha hai...' : 'Computer se Upload Karein'}
+                      className="flex items-center gap-2 w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
+                      <Upload size={15} /> {uploading ? 'Uploading...' : 'Upload from Computer'}
                     </button>
                     {/* Or paste URL */}
                     <div className="flex items-center gap-2">
                       <Link size={13} className="text-gray-400 flex-shrink-0" />
                       <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
-                        placeholder="ya URL paste karein..." className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-red-500" />
+                        placeholder="or paste URL here..." className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500" />
                     </div>
                   </div>
                 </div>
@@ -222,24 +222,24 @@ export default function AdminProductsPage() {
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  rows={3} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500 resize-none" />
+                  rows={3} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 resize-none" />
               </div>
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.featured} onChange={e => setForm(f => ({ ...f, featured: e.target.checked }))} className="w-4 h-4 accent-red-600" />
+                  <input type="checkbox" checked={form.featured} onChange={e => setForm(f => ({ ...f, featured: e.target.checked }))} className="w-4 h-4 accent-blue-600" />
                   <span className="text-sm font-semibold text-gray-700">Featured</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="w-4 h-4 accent-red-600" />
+                  <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="w-4 h-4 accent-blue-600" />
                   <span className="text-sm font-semibold text-gray-700">Active</span>
                 </label>
               </div>
             </div>
             <div className="flex gap-3">
               <button type="submit" disabled={saving} className="flex items-center gap-1.5 btn-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60">
-                <Check size={15} /> {saving ? 'Save ho raha hai...' : 'Save Karein'}
+                <Check size={15} /> {saving ? 'Saving...' : 'Save'}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold hover:border-red-400">
+              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold hover:border-blue-400">
                 Cancel
               </button>
             </div>
@@ -251,7 +251,7 @@ export default function AdminProductsPage() {
       <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-4">
         <div className="flex items-center gap-3 border-2 border-gray-200 rounded-xl px-3 py-2 focus-within:border-red-500 transition-colors">
           <Search size={16} className="text-gray-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Product search karein..."
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..."
             className="flex-1 text-sm outline-none" />
         </div>
       </div>
@@ -265,7 +265,7 @@ export default function AdminProductsPage() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-16">
             <PackageSearch size={48} className="mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500 font-medium">Koi product nahi mila</p>
+            <p className="text-gray-500 font-medium">No products found</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -317,7 +317,7 @@ export default function AdminProductsPage() {
                         <button onClick={() => handleOpenEdit(product)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
                           <Pencil size={15} />
                         </button>
-                        <button onClick={() => handleDelete(product.id)} disabled={deletingId === product.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40">
+                        <button onClick={() => handleDelete(product.id)} disabled={deletingId === product.id} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-40">
                           <Trash2 size={15} />
                         </button>
                       </div>
@@ -333,10 +333,10 @@ export default function AdminProductsPage() {
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 p-4 border-t border-gray-100">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-red-500 hover:text-red-600">Prev</button>
+              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-red-500 hover:text-blue-600">Prev</button>
             <span className="px-3 py-1.5 text-xs font-bold text-gray-600">{page + 1} / {totalPages}</span>
             <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
-              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-red-500 hover:text-red-600">Next</button>
+              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-red-500 hover:text-blue-600">Next</button>
           </div>
         )}
       </div>

@@ -13,7 +13,7 @@ const STATUS_CONFIG = {
   CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700 border-blue-200',       icon: CheckCircle },
   SHIPPED:   { label: 'Shipped',   color: 'bg-purple-100 text-purple-700 border-purple-200', icon: Truck },
   DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700 border-green-200',    icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-red-100 text-red-700 border-red-200',          icon: XCircle },
+  CANCELLED: { label: 'Cancelled', color: 'bg-blue-100 text-blue-700 border-blue-200',          icon: XCircle },
 };
 
 const PAYMENT_CONFIG = {
@@ -41,7 +41,7 @@ export default function OrderDetailPage() {
   }, [isLoggedIn, id, router]);
 
   const toast_error = () => {
-    import('react-hot-toast').then(({ default: toast }) => toast.error('Order load nahi hua'));
+    import('react-hot-toast').then(({ default: toast }) => toast.error('Failed to load order'));
   };
 
   if (!isLoggedIn) return null;
@@ -61,9 +61,9 @@ export default function OrderDetailPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="text-center">
         <div className="text-6xl mb-4">📦</div>
-        <h3 className="text-xl font-bold text-gray-700 mb-2">Order nahi mila</h3>
+        <h3 className="text-xl font-bold text-gray-700 mb-2">Order not found</h3>
         <Link href="/orders" className="btn-primary text-white px-6 py-3 rounded-xl font-bold text-sm inline-block mt-4">
-          Orders Dekhein
+          View Orders
         </Link>
       </div>
     </div>
@@ -78,8 +78,8 @@ export default function OrderDetailPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Back */}
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-red-600 mb-6 text-sm font-medium transition-colors">
-          <ArrowLeft size={16} /> Wapas Jaein
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6 text-sm font-medium transition-colors">
+          <ArrowLeft size={16} /> Go Back
         </button>
 
         {/* Header */}
@@ -87,7 +87,7 @@ export default function OrderDetailPage() {
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Package size={20} className="text-red-600" />
+                <Package size={20} className="text-blue-600" />
                 <h1 className="text-xl font-black text-gray-900">{order.orderNumber}</h1>
               </div>
               <p className="text-sm text-gray-500">
@@ -111,15 +111,15 @@ export default function OrderDetailPage() {
                 {STEPS.map((s, i) => (
                   <div key={s} className="flex items-center flex-1 last:flex-none">
                     <div className="flex flex-col items-center">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-colors ${i <= currentStep ? 'bg-red-600 border-red-600 text-white' : 'bg-white border-gray-200 text-gray-400'}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs border-2 transition-colors ${i <= currentStep ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-gray-200 text-gray-400'}`}>
                         {i < currentStep ? '✓' : i + 1}
                       </div>
-                      <span className={`text-xs mt-1 font-medium whitespace-nowrap ${i <= currentStep ? 'text-red-600' : 'text-gray-400'}`}>
+                      <span className={`text-xs mt-1 font-medium whitespace-nowrap ${i <= currentStep ? 'text-blue-600' : 'text-gray-400'}`}>
                         {STEP_LABELS[i]}
                       </span>
                     </div>
                     {i < STEPS.length - 1 && (
-                      <div className={`flex-1 h-0.5 mx-2 mb-5 ${i < currentStep ? 'bg-red-600' : 'bg-gray-200'}`} />
+                      <div className={`flex-1 h-0.5 mx-2 mb-5 ${i < currentStep ? 'bg-blue-600' : 'bg-gray-200'}`} />
                     )}
                   </div>
                 ))}
@@ -164,22 +164,22 @@ export default function OrderDetailPage() {
               </div>
               <div className="border-t pt-2 flex justify-between font-black text-base">
                 <span>Total</span>
-                <span className="text-red-600">{formatPrice(order.totalAmount + (order.totalAmount < 2000 ? 200 : 0))}</span>
+                <span className="text-blue-600">{formatPrice(order.totalAmount + (order.totalAmount < 2000 ? 200 : 0))}</span>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="font-black text-gray-900 mb-4 flex items-center gap-2">
-              <MapPin size={16} className="text-red-600" /> Shipping Address
+              <MapPin size={16} className="text-blue-600" /> Shipping Address
             </h2>
             <p className="text-sm text-gray-700 leading-relaxed">{order.shippingAddress}</p>
           </div>
         </div>
 
         <div className="mt-6 text-center">
-          <Link href="/orders" className="text-red-600 font-semibold text-sm hover:underline">
-            ← Saare Orders Dekhein
+          <Link href="/orders" className="text-blue-600 font-semibold text-sm hover:underline">
+            ← View All Orders
           </Link>
         </div>
       </div>
