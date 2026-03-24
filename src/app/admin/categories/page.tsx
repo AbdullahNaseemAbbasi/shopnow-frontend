@@ -1,0 +1,178 @@
+'use client';
+import { useEffect, useState } from 'react';
+import { Plus, Pencil, Trash2, X, Check, Tag } from 'lucide-react';
+import api from '@/lib/axios';
+import { Category } from '@/types';
+import toast from 'react-hot-toast';
+
+const EMPTY_FORM = { name: '', description: '', imageUrl: '' };
+
+export default function AdminCategoriesPage() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = () => {
+    setLoading(true);
+    api.get('/api/categories')
+      .then(res => {
+        const data = res.data?.content || res.data;
+        setCategories(Array.isArray(data) ? data : []);
+      })
+      .catch(() => toast.error('Categories load nahi hue'))
+      .finally(() => setLoading(false));
+  };
+
+  const handleOpenAdd = () => {
+    setEditId(null);
+    setForm(EMPTY_FORM);
+    setShowForm(true);
+  };
+
+  const handleOpenEdit = (cat: Category) => {
+    setEditId(cat.id);
+    setForm({ name: cat.name, description: cat.description || '', imageUrl: cat.imageUrl || '' });
+    setShowForm(true);
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.name.trim()) { toast.error('Category ka naam daalein!'); return; }
+    setSaving(true);
+    try {
+      if (editId) {
+        const res = await api.put(`/api/categories/${editId}`, form);
+        setCategories(prev => prev.map(c => c.id === editId ? res.data : c));
+        toast.success('Category update ho gayi!');
+      } else {
+        const res = await api.post('/api/categories', form);
+        setCategories(prev => [...prev, res.data]);
+        toast.success('Naya category add ho gayi!');
+      }
+      setShowForm(false);
+      setEditId(null);
+      setForm(EMPTY_FORM);
+    } catch (err: unknown) {
+      const error = err as { response?: { data?: { message?: string } } };
+      toast.error(error?.response?.data?.message || 'Save nahi hua');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Yeh category delete karein? Is se linked products affect ho sakte hain.')) return;
+    setDeletingId(id);
+    try {
+      await api.delete(`/api/categories/${id}`);
+      setCategories(prev => prev.filter(c => c.id !== id));
+      toast.success('Category delete ho gayi!');
+    } catch {
+      toast.error('Delete nahi hua — products linked ho sakte hain');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-black text-gray-900">Categories</h1>
+          <p className="text-gray-500 text-sm">{categories.length} categories</p>
+        </div>
+        <button onClick={handleOpenAdd} className="flex items-center gap-2 btn-primary text-white px-4 py-2.5 rounded-xl text-sm font-bold">
+          <Plus size={16} /> Naya Category
+        </button>
+      </div>
+
+      {/* Form */}
+      {showForm && (
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-black text-gray-900">{editId ? 'Category Edit Karein' : 'Naya Category'}</h2>
+            <button onClick={() => { setShowForm(false); setEditId(null); }} className="p-2 hover:bg-gray-100 rounded-xl">
+              <X size={18} />
+            </button>
+          </div>
+          <form onSubmit={handleSave}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Category Name *</label>
+                <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="Electronics" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" required />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Image URL</label>
+                <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
+                  placeholder="https://..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500" />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
+                <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  rows={2} placeholder="Category ki description..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-red-500 resize-none" />
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button type="submit" disabled={saving} className="flex items-center gap-1.5 btn-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60">
+                <Check size={15} /> {saving ? 'Save ho raha hai...' : 'Save Karein'}
+              </button>
+              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold">
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Categories Grid */}
+      {loading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />)}
+        </div>
+      ) : categories.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-gray-100 text-center py-16">
+          <Tag size={48} className="mx-auto text-gray-300 mb-3" />
+          <p className="text-gray-500 font-medium">Koi category nahi hai</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {categories.map(cat => (
+            <div key={cat.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                  {cat.imageUrl ? (
+                    <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover rounded-xl" />
+                  ) : (
+                    <Tag size={20} className="text-red-600" />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-gray-900 text-sm truncate">{cat.name}</p>
+                  {cat.description && <p className="text-xs text-gray-400 line-clamp-1 mt-0.5">{cat.description}</p>}
+                  <p className="text-xs text-gray-300 font-mono mt-0.5">{cat.slug}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <button onClick={() => handleOpenEdit(cat)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+                  <Pencil size={15} />
+                </button>
+                <button onClick={() => handleDelete(cat.id)} disabled={deletingId === cat.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40">
+                  <Trash2 size={15} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

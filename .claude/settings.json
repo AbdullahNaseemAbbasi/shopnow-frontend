@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xargs grep:*)",
+      "Bash(xargs cat:*)",
+      "Read(//d/shopnow-backend/**)"
+    ],
+    "additionalDirectories": [
+      "d:\\shopnow-frontend\\src\\app\\products\\[slug]",
+      "d:\\shopnow-backend\\backend\\src\\main\\java\\com\\shopnow\\backend\\repository",
+      "d:\\shopnow-backend\\backend\\src\\main\\java\\com\\shopnow\\backend\\service",
+      "d:\\shopnow-backend\\backend\\src\\main\\java\\com\\shopnow\\backend\\controller"
+    ]
+  }
+}

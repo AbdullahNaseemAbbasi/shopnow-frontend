@@ -1,0 +1,140 @@
+'use client';
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import api from '@/lib/axios';
+import { Category } from '@/types';
+
+const GRADIENTS = [
+  'from-slate-900 via-red-950 to-slate-900',
+  'from-purple-900 via-red-900 to-purple-900',
+  'from-blue-900 via-red-950 to-blue-900',
+  'from-green-900 via-emerald-900 to-slate-900',
+  'from-orange-900 via-red-900 to-slate-900',
+];
+
+const ACCENTS = ['bg-red-600', 'bg-purple-600', 'bg-blue-600', 'bg-emerald-600', 'bg-orange-600'];
+
+const EMOJIS: Record<string, string> = {
+  'Electronics': '📱', 'Fashion': '👗', 'Ladies Fashion': '👗',
+  'Gents Fashion': '👘', 'Beauty': '💄', 'Home & Living': '🏠',
+  'Sports': '⚽', 'Books': '📚', 'Kids': '🧸', 'Groceries': '🛒',
+};
+
+const BADGES = ['Mega Sale', 'New Collection', 'Best Deals', 'Hot Picks', 'Top Rated'];
+const TAGS = ['Up to 50% OFF', 'Shop Now', 'Explore Collection', 'View Deals', 'Discover More'];
+
+export default function HeroBanner() {
+  const [current, setCurrent] = useState(0);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    api.get('/api/categories')
+      .then(res => {
+        const data = res.data?.content || res.data;
+        if (Array.isArray(data)) setCategories(data.slice(0, 5));
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  useEffect(() => {
+    if (categories.length === 0) return;
+    const timer = setInterval(() => setCurrent(prev => (prev + 1) % categories.length), 5000);
+    return () => clearInterval(timer);
+  }, [categories.length]);
+
+  const prev = () => setCurrent(prev => (prev - 1 + categories.length) % categories.length);
+  const next = () => setCurrent(prev => (prev + 1) % categories.length);
+
+  if (loading) {
+    return (
+      <div className="h-64 md:h-80 bg-gradient-to-r from-slate-900 via-red-950 to-slate-900 animate-pulse" />
+    );
+  }
+
+  if (categories.length === 0) return null;
+
+  const cat = categories[current];
+  const emoji = EMOJIS[cat.name] || '🛍️';
+  const bg = GRADIENTS[current % GRADIENTS.length];
+  const accent = ACCENTS[current % ACCENTS.length];
+  const badge = BADGES[current % BADGES.length];
+  const tag = TAGS[current % TAGS.length];
+
+  return (
+    <div className={`relative bg-gradient-to-r ${bg} overflow-hidden transition-all duration-700`}>
+      <div className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="text-white space-y-4 md:w-1/2 animate-fade-in-up">
+            <span className={`inline-block ${accent} text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide`}>
+              {badge}
+            </span>
+            <h1 className="text-4xl md:text-6xl font-black leading-tight">
+              {cat.name}
+              {cat.description && (
+                <span className="block text-red-400 text-lg md:text-2xl font-light mt-2 leading-relaxed max-w-md">
+                  {cat.description}
+                </span>
+              )}
+            </h1>
+            {!cat.description && (
+              <p className="text-gray-300 text-lg max-w-md">
+                Behtareen quality ke products, sab se behtar damo par. Abhi shop karein!
+              </p>
+            )}
+            <div className="flex items-center gap-3">
+              <span className="bg-red-600 text-white text-sm font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
+                <ShoppingBag size={14} /> {tag}
+              </span>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Link
+                href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`}
+                className="btn-primary text-white px-8 py-3 rounded-xl font-bold text-sm hover:scale-105 transition-transform inline-block"
+              >
+                Shop {cat.name}
+              </Link>
+              <Link href="/products" className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all inline-block">
+                Sab Dekhein
+              </Link>
+            </div>
+          </div>
+
+          <div className="md:w-1/2 flex justify-center">
+            {cat.imageUrl ? (
+              <img
+                src={cat.imageUrl}
+                alt={cat.name}
+                className="max-h-64 md:max-h-80 object-contain rounded-2xl animate-float"
+              />
+            ) : (
+              <div className="text-[120px] md:text-[200px] animate-float select-none">{emoji}</div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Controls */}
+      {categories.length > 1 && (
+        <>
+          <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all">
+            <ChevronLeft size={24} />
+          </button>
+          <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all">
+            <ChevronRight size={24} />
+          </button>
+        </>
+      )}
+
+      {/* Dots */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        {categories.map((_, i) => (
+          <button key={i} onClick={() => setCurrent(i)}
+            className={`transition-all rounded-full ${i === current ? 'w-8 h-2 bg-red-500' : 'w-2 h-2 bg-white/50'}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
