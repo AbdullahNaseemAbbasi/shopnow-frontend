@@ -17,11 +17,13 @@ export const useAuthStore = create<AuthState>()(
 
       login: (user: User) => {
         localStorage.setItem("shopnow_token", user.token);
+        document.cookie = `shopnow-auth=${encodeURIComponent(JSON.stringify({ state: { user } }))};path=/;max-age=86400`;
         set({ user, isLoggedIn: true });
       },
 
       logout: () => {
         localStorage.removeItem("shopnow_token");
+        document.cookie = "shopnow-auth=;path=/;max-age=0";
         set({ user: null, isLoggedIn: false });
       },
     }),
