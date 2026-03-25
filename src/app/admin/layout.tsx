@@ -19,14 +19,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const { user, isLoggedIn, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     if (!isLoggedIn) { router.push('/auth/login'); return; }
     if (user?.role !== 'ADMIN') {
       toast.error('Admin access required!');
       router.push('/');
     }
-  }, [isLoggedIn, user, router]);
+  }, [isLoggedIn, user, router, mounted]);
 
   const handleLogout = () => {
     logout();
@@ -34,6 +40,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push('/');
   };
 
+  if (!mounted) return null;
   if (!isLoggedIn || user?.role !== 'ADMIN') return null;
 
   const Sidebar = () => (
