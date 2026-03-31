@@ -143,13 +143,13 @@ export default function AdminProductsPage() {
           <h1 className="text-2xl font-black text-gray-900">Products</h1>
           <p className="text-gray-500 text-sm">{products.length} products</p>
         </div>
-        <button onClick={handleOpenAdd} className="flex items-center gap-2 btn-primary text-white px-4 py-2.5 rounded-xl text-sm font-bold">
+        <button onClick={handleOpenAdd} className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors">
           <Plus size={16} /> New Product
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-black text-gray-900">{editId ? 'Edit Product' : 'Add New Product'}</h2>
             <button onClick={() => { setShowForm(false); setEditId(null); }} className="p-2 hover:bg-gray-100 rounded-xl">
@@ -232,10 +232,10 @@ export default function AdminProductsPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button type="submit" disabled={saving} className="flex items-center gap-1.5 btn-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60">
+              <button type="submit" disabled={saving} className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60 transition-colors">
                 <Check size={15} /> {saving ? 'Saving...' : 'Save'}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold hover:border-blue-400">
+              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold hover:border-gray-400 transition-colors">
                 Cancel
               </button>
             </div>
@@ -243,15 +243,15 @@ export default function AdminProductsPage() {
         </div>
       )}
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-4">
-        <div className="flex items-center gap-3 border-2 border-gray-200 rounded-xl px-3 py-2 focus-within:border-red-500 transition-colors">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 mb-4">
+        <div className="flex items-center gap-3 border-2 border-gray-200 rounded-xl px-3 py-2 focus-within:border-blue-500 transition-colors">
           <Search size={16} className="text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..."
             className="flex-1 text-sm outline-none" />
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
         {loading ? (
           <div className="p-6 space-y-3">
             {[...Array(5)].map((_, i) => <div key={i} className="skeleton h-14 rounded-xl" />)}
@@ -264,7 +264,7 @@ export default function AdminProductsPage() {
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-gray-50 border-b border-gray-200">
                 <tr>
                   <th className="text-left text-xs font-bold text-gray-500 uppercase px-4 py-3">Product</th>
                   <th className="text-left text-xs font-bold text-gray-500 uppercase px-4 py-3 hidden md:table-cell">Category</th>
@@ -274,7 +274,7 @@ export default function AdminProductsPage() {
                   <th className="text-right text-xs font-bold text-gray-500 uppercase px-4 py-3">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-gray-100">
                 {filtered.map(product => (
                   <tr key={product.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
@@ -292,18 +292,18 @@ export default function AdminProductsPage() {
                       <span className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-full font-medium">{product.categoryName}</span>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-bold text-red-600 text-sm">{formatPrice(product.salePrice || product.price)}</p>
+                      <p className="font-bold text-gray-900 text-sm">{formatPrice(product.salePrice || product.price)}</p>
                       {product.salePrice && <p className="text-xs text-gray-400 line-through">{formatPrice(product.price)}</p>}
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${product.stock === 0 ? 'bg-red-100 text-red-600' : product.stock <= 10 ? 'bg-orange-100 text-orange-600' : 'bg-green-100 text-green-600'}`}>
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${product.stock === 0 ? 'bg-red-50 text-red-600' : product.stock <= 10 ? 'bg-gray-200 text-gray-700' : 'bg-blue-50 text-blue-700'}`}>
                         {product.stock === 0 ? 'Out of Stock' : `${product.stock} units`}
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
                       <div className="flex gap-1.5">
-                        {product.active && <span className="text-xs bg-green-100 text-green-600 px-2 py-0.5 rounded-full font-medium">Active</span>}
-                        {product.featured && <span className="text-xs bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-medium">Featured</span>}
+                        {product.active && <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">Active</span>}
+                        {product.featured && <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">Featured</span>}
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -311,7 +311,7 @@ export default function AdminProductsPage() {
                         <button onClick={() => handleOpenEdit(product)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
                           <Pencil size={15} />
                         </button>
-                        <button onClick={() => handleDelete(product.id)} disabled={deletingId === product.id} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-40">
+                        <button onClick={() => handleDelete(product.id)} disabled={deletingId === product.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40">
                           <Trash2 size={15} />
                         </button>
                       </div>
@@ -324,12 +324,12 @@ export default function AdminProductsPage() {
         )}
 
         {totalPages > 1 && (
-          <div className="flex justify-center gap-2 p-4 border-t border-gray-100">
+          <div className="flex justify-center gap-2 p-4 border-t border-gray-200">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-red-500 hover:text-blue-600">Prev</button>
+              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-blue-500 hover:text-blue-600 transition-colors">Prev</button>
             <span className="px-3 py-1.5 text-xs font-bold text-gray-600">{page + 1} / {totalPages}</span>
             <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
-              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-red-500 hover:text-blue-600">Next</button>
+              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-blue-500 hover:text-blue-600 transition-colors">Next</button>
           </div>
         )}
       </div>

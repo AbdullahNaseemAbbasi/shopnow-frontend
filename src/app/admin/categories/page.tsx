@@ -110,13 +110,13 @@ export default function AdminCategoriesPage() {
           <h1 className="text-2xl font-black text-gray-900">Categories</h1>
           <p className="text-gray-500 text-sm">{categories.length} categories</p>
         </div>
-        <button onClick={handleOpenAdd} className="flex items-center gap-2 btn-primary text-white px-4 py-2.5 rounded-xl text-sm font-bold">
+        <button onClick={handleOpenAdd} className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors">
           <Plus size={16} /> New Category
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-black text-gray-900">{editId ? 'Edit Category' : 'New Category'}</h2>
             <button onClick={() => { setShowForm(false); setEditId(null); }} className="p-2 hover:bg-gray-100 rounded-xl">
@@ -133,11 +133,11 @@ export default function AdminCategoriesPage() {
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Category Image</label>
                 <div className="flex gap-3 items-start">
-                  <div className="w-16 h-16 rounded-xl border-2 border-gray-200 flex-shrink-0 overflow-hidden bg-blue-50 flex items-center justify-center">
+                  <div className="w-16 h-16 rounded-xl border-2 border-gray-200 flex-shrink-0 overflow-hidden bg-gray-50 flex items-center justify-center">
                     {form.imageUrl ? (
                       <img src={form.imageUrl} alt="preview" className="w-full h-full object-cover" />
                     ) : (
-                      <Tag size={18} className="text-red-400" />
+                      <Tag size={18} className="text-gray-400" />
                     )}
                   </div>
                   <div className="flex-1 space-y-2">
@@ -161,10 +161,10 @@ export default function AdminCategoriesPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button type="submit" disabled={saving} className="flex items-center gap-1.5 btn-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60">
+              <button type="submit" disabled={saving} className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60 transition-colors">
                 <Check size={15} /> {saving ? 'Saving...' : 'Save'}
               </button>
-              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold">
+              <button type="button" onClick={() => { setShowForm(false); setEditId(null); }} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold hover:border-gray-400 transition-colors">
                 Cancel
               </button>
             </div>
@@ -177,20 +177,20 @@ export default function AdminCategoriesPage() {
           {[...Array(8)].map((_, i) => <div key={i} className="skeleton h-28 rounded-2xl" />)}
         </div>
       ) : categories.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 text-center py-16">
+        <div className="bg-white rounded-2xl border border-gray-200 text-center py-16">
           <Tag size={48} className="mx-auto text-gray-300 mb-3" />
           <p className="text-gray-500 font-medium">No categories found</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {categories.map(cat => (
-            <div key={cat.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 flex items-center justify-between gap-3">
+            <div key={cat.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex items-center justify-between gap-3 hover:border-blue-200 hover:shadow-md transition-all">
               <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
                   {cat.imageUrl ? (
                     <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover rounded-xl" />
                   ) : (
-                    <Tag size={20} className="text-red-600" />
+                    <Tag size={20} className="text-gray-500" />
                   )}
                 </div>
                 <div className="min-w-0">
@@ -203,7 +203,7 @@ export default function AdminCategoriesPage() {
                 <button onClick={() => handleOpenEdit(cat)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
                   <Pencil size={15} />
                 </button>
-                <button onClick={() => handleDelete(cat.id)} disabled={deletingId === cat.id} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-40">
+                <button onClick={() => handleDelete(cat.id)} disabled={deletingId === cat.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40">
                   <Trash2 size={15} />
                 </button>
               </div>

@@ -89,13 +89,13 @@ export default function AdminCouponsPage() {
           <h1 className="text-2xl font-black text-gray-900">Coupons</h1>
           <p className="text-gray-500 text-sm">{coupons.length} coupons</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="flex items-center gap-2 btn-primary text-white px-4 py-2.5 rounded-xl text-sm font-bold">
+        <button onClick={() => setShowForm(true)} className="flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white px-4 py-2.5 rounded-xl text-sm font-bold transition-colors">
           <Plus size={16} /> New Coupon
         </button>
       </div>
 
       {showForm && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mb-6">
           <div className="flex items-center justify-between mb-5">
             <h2 className="font-black text-gray-900">Create New Coupon</h2>
             <button onClick={() => setShowForm(false)} className="p-2 hover:bg-gray-100 rounded-xl">
@@ -151,10 +151,10 @@ export default function AdminCouponsPage() {
               </div>
             </div>
             <div className="flex gap-3">
-              <button type="submit" disabled={saving} className="flex items-center gap-1.5 btn-primary text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60">
+              <button type="submit" disabled={saving} className="flex items-center gap-1.5 bg-gray-900 hover:bg-gray-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold disabled:opacity-60 transition-colors">
                 <Check size={15} /> {saving ? 'Creating...' : 'Create Coupon'}
               </button>
-              <button type="button" onClick={() => setShowForm(false)} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold">
+              <button type="button" onClick={() => setShowForm(false)} className="border-2 border-gray-200 text-gray-600 px-5 py-2.5 rounded-xl text-sm font-semibold hover:border-gray-400 transition-colors">
                 Cancel
               </button>
             </div>
@@ -167,7 +167,7 @@ export default function AdminCouponsPage() {
           {[...Array(3)].map((_, i) => <div key={i} className="skeleton h-24 rounded-2xl" />)}
         </div>
       ) : coupons.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 text-center py-16">
+        <div className="bg-white rounded-2xl border border-gray-200 text-center py-16">
           <Ticket size={48} className="mx-auto text-gray-300 mb-3" />
           <p className="text-gray-500 font-medium">No coupons found</p>
         </div>
@@ -176,20 +176,20 @@ export default function AdminCouponsPage() {
           {coupons.map(coupon => {
             const expired = isExpired(coupon.expiresAt);
             return (
-              <div key={coupon.id} className={`bg-white rounded-2xl border shadow-sm p-5 ${expired ? 'border-gray-100 opacity-60' : 'border-gray-100'}`}>
+              <div key={coupon.id} className={`bg-white rounded-2xl border shadow-sm p-5 ${expired ? 'border-gray-200 opacity-60' : 'border-gray-200 hover:border-blue-200 transition-colors'}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 flex-1">
-                    <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Ticket size={20} className="text-red-600" />
+                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Ticket size={20} className="text-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
                         <span className="font-black text-gray-900 text-lg font-mono tracking-widest">{coupon.code}</span>
-                        <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${coupon.discountType === 'PERCENTAGE' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
+                        <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${coupon.discountType === 'PERCENTAGE' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
                           {coupon.discountType === 'PERCENTAGE' ? <Percent size={11} /> : <DollarSign size={11} />}
                           {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}% OFF` : `Rs. ${coupon.discountValue} OFF`}
                         </span>
-                        {expired && <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">Expired</span>}
+                        {expired && <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-bold">Expired</span>}
                       </div>
                       {coupon.description && <p className="text-xs text-gray-500 mb-2">{coupon.description}</p>}
                       <div className="flex flex-wrap gap-3 text-xs text-gray-500">

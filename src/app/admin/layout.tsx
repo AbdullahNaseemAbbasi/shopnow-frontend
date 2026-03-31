@@ -47,7 +47,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     <div className="flex flex-col h-full">
       <div className="p-5 border-b border-gray-800">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
             <span className="text-white font-black text-sm">S</span>
           </div>
           <div>
@@ -63,7 +63,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           return (
             <Link key={href} href={href}
               onClick={() => setSidebarOpen(false)}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-red-600 text-white shadow-lg shadow-red-600/30' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${active ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30' : 'text-gray-400 hover:bg-gray-800 hover:text-white'}`}>
               <Icon size={18} />
               {label}
               {active && <ChevronRight size={14} className="ml-auto" />}
@@ -74,7 +74,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       <div className="p-4 border-t border-gray-800">
         <div className="flex items-center gap-3 mb-3 px-2">
-          <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
             {user?.firstName?.[0]}
           </div>
           <div className="flex-1 min-w-0">
@@ -90,7 +90,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gray-50 flex">
       <aside className="hidden lg:flex flex-col w-60 bg-gray-900 fixed top-0 left-0 h-full z-40">
         <Sidebar />
       </aside>

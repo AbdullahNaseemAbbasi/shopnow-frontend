@@ -16,11 +16,11 @@ interface AdminOrder {
 }
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
-  PENDING:   { label: 'Pending',   color: 'bg-yellow-100 text-yellow-700', icon: Clock },
-  CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700',     icon: CheckCircle },
-  SHIPPED:   { label: 'Shipped',   color: 'bg-purple-100 text-purple-700', icon: Truck },
-  DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700',   icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-red-100 text-red-700',       icon: XCircle },
+  PENDING:   { label: 'Pending',   color: 'bg-gray-100 text-gray-600',  icon: Clock },
+  CONFIRMED: { label: 'Confirmed', color: 'bg-blue-50 text-blue-700',   icon: CheckCircle },
+  SHIPPED:   { label: 'Shipped',   color: 'bg-blue-100 text-blue-800',  icon: Truck },
+  DELIVERED: { label: 'Delivered', color: 'bg-gray-200 text-gray-800',  icon: CheckCircle },
+  CANCELLED: { label: 'Cancelled', color: 'bg-red-50 text-red-600',     icon: XCircle },
 };
 
 const NEXT_STATUS: Record<string, string[]> = {
@@ -75,7 +75,7 @@ export default function AdminOrdersPage() {
           <h1 className="text-2xl font-black text-gray-900">Orders</h1>
           <p className="text-gray-500 text-sm">Manage all orders</p>
         </div>
-        <button onClick={fetchOrders} className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-xl text-sm font-semibold hover:border-red-400 hover:text-red-600 transition-colors">
+        <button onClick={fetchOrders} className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-xl text-sm font-semibold hover:border-blue-400 hover:text-blue-600 transition-colors">
           <RefreshCw size={14} /> Refresh
         </button>
       </div>
@@ -83,7 +83,7 @@ export default function AdminOrdersPage() {
       <div className="flex gap-2 flex-wrap mb-6">
         {['ALL', 'PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED', 'CANCELLED'].map(s => (
           <button key={s} onClick={() => setFilter(s)}
-            className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${filter === s ? 'bg-red-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-red-400'}`}>
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors ${filter === s ? 'bg-gray-900 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:border-blue-400'}`}>
             {s === 'ALL' ? `All (${orders.length})` : `${STATUS_CONFIG[s]?.label || s}${counts[s] ? ` (${counts[s]})` : ''}`}
           </button>
         ))}
@@ -94,7 +94,7 @@ export default function AdminOrdersPage() {
           {[...Array(4)].map((_, i) => <div key={i} className="skeleton h-24 rounded-2xl" />)}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-gray-100 text-center py-16">
+        <div className="bg-white rounded-2xl border border-gray-200 text-center py-16">
           <p className="text-gray-500 font-medium">No orders found</p>
         </div>
       ) : (
@@ -106,7 +106,7 @@ export default function AdminOrdersPage() {
             const isExpanded = expandedId === order.id;
 
             return (
-              <div key={order.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div key={order.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:border-blue-200 transition-colors">
                 <div className="p-5">
                   <div className="flex items-start justify-between flex-wrap gap-3">
                     <div className="flex-1">
@@ -124,13 +124,13 @@ export default function AdminOrdersPage() {
                       <p className="text-xs text-gray-400 mt-0.5">{order.createdAt}</p>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                      <span className="font-black text-red-600">{formatPrice(order.totalAmount)}</span>
+                      <span className="font-black text-gray-900">{formatPrice(order.totalAmount)}</span>
                       {nextStatuses.length > 0 && (
                         <div className="flex gap-2 flex-wrap">
                           {nextStatuses.map(ns => (
                             <button key={ns} onClick={() => handleStatusUpdate(order.id, ns)}
                               disabled={updatingId === order.id}
-                              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-colors disabled:opacity-60 ${ns === 'CANCELLED' ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200' : 'btn-primary text-white'}`}>
+                              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-colors disabled:opacity-60 ${ns === 'CANCELLED' ? 'bg-red-50 text-red-600 hover:bg-red-100 border border-red-200' : 'bg-gray-900 text-white hover:bg-gray-800'}`}>
                               {updatingId === order.id ? '...' : ns === 'CONFIRMED' ? 'Confirm' : ns === 'SHIPPED' ? 'Ship' : ns === 'DELIVERED' ? 'Deliver' : 'Cancel'}
                             </button>
                           ))}
@@ -141,7 +141,7 @@ export default function AdminOrdersPage() {
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t border-gray-50 px-5 py-3 bg-gray-50">
+                  <div className="border-t border-gray-100 px-5 py-3 bg-gray-50">
                     <p className="text-xs text-gray-500">Order ID: #{order.id}</p>
                   </div>
                 )}
