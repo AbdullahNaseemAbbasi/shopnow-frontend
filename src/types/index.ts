@@ -22,6 +22,9 @@ export interface Product {
   salePrice?: number;
   stock: number;
   imageUrl?: string;
+  imageUrls?: string[];
+  sizes?: string;
+  colors?: string;
   featured: boolean;
   active: boolean;
   categoryId: number;

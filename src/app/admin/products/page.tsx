@@ -1,12 +1,14 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
-import { Plus, Pencil, Trash2, Search, X, Check, PackageSearch, Upload, Link } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, X, Check, PackageSearch, Upload, Link, Camera, Image as ImageIcon } from 'lucide-react';
 import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
 import { Product, Category } from '@/types';
 import toast from 'react-hot-toast';
 
-const EMPTY_FORM = { name: '', slug: '', description: '', price: '', salePrice: '', stock: '', imageUrl: '', categoryId: '', featured: false, active: true };
+const EMPTY_FORM = { name: '', slug: '', description: '', price: '', salePrice: '', stock: '', imageUrl: '', categoryId: '', featured: false, active: true, sizes: '', colors: '' };
+
+const PRESET_COLORS = ['Red', 'Blue', 'Green', 'Black', 'White', 'Grey', 'Navy', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange', 'Beige', 'Maroon', 'Teal', 'Olive'];
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -16,12 +18,14 @@ export default function AdminProductsPage() {
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -48,6 +52,7 @@ export default function AdminProductsPage() {
   const handleOpenAdd = () => {
     setEditId(null);
     setForm(EMPTY_FORM);
+    setImageUrls([]);
     setShowForm(true);
   };
 
@@ -58,7 +63,9 @@ export default function AdminProductsPage() {
       price: String(p.price), salePrice: p.salePrice ? String(p.salePrice) : '',
       stock: String(p.stock), imageUrl: p.imageUrl || '',
       categoryId: String(p.categoryId), featured: p.featured, active: p.active,
+      sizes: p.sizes || '', colors: p.colors || '',
     });
+    setImageUrls(p.imageUrls || []);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -74,8 +81,10 @@ export default function AdminProductsPage() {
       name: form.name, slug: form.slug || generateSlug(form.name),
       description: form.description, price: Number(form.price),
       salePrice: form.salePrice ? Number(form.salePrice) : null,
-      stock: Number(form.stock), imageUrl: form.imageUrl,
+      stock: Number(form.stock), imageUrl: form.imageUrl || (imageUrls.length > 0 ? imageUrls[0] : ''),
       categoryId: Number(form.categoryId), featured: form.featured, active: form.active,
+      sizes: form.sizes, colors: form.colors,
+      imageUrls: imageUrls,
     };
     try {
       if (editId) {
@@ -90,6 +99,7 @@ export default function AdminProductsPage() {
       setShowForm(false);
       setEditId(null);
       setForm(EMPTY_FORM);
+      setImageUrls([]);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       toast.error(error?.response?.data?.message || 'Failed to save');
@@ -112,24 +122,47 @@ export default function AdminProductsPage() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 10 * 1024 * 1024) { toast.error('Image must be smaller than 10MB'); return; }
+  const handleMultiImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
     setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await api.post('/api/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-      setForm(f => ({ ...f, imageUrl: res.data.url }));
-      toast.success('Image uploaded successfully!');
-    } catch {
-      toast.error('Image upload failed');
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
+    const newUrls: string[] = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (file.size > 10 * 1024 * 1024) { toast.error(`${file.name} is too large (max 10MB)`); continue; }
+      try {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await api.post('/api/upload', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
+        newUrls.push(res.data.url);
+      } catch {
+        toast.error(`Failed to upload ${file.name}`);
+      }
+    }
+    if (newUrls.length > 0) {
+      setImageUrls(prev => [...prev, ...newUrls]);
+      if (!form.imageUrl) setForm(f => ({ ...f, imageUrl: newUrls[0] }));
+      toast.success(`${newUrls.length} image(s) uploaded!`);
+    }
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+    if (cameraInputRef.current) cameraInputRef.current.value = '';
+  };
+
+  const removeImage = (index: number) => {
+    setImageUrls(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const toggleColor = (color: string) => {
+    const current = form.colors ? form.colors.split(',').map(c => c.trim()).filter(Boolean) : [];
+    if (current.includes(color)) {
+      setForm(f => ({ ...f, colors: current.filter(c => c !== color).join(', ') }));
+    } else {
+      setForm(f => ({ ...f, colors: [...current, color].join(', ') }));
     }
   };
+
+  const selectedColors = form.colors ? form.colors.split(',').map(c => c.trim()).filter(Boolean) : [];
 
   const filtered = products.filter(p =>
     p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -191,30 +224,89 @@ export default function AdminProductsPage() {
                 <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
                   placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
               </div>
+
+              {/* MULTI IMAGE UPLOAD */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Product Image</label>
-                <div className="flex gap-3 items-start">
-                  <div className="w-20 h-20 rounded-xl border-2 border-gray-200 flex-shrink-0 overflow-hidden bg-gray-50 flex items-center justify-center">
-                    {form.imageUrl ? (
-                      <img src={form.imageUrl} alt="preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-2xl">📦</span>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Product Images (up to 15)</label>
+                <div className="flex gap-2 mb-3">
+                  <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleMultiImageUpload} className="hidden" />
+                  <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleMultiImageUpload} className="hidden" />
+                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading || imageUrls.length >= 15}
+                    className="flex items-center gap-2 flex-1 border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-3 py-3 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
+                    <Upload size={16} /> {uploading ? 'Uploading...' : 'Upload Images'}
+                  </button>
+                  <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={uploading || imageUrls.length >= 15}
+                    className="flex items-center gap-2 border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-4 py-3 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
+                    <Camera size={16} /> Take Photo
+                  </button>
+                </div>
+                {imageUrls.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {imageUrls.map((url, i) => (
+                      <div key={i} className="relative group w-20 h-20">
+                        <img src={url} alt={`img-${i}`} className="w-full h-full object-cover rounded-xl border-2 border-gray-200" />
+                        <button type="button" onClick={() => removeImage(i)}
+                          className="absolute -top-1.5 -right-1.5 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X size={12} />
+                        </button>
+                        {i === 0 && <span className="absolute bottom-0.5 left-0.5 bg-blue-600 text-white text-[9px] px-1 rounded font-bold">Main</span>}
+                      </div>
+                    ))}
+                    {imageUrls.length < 15 && (
+                      <button type="button" onClick={() => fileInputRef.current?.click()}
+                        className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-400 transition-colors">
+                        <ImageIcon size={20} />
+                      </button>
                     )}
                   </div>
-                  <div className="flex-1 space-y-2">
-                    <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                    <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                      className="flex items-center gap-2 w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-3 py-2.5 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
-                      <Upload size={15} /> {uploading ? 'Uploading...' : 'Upload from Computer'}
-                    </button>
-                    <div className="flex items-center gap-2">
-                      <Link size={13} className="text-gray-400 flex-shrink-0" />
-                      <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
-                        placeholder="or paste URL here..." className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-blue-500" />
-                    </div>
-                  </div>
+                )}
+                <p className="text-xs text-gray-400 mt-1">{imageUrls.length}/15 images uploaded</p>
+              </div>
+
+              {/* SIZES */}
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Sizes (comma separated)</label>
+                <input value={form.sizes} onChange={e => setForm(f => ({ ...f, sizes: e.target.value }))}
+                  placeholder="S, M, L, XL, XXL"
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
+                <div className="flex gap-2 mt-2">
+                  {['S', 'M', 'L', 'XL', 'XXL'].map(size => {
+                    const current = form.sizes ? form.sizes.split(',').map(s => s.trim()) : [];
+                    const isSelected = current.includes(size);
+                    return (
+                      <button key={size} type="button"
+                        onClick={() => {
+                          if (isSelected) {
+                            setForm(f => ({ ...f, sizes: current.filter(s => s !== size).join(', ') }));
+                          } else {
+                            setForm(f => ({ ...f, sizes: [...current, size].filter(Boolean).join(', ') }));
+                          }
+                        }}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold border-2 transition-all ${isSelected ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 text-gray-600 hover:border-blue-400'}`}>
+                        {size}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
+
+              {/* COLORS */}
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Colors (click to select or type custom)</label>
+                <input value={form.colors} onChange={e => setForm(f => ({ ...f, colors: e.target.value }))}
+                  placeholder="Red, Blue, Green, Black, White..."
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 mb-2" />
+                <div className="flex gap-2 flex-wrap">
+                  {PRESET_COLORS.map(color => (
+                    <button key={color} type="button" onClick={() => toggleColor(color)}
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border-2 transition-all ${selectedColors.includes(color) ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>
+                      <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: color.toLowerCase() }} />
+                      {color}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}

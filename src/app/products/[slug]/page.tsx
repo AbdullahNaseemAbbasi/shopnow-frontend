@@ -1,8 +1,8 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw } from 'lucide-react';
+import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Eye, Flame, MessageCircle } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { formatPrice, getDiscountPercent } from '@/lib/utils';
@@ -14,6 +14,8 @@ const EMOJIS: Record<string, string> = {
   'Electronics': '📱', 'Fashion': '👗', 'Ladies Fashion': '👗', 'Gents Fashion': '👘',
   'Beauty': '✨', 'Home & Living': '🏠', 'Sports': '⚽', 'Books': '📚', 'Kids': '🧸', 'Groceries': '🛒',
 };
+
+const WHATSAPP_NUMBER = '923248234639';
 
 export default function ProductDetailPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -32,18 +34,54 @@ export default function ProductDetailPage() {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
 
+  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  const [liveViews, setLiveViews] = useState(0);
+  const [soldCount, setSoldCount] = useState(0);
+
   useEffect(() => {
     if (!slug) return;
     setLoading(true);
     api.get(`/api/products/slug/${slug}`)
       .then(res => {
         setProduct(res.data);
+        const sizes = res.data.sizes ? res.data.sizes.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
+        if (sizes.length > 0) setSelectedSize(sizes[0]);
+        const colors = res.data.colors ? res.data.colors.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
+        if (colors.length > 0) setSelectedColor(colors[0]);
+
+        api.get(`/api/products/${res.data.id}/sold-recently`).then(r => setSoldCount(r.data.soldCount || 0)).catch(() => {});
         return api.get(`/api/reviews/product/${res.data.id}`);
       })
       .then(res => setReviews(res.data || []))
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [slug, router]);
+  }, [slug]);
+
+  // Live views simulation
+  useEffect(() => {
+    setLiveViews(Math.floor(Math.random() * 40) + 15);
+    const interval = setInterval(() => {
+      setLiveViews(prev => {
+        const change = Math.floor(Math.random() * 7) - 3;
+        return Math.max(8, Math.min(80, prev + change));
+      });
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [slug]);
+
+  const getAllImages = useCallback(() => {
+    if (!product) return [];
+    const images: string[] = [];
+    if (product.imageUrl) images.push(product.imageUrl);
+    if (product.imageUrls) {
+      product.imageUrls.forEach(url => {
+        if (url && !images.includes(url)) images.push(url);
+      });
+    }
+    return images;
+  }, [product]);
 
   const handleAddToCart = async () => {
     if (!isLoggedIn) { toast.error('Please login first!'); router.push('/auth/login'); return; }
@@ -71,6 +109,12 @@ export default function ProductDetailPage() {
       setWishlisted(w => !w);
       toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist!');
     } catch { toast.error('Please try again'); }
+  };
+
+  const handleWhatsApp = () => {
+    if (!product) return;
+    const message = `Hi! I'm interested in *${product.name}*${selectedSize ? ` (Size: ${selectedSize})` : ''}${selectedColor ? ` (Color: ${selectedColor})` : ''} - ${formatPrice(product.salePrice || product.price)}\n\nProduct link: ${window.location.href}`;
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
   const handleSubmitReview = async (e: React.FormEvent) => {
@@ -118,10 +162,14 @@ export default function ProductDetailPage() {
   const disc = product.salePrice ? getDiscountPercent(product.price, product.salePrice) : 0;
   const emoji = EMOJIS[product.categoryName] || '🛍️';
   const inStock = product.stock > 0;
+  const images = getAllImages();
+  const sizes = product.sizes ? product.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
+  const colors = product.colors ? product.colors.split(',').map(c => c.trim()).filter(Boolean) : [];
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1600px] mx-auto px-8 py-6">
+        {/* Breadcrumbs */}
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-blue-600">Home</Link>
           <span>/</span>
@@ -138,10 +186,11 @@ export default function ProductDetailPage() {
 
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* IMAGE GALLERY */}
             <div className="relative">
-              <div className="bg-gray-50 rounded-2xl h-80 md:h-96 flex items-center justify-center overflow-hidden">
-                {product.imageUrl ? (
-                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-contain" />
+              <div className="bg-gray-50 rounded-2xl h-80 md:h-[450px] flex items-center justify-center overflow-hidden mb-3">
+                {images.length > 0 ? (
+                  <img src={images[selectedImage] || images[0]} alt={product.name} className="w-full h-full object-contain" />
                 ) : (
                   <span className="text-8xl">{emoji}</span>
                 )}
@@ -156,8 +205,21 @@ export default function ProductDetailPage() {
                   <span className="bg-gray-800 text-white font-black px-6 py-3 rounded-xl text-lg">Out of Stock</span>
                 </div>
               )}
+
+              {/* Thumbnail Strip */}
+              {images.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                  {images.map((img, i) => (
+                    <button key={i} onClick={() => setSelectedImage(i)}
+                      className={`w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all ${i === selectedImage ? 'border-blue-600 shadow-md' : 'border-gray-200 hover:border-gray-400'}`}>
+                      <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
+            {/* PRODUCT INFO */}
             <div className="flex flex-col">
               <p className="text-blue-600 font-semibold text-sm mb-1">{product.categoryName}</p>
               <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-3 leading-tight">{product.name}</h1>
@@ -174,29 +236,82 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
+              {/* Live Views + Sold Count */}
+              <div className="flex items-center gap-4 mb-4 flex-wrap">
+                <div className="flex items-center gap-1.5 text-sm bg-orange-50 text-orange-700 px-3 py-1.5 rounded-full font-semibold">
+                  <Eye size={14} className="animate-pulse" />
+                  <span>{liveViews} people viewing now</span>
+                </div>
+                {soldCount > 0 && (
+                  <div className="flex items-center gap-1.5 text-sm bg-red-50 text-red-600 px-3 py-1.5 rounded-full font-semibold">
+                    <Flame size={14} />
+                    <span>{soldCount} sold in last 24 hours</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Price */}
               <div className="flex items-baseline gap-3 mb-4">
                 <span className="text-3xl font-black text-blue-600">{formatPrice(product.salePrice || product.price)}</span>
                 {product.salePrice && (
                   <>
                     <span className="text-xl text-gray-400 line-through">{formatPrice(product.price)}</span>
                     <span className="text-green-600 font-bold text-sm">
-                      Save Rs. {formatPrice(product.price - product.salePrice)}!
+                      Save {formatPrice(product.price - product.salePrice)}!
                     </span>
                   </>
                 )}
               </div>
 
-              <div className="mb-6">
+              {/* Stock */}
+              <div className="mb-4">
                 {inStock ? (
                   <span className="text-green-600 font-semibold text-sm flex items-center gap-1">
                     <div className="w-2 h-2 bg-green-500 rounded-full" />
                     {product.stock <= 10 ? `Only ${product.stock} left in stock!` : 'In Stock'}
                   </span>
                 ) : (
-                  <span className="text-blue-600 font-semibold text-sm">Out of Stock</span>
+                  <span className="text-red-600 font-semibold text-sm">Out of Stock</span>
                 )}
               </div>
 
+              {/* SIZE SELECTOR */}
+              {sizes.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-gray-700 mb-2">Size:</p>
+                  <div className="flex flex-wrap gap-2">
+                    {sizes.map(size => (
+                      <button key={size} onClick={() => setSelectedSize(size)}
+                        className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${selectedSize === size ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 text-gray-700 hover:border-blue-400'}`}>
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* COLOR SELECTOR */}
+              {colors.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-gray-700 mb-2">Color: <span className="text-blue-600">{selectedColor}</span></p>
+                  <div className="flex flex-wrap gap-2">
+                    {colors.map(color => (
+                      <button key={color} onClick={() => setSelectedColor(color)}
+                        className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${selectedColor === color ? 'border-blue-600 ring-2 ring-blue-300 ring-offset-1' : 'border-gray-300 hover:border-gray-500'}`}
+                        style={{ backgroundColor: color.toLowerCase() }}
+                        title={color}>
+                        {selectedColor === color && (
+                          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
+                            <path d="M6 10l3 3 5-6" stroke={['white','yellow','beige','cream','ivory','lightyellow','snow','linen','floralwhite','ghostwhite','mintcream','azure','aliceblue','lavenderblush','seashell','cornsilk','lemonchiffon','honeydew','oldlace','papayawhip','blanchedalmond','bisque','wheat','moccasin','peachpuff','mistyrose','lavender','thistle','pink','lightpink','lightsalmon','lightyellow','lightgoldenrodyellow','lightcyan','lightblue','lightsteelblue','lightgray','lightgrey','silver','gainsboro','whitesmoke'].includes(color.toLowerCase()) ? '#111' : '#fff'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quantity */}
               {inStock && (
                 <div className="flex items-center gap-4 mb-6">
                   <span className="text-sm font-semibold text-gray-700">Quantity:</span>
@@ -212,7 +327,8 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
-              <div className="flex gap-3 mb-6">
+              {/* Add to Cart + Wishlist */}
+              <div className="flex gap-3 mb-4">
                 <button onClick={handleAddToCart} disabled={adding || !inStock}
                   className="flex-1 btn-primary text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-60 text-sm">
                   {adding ? (
@@ -227,14 +343,16 @@ export default function ProductDetailPage() {
                 </button>
               </div>
 
+              {/* Buy Now */}
               {inStock && (
                 <button onClick={handleBuyNow}
-                  className="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white py-4 rounded-xl font-bold transition-all text-sm">
+                  className="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white py-4 rounded-xl font-bold transition-all text-sm mb-4">
                   Buy Now
                 </button>
               )}
 
-              <div className="mt-6 pt-6 border-t border-gray-100 grid grid-cols-3 gap-3">
+              {/* Trust badges */}
+              <div className="pt-4 border-t border-gray-100 grid grid-cols-3 gap-3">
                 <div className="flex flex-col items-center text-center gap-1">
                   <Truck size={20} className="text-blue-600" />
                   <span className="text-xs text-gray-600 font-medium">Free Delivery<br />Rs. 2000+</span>
@@ -252,6 +370,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
+        {/* Details + Reviews Tabs */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex border-b border-gray-100">
             <button onClick={() => setActiveTab('details')}
@@ -334,6 +453,15 @@ export default function ProductDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* FLOATING WHATSAPP BUTTON */}
+      <button onClick={handleWhatsApp}
+        className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2 group">
+        <MessageCircle size={24} fill="currentColor" />
+        <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 whitespace-nowrap text-sm font-bold">
+          Chat on WhatsApp
+        </span>
+      </button>
     </div>
   );
 }
