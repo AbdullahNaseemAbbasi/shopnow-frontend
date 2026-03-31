@@ -10,7 +10,7 @@ const promos = [
 export default function PromoStrip() {
   return (
     <div className="bg-white border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 py-6">
+      <div className="max-w-[1600px] mx-auto px-8 py-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {promos.map(({ icon: Icon, title, desc, color }) => (
             <div key={title} className="flex items-center gap-3 group">

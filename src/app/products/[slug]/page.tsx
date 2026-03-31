@@ -98,7 +98,7 @@ export default function ProductDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="max-w-[1600px] mx-auto px-8 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="skeleton h-96 rounded-2xl" />
             <div className="space-y-4">
@@ -121,7 +121,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 py-6">
+      <div className="max-w-[1600px] mx-auto px-8 py-6">
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-blue-600">Home</Link>
           <span>/</span>

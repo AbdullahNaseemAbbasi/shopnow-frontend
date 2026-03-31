@@ -66,7 +66,7 @@ export default function Navbar() {
     <>
       {!isAdmin && (
         <div className="bg-gray-900 text-white text-xs py-2 hidden md:block">
-          <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
+          <div className="max-w-[1600px] mx-auto px-8 flex justify-between items-center">
             <span>Free delivery on orders above Rs. 2,000</span>
             <div className="flex gap-4">
               <Link href="/orders" className="hover:text-blue-400 transition-colors">Track Order</Link>
@@ -76,7 +76,7 @@ export default function Navbar() {
       )}
 
       <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg' : 'bg-white shadow-sm'}`}>
-        <div className="max-w-7xl mx-auto px-4">
+        <div className="max-w-[1600px] mx-auto px-8">
           <div className="flex items-center justify-between h-16 gap-4">
 
             <Link href={isAdmin ? '/admin' : '/'} className="flex items-center gap-1 flex-shrink-0">
@@ -254,7 +254,7 @@ export default function Navbar() {
 
         {mobileOpen && (
           <div className="md:hidden bg-white border-t border-gray-100">
-            <div className="max-w-7xl mx-auto px-4 py-4 space-y-1">
+            <div className="max-w-[1600px] mx-auto px-8 py-4 space-y-1">
 
               {isAdmin ? (
                 <>

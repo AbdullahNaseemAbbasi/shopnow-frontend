@@ -83,7 +83,7 @@ export default function FeaturedProducts() {
 
   return (
     <section className="py-12 bg-white">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="max-w-[1600px] mx-auto px-8">
         <div className="flex items-center justify-between mb-8">
           <div>
             <div className="flex items-center gap-2 mb-1">

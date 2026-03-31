@@ -156,7 +156,7 @@ function ProductsContent() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="max-w-[1600px] mx-auto px-8 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div>
             <h1 className="text-xl font-black text-gray-900">{pageTitle}</h1>
             {!loading && <p className="text-sm text-gray-500">{totalElements} products found</p>}
@@ -170,7 +170,7 @@ function ProductsContent() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-[1600px] mx-auto px-8 py-8">
         {loading ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (

@@ -48,7 +48,7 @@ export default function WishlistPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-[1600px] mx-auto px-8 py-8">
         <h1 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
           <Heart size={24} className="text-blue-600 fill-red-600" /> My Wishlist
           {items.length > 0 && <span className="text-sm font-normal text-gray-500 ml-1">({items.length} items)</span>}

@@ -65,7 +65,7 @@ export default function HeroBanner() {
 
   return (
     <div className={`relative bg-gradient-to-r ${bg} overflow-hidden transition-all duration-700`}>
-      <div className="max-w-7xl mx-auto px-4 py-16 md:py-24">
+      <div className="max-w-[1600px] mx-auto px-8 py-16 md:py-24">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-white space-y-4 md:w-1/2 animate-fade-in-up">
             <span className={`inline-block ${accent} text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide`}>
