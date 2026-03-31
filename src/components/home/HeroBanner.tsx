@@ -71,16 +71,16 @@ export default function HeroBanner() {
             <span className={`inline-block ${accent} text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide`}>
               {badge}
             </span>
-            <h1 className="text-4xl md:text-6xl font-black leading-tight">
+            <h1 className="text-2xl md:text-4xl font-black leading-tight">
               {cat.name}
               {cat.description && (
-                <span className="block text-blue-300 text-lg md:text-2xl font-light mt-2 leading-relaxed max-w-md">
+                <span className="block text-blue-300 text-sm md:text-base font-light mt-2 leading-relaxed max-w-md">
                   {cat.description}
                 </span>
               )}
             </h1>
             {!cat.description && (
-              <p className="text-gray-300 text-lg max-w-md">
+              <p className="text-gray-300 text-sm max-w-md">
                 Best quality products at the best prices. Shop now!
               </p>
             )}
