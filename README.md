@@ -22,6 +22,12 @@ A modern, full-featured e-commerce frontend built with Next.js, TypeScript, and 
 
 <img src="https://github.com/user-attachments/assets/40906593-da58-4057-bd8d-3d3b771b9ac3" width="100%" alt="Admin Dashboard" />
 
+<img src="https://github.com/user-attachments/assets/54f77314-e98e-4cc9-9ab4-5c09b16a4cad" width="100%" alt="Product Detail" />
+
+<img src="https://github.com/user-attachments/assets/93d7ab3f-e673-469f-9006-86fe0bde87a9" width="100%" alt="Cart & Checkout" />
+
+<img src="https://github.com/user-attachments/assets/445a0d32-ad8d-4d97-b6a8-ab338c970f54" width="100%" alt="Orders" />
+
 </div>
 
 ---
