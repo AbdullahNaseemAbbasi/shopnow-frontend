@@ -29,7 +29,7 @@ export default function RegisterPage() {
       toast.success(`Welcome, ${res.data.firstName}! Account created successfully!`);
       router.push(res.data.role === 'ADMIN' ? '/admin' : '/');
     } catch (err: unknown) {
-      const error = err as { response?: { data?: { message?: string } } };
+      const error = err as { response?: { data?: { message?: string } } }; 
       toast.error(error?.response?.data?.message || 'Please try again!');
     } finally {
       setLoading(false);
