@@ -14,7 +14,7 @@ const SERVICE_LINKS = [
   { label: 'My Dashboard', href: '/dashboard' },
   { label: 'Login', href: '/auth/login' },
   { label: 'Create Account', href: '/auth/register' },
-  { label: 'Browse Categories', href: '/products' },
+  { label: 'Browse Categories', href: '/products' }, 
 ];
 
 export default function Footer() {

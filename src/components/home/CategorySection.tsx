@@ -8,7 +8,7 @@ const CATEGORY_STYLES: Record<string, { color: string; emoji: string }> = {
   'Electronics':    { color: 'from-blue-500 to-blue-700',     emoji: '📱' },
   'Fashion':        { color: 'from-pink-500 to-rose-600',     emoji: '👗' },
   'Home & Living':  { color: 'from-amber-500 to-orange-600',  emoji: '🏠' },
-  'Beauty':         { color: 'from-purple-500 to-violet-600', emoji: '💄' },
+  'Beauty':         { color: 'from-purple-500 to-violet-600', emoji: '💄' }, 
   'Sports':         { color: 'from-green-500 to-emerald-600', emoji: '⚽' },
   'Books':          { color: 'from-indigo-500 to-indigo-700', emoji: '📚' },
   'Kids':           { color: 'from-yellow-500 to-amber-600',  emoji: '🧸' },

@@ -17,5 +17,5 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
       <main className="flex-1">{children}</main>
       <Footer />
     </>
-  );
+  ); 
 }
