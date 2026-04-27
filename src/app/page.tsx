@@ -13,8 +13,8 @@ export default async function HomePage() {
     serverFetch<Product[]>("/api/products/featured", { revalidate: 120 }),
   ]);
 
-  return (
-    <div className="min-h-screen">
+  return ( 
+    <div className="min-h-screen">  
       <HeroBanner initialData={categories ?? undefined} />
       <PromoStrip />
       <CategorySection initialData={categories ?? undefined} />
