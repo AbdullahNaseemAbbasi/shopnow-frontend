@@ -73,9 +73,9 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16 gap-4"> 
 
             <Link href={isAdmin ? '/admin' : '/'} className="flex items-center gap-1 flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center"> 
                 <span className="text-white font-black text-sm">S</span>
-              </div>
+              </div> 
               <span className="text-xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
             </Link>
 
