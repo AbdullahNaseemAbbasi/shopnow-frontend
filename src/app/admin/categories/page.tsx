@@ -4,32 +4,32 @@ import { Plus, Pencil, Trash2, X, Check, Tag, Upload, Link } from 'lucide-react'
 import api from '@/lib/axios';
 import { invalidate } from '@/lib/cache';
 import { Category } from '@/types';
-import toast from 'react-hot-toast';
+import toast from 'react-hot-toast'; 
 
-const EMPTY_FORM = { name: '', description: '', imageUrl: '' };
+const EMPTY_FORM = { name: '', description: '', imageUrl: '' }; 
 
-export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
+export default function AdminCategoriesPage() { 
+  const [categories, setCategories] = useState<Category[]>([]); 
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [showForm, setShowForm] = useState(false); 
+  const [editId, setEditId] = useState<number | null>(null); 
   const [form, setForm] = useState(EMPTY_FORM);
-  const [saving, setSaving] = useState(false);
-  const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [saving, setSaving] = useState(false); 
+  const [deletingId, setDeletingId] = useState<number | null>(null); 
+  const [uploading, setUploading] = useState(false); 
+  const fileInputRef = useRef<HTMLInputElement>(null); 
 
   useEffect(() => {
-    fetchCategories();
-  }, []);
+    fetchCategories(); 
+  }, []); 
 
-  const fetchCategories = () => {
-    setLoading(true);
-    api.get('/api/categories')
+  const fetchCategories = () => { 
+    setLoading(true); 
+    api.get('/api/categories') 
       .then(res => {
-        const data = res.data?.content || res.data;
+        const data = res.data?.content || res.data; 
         setCategories(Array.isArray(data) ? data : []);
-      })
+      }) 
       .catch(() => toast.error('Failed to load categories'))
       .finally(() => setLoading(false));
   };
