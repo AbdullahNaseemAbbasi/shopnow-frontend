@@ -41,13 +41,11 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
 
   const prev = () => setCurrent(prev => (prev - 1 + categories.length) % categories.length);
   const next = () => setCurrent(prev => (prev + 1) % categories.length);
-
   if (loading) {
     return (
       <div className="h-64 md:h-80 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 animate-pulse" />
     );
   }
-
   if (categories.length === 0) return null;
 
   const cat = categories[current];
