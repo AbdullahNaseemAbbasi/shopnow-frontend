@@ -79,35 +79,35 @@ export default function Navbar() {
               <span className="text-xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
             </Link>
 
-            {!isAdmin && (
+            {!isAdmin && ( 
               <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl">
-                <div className="flex w-full rounded-xl overflow-hidden border-2 border-blue-600 focus-within:shadow-lg transition-shadow">
+                <div className="flex w-full rounded-xl overflow-hidden border-2 border-blue-600 focus-within:shadow-lg transition-shadow"> 
                   <input
-                    type="text"
-                    placeholder="Search products, brands, categories..."
+                    type="text" 
+                    placeholder="Search products, brands, categories..." 
                     className="flex-1 px-4 py-2.5 text-sm outline-none"
-                    value={searchQuery}
+                    value={searchQuery} 
                     onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 px-5 text-white transition-colors">
+                  /> 
+                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 px-5 text-white transition-colors"> 
                     <Search size={18} />
                   </button>
                 </div>
               </form>
             )}
 
-            {isAdmin && (
+            {isAdmin && ( 
               <div className="hidden md:flex items-center gap-3 ml-auto">
                 <Link href="/admin" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors">
                   <LayoutDashboard size={16} /> Admin Panel
                 </Link>
-                <div className="relative">
+                <div className="relative"> 
                   <button onClick={() => setAccountOpen(!accountOpen)}
                     className="flex items-center gap-2 p-2 hover:text-blue-600 transition-colors">
                     <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                      {user?.firstName?.[0]}
-                    </div>
-                    <ChevronDown size={14} className="text-gray-400" />
+                      {user?.firstName?.[0]} 
+                    </div> 
+                    <ChevronDown size={14} className="text-gray-400" /> 
                   </button>
                   {accountOpen && (
                     <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
