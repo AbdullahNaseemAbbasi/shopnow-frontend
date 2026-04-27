@@ -20,6 +20,7 @@ export default function CheckoutPage() {
   const [placing, setPlacing] = useState(false);
   const [placed, setPlaced] = useState(false);
   const [orderNumber, setOrderNumber] = useState('');
+  const [couponCode, setCouponCode] = useState<string>('');
 
   useEffect(() => {
     if (!isLoggedIn) { router.push('/auth/login'); return; }
@@ -29,6 +30,8 @@ export default function CheckoutPage() {
       const def = res.data?.find((a: Address) => a.isDefault);
       if (def) setSelectedAddress(def.id);
     }).catch(() => {});
+    const savedCoupon = sessionStorage.getItem('shopnow_coupon');
+    if (savedCoupon) setCouponCode(savedCoupon);
   }, [isLoggedIn, fetchCart, router]);
 
   const handlePlaceOrder = async () => {
@@ -41,9 +44,12 @@ export default function CheckoutPage() {
 
     setPlacing(true);
     try {
-      const res = await api.post('/api/orders', { shippingAddress });
+      const payload: { shippingAddress: string; couponCode?: string } = { shippingAddress };
+      if (couponCode) payload.couponCode = couponCode;
+      const res = await api.post('/api/orders', payload);
       setOrderNumber(res.data.orderNumber);
       setPlaced(true);
+      sessionStorage.removeItem('shopnow_coupon');
       await clearCart();
       toast.success('Order placed successfully! Please check your email.');
     } catch (err: unknown) {
@@ -135,6 +141,15 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-gray-600">
                 <span>Subtotal</span><span>{formatPrice(cart?.totalAmount || 0)}</span>
               </div>
+              {couponCode && (
+                <div className="flex justify-between text-green-600 font-semibold items-center">
+                  <span className="flex items-center gap-1.5">
+                    Coupon
+                    <span className="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">{couponCode}</span>
+                  </span>
+                  <span className="text-xs">applied at checkout</span>
+                </div>
+              )}
               <div className="flex justify-between text-gray-600">
                 <span>Delivery</span>
                 <span className={cart && cart.totalAmount >= 2000 ? 'text-green-600 font-semibold' : ''}>
@@ -145,6 +160,9 @@ export default function CheckoutPage() {
                 <span>Total</span>
                 <span className="text-blue-600">{formatPrice((cart?.totalAmount || 0) + (cart && cart.totalAmount >= 2000 ? 0 : 200))}</span>
               </div>
+              {couponCode && (
+                <p className="text-xs text-gray-400 pt-1">Final amount will reflect coupon discount.</p>
+              )}
             </div>
             <button onClick={handlePlaceOrder} disabled={placing}
               className="w-full btn-primary text-white py-4 rounded-xl font-bold text-sm mt-4 disabled:opacity-60 flex items-center justify-center gap-2">

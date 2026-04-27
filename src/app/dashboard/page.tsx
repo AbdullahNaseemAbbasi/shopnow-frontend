@@ -13,7 +13,7 @@ const STATUS_CONFIG = {
   CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700',     icon: CheckCircle },
   SHIPPED:   { label: 'Shipped',   color: 'bg-purple-100 text-purple-700', icon: Truck },
   DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700',   icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-blue-100 text-blue-700',     icon: XCircle },
+  CANCELLED: { label: 'Cancelled', color: 'bg-red-100 text-red-700',       icon: XCircle },
 };
 
 export default function DashboardPage() {

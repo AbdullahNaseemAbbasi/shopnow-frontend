@@ -28,9 +28,11 @@ export default function CartPage() {
     setApplyingCoupon(true);
     try {
       const total = cart?.totalAmount || 0;
-      const res = await api.post(`/api/coupons/apply?code=${couponCode.toUpperCase()}&amount=${total}`);
+      const code = couponCode.toUpperCase();
+      const res = await api.post(`/api/coupons/apply?code=${code}&amount=${total}`);
       setDiscount(res.data.discountAmount);
-      setCouponApplied(couponCode.toUpperCase());
+      setCouponApplied(code);
+      sessionStorage.setItem('shopnow_coupon', code);
       toast.success(res.data.message || `Rs. ${res.data.discountAmount} discount applied!`);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
@@ -123,7 +125,7 @@ export default function CartPage() {
                       <p className="text-sm font-bold text-green-700">{couponApplied}</p>
                       <p className="text-xs text-green-600">-{formatPrice(discount)} discount</p>
                     </div>
-                    <button onClick={() => { setCouponApplied(''); setDiscount(0); setCouponCode(''); }} className="text-xs text-blue-600 font-semibold">Remove</button>
+                    <button onClick={() => { setCouponApplied(''); setDiscount(0); setCouponCode(''); sessionStorage.removeItem('shopnow_coupon'); }} className="text-xs text-blue-600 font-semibold">Remove</button>
                   </div>
                 ) : (
                   <div className="flex gap-2">

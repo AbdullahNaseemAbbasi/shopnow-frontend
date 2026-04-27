@@ -13,7 +13,7 @@ interface Coupon {
   minimumAmount: number;
   maximumDiscount: number;
   usageLimit: number;
-  usageCount: number;
+  usedCount: number;
   expiresAt: string;
   active: boolean;
 }
@@ -195,7 +195,7 @@ export default function AdminCouponsPage() {
                       <div className="flex flex-wrap gap-3 text-xs text-gray-500">
                         {coupon.minimumAmount > 0 && <span>Min order: Rs. {coupon.minimumAmount.toLocaleString()}</span>}
                         {coupon.maximumDiscount > 0 && <span>Max discount: Rs. {coupon.maximumDiscount.toLocaleString()}</span>}
-                        <span className="flex items-center gap-1"><Ticket size={11} /> {coupon.usageCount || 0}/{coupon.usageLimit} used</span>
+                        <span className="flex items-center gap-1"><Ticket size={11} /> {coupon.usedCount || 0}/{coupon.usageLimit} used</span>
                         {coupon.expiresAt && (
                           <span className="flex items-center gap-1"><Calendar size={11} /> {new Date(coupon.expiresAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                         )}
