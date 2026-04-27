@@ -10,7 +10,6 @@ export const metadata: Metadata = {
   title: "ShopNow — Pakistan's Favorite Online Store",
   description: "Shop the latest electronics, fashion, home appliances and more at the best prices. Fast delivery all over Pakistan.",
 };
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="h-full">
