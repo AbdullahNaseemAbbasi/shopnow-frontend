@@ -24,7 +24,7 @@ export default function PromoStrip() {
             </div>
           ))}
         </div>
-      </div>
-    </div>
-  );
+      </div> 
+    </div> 
+  ); 
 }
