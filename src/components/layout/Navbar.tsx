@@ -61,7 +61,7 @@ export default function Navbar() {
         <div className="bg-gray-900 text-white text-xs py-2 hidden md:block">
           <div className="max-w-[1600px] mx-auto px-8 flex justify-between items-center">
             <span>Free delivery on orders above Rs. 2,000</span>
-            <div className="flex gap-4">
+            <div className="flex gap-4"> 
               <Link href="/orders" className="hover:text-blue-400 transition-colors">Track Order</Link>
             </div>
           </div>
@@ -69,8 +69,8 @@ export default function Navbar() {
       )}
 
       <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-white shadow-lg' : 'bg-white shadow-sm'}`}>
-        <div className="max-w-[1600px] mx-auto px-8">
-          <div className="flex items-center justify-between h-16 gap-4">
+        <div className="max-w-[1600px] mx-auto px-8"> 
+          <div className="flex items-center justify-between h-16 gap-4"> 
 
             <Link href={isAdmin ? '/admin' : '/'} className="flex items-center gap-1 flex-shrink-0">
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -79,7 +79,7 @@ export default function Navbar() {
               <span className="text-xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
             </Link>
 
-            {!isAdmin && ( 
+            {!isAdmin && (  
               <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl">
                 <div className="flex w-full rounded-xl overflow-hidden border-2 border-blue-600 focus-within:shadow-lg transition-shadow"> 
                   <input
@@ -90,7 +90,7 @@ export default function Navbar() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   /> 
                   <button type="submit" className="bg-blue-600 hover:bg-blue-700 px-5 text-white transition-colors"> 
-                    <Search size={18} />
+                    <Search size={18} /> 
                   </button>
                 </div>
               </form>
@@ -101,15 +101,15 @@ export default function Navbar() {
                 <Link href="/admin" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors">
                   <LayoutDashboard size={16} /> Admin Panel
                 </Link>
-                <div className="relative"> 
+                <div className="relative">  
                   <button onClick={() => setAccountOpen(!accountOpen)}
                     className="flex items-center gap-2 p-2 hover:text-blue-600 transition-colors">
                     <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                       {user?.firstName?.[0]} 
                     </div> 
-                    <ChevronDown size={14} className="text-gray-400" /> 
+                    <ChevronDown size={14} className="text-gray-400" />  
                   </button>
-                  {accountOpen && (
+                  {accountOpen && ( 
                     <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-2 z-50">
                       <div className="px-4 py-2 border-b border-gray-100">
                         <p className="font-semibold text-sm">{user?.firstName}</p>
