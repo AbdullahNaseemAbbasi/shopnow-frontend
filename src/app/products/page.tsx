@@ -14,33 +14,33 @@ import toast from 'react-hot-toast';
 const EMOJIS: Record<string, string> = {
   'Electronics': '📱', 'Fashion': '👗', 'Ladies Fashion': '👗', 'Gents Fashion': '👘',
   'Beauty': '✨', 'Home & Living': '🏠', 'Sports': '⚽', 'Books': '📚', 'Kids': '🧸', 'Groceries': '🛒',
-};
-
+}; 
+ 
 function ProductItem({
-  product, isWished, addingId, onAddToCart, onWishlist,
+  product, isWished, addingId, onAddToCart, onWishlist, 
 }: {
   product: Product;
-  isWished: boolean;
+  isWished: boolean; 
   addingId: number | null;
   onAddToCart: (e: React.MouseEvent, p: Product) => void;
-  onWishlist: (e: React.MouseEvent, id: number) => void;
+  onWishlist: (e: React.MouseEvent, id: number) => void; 
 }) {
   const [imgLoaded, setImgLoaded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const disc = product.salePrice ? getDiscountPercent(product.price, product.salePrice) : 0;
-  const emoji = EMOJIS[product.categoryName] || '🛍️';
+  const emoji = EMOJIS[product.categoryName] || '🛍️'; 
 
-  return (
+  return ( 
     <Link href={`/products/${product.slug}`} className="block h-full">
       <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden group cursor-pointer h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-blue-200">
         <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>
           <div className="absolute inset-0">
-            {(!imgLoaded || imgError) && (
+            {(!imgLoaded || imgError) && ( 
               <div className="absolute inset-0 flex items-center justify-center bg-slate-50">
                 <span className="text-5xl select-none">{emoji}</span>
               </div>
-            )}
-            {product.imageUrl && !imgError && (
+            )} 
+            {product.imageUrl && !imgError && ( 
               <img
                 src={product.imageUrl}
                 alt=""
