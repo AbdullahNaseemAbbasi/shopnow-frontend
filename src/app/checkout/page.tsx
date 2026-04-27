@@ -9,12 +9,12 @@ import { Address } from '@/types';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 
-export default function CheckoutPage() {
-  const { cart, fetchCart, clearCart } = useCartStore();
-  const { isLoggedIn } = useAuthStore();
-  const router = useRouter();
-  const [addresses, setAddresses] = useState<Address[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<number | null>(null);
+export default function CheckoutPage() { 
+  const { cart, fetchCart, clearCart } = useCartStore(); 
+  const { isLoggedIn } = useAuthStore(); 
+  const router = useRouter(); 
+  const [addresses, setAddresses] = useState<Address[]>([]); 
+  const [selectedAddress, setSelectedAddress] = useState<number | null>(null); 
   const [customAddress, setCustomAddress] = useState('');
   const [useCustom, setUseCustom] = useState(false);
   const [placing, setPlacing] = useState(false);
