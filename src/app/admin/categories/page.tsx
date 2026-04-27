@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Plus, Pencil, Trash2, X, Check, Tag, Upload, Link } from 'lucide-react';
 import api from '@/lib/axios';
+import { invalidate } from '@/lib/cache';
 import { Category } from '@/types';
 import toast from 'react-hot-toast';
 
@@ -59,6 +60,7 @@ export default function AdminCategoriesPage() {
         setCategories(prev => [...prev, res.data]);
         toast.success('Category added successfully!');
       }
+      invalidate('categories');
       setShowForm(false);
       setEditId(null);
       setForm(EMPTY_FORM);
@@ -95,6 +97,7 @@ export default function AdminCategoriesPage() {
     try {
       await api.delete(`/api/categories/${id}`);
       setCategories(prev => prev.filter(c => c.id !== id));
+      invalidate('categories');
       toast.success('Category deleted!');
     } catch {
       toast.error('Delete failed — products may be linked to this category');

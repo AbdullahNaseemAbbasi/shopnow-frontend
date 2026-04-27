@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ShoppingCart, Search, Heart, User, Menu, X, ChevronDown, LogOut, Package, LayoutDashboard, UserCircle, MapPin } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
-import api from '@/lib/axios';
+import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category } from '@/types';
 import toast from 'react-hot-toast';
 
@@ -21,24 +21,17 @@ export default function Navbar() {
   const { itemCount, fetchCart } = useCartStore();
 
   const isAdmin = user?.role === 'ADMIN';
-  const [categories, setCategories] = useState<Category[]>([]);
+  const { data: categoriesData } = useCachedFetch<Category[]>(
+    isAdmin ? null : 'categories',
+    isAdmin ? null : '/api/categories'
+  );
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
-
-  useEffect(() => {
-    if (!isAdmin) {
-      api.get('/api/categories')
-        .then(res => {
-          const data = res.data?.content || res.data;
-          setCategories(Array.isArray(data) ? data : []);
-        })
-        .catch(() => {});
-    }
-  }, [isAdmin]);
 
   useEffect(() => {
     if (isLoggedIn && !isAdmin) fetchCart();

@@ -2,6 +2,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Plus, Pencil, Trash2, Search, X, Check, PackageSearch, Upload, Link, Camera, Image as ImageIcon } from 'lucide-react';
 import api from '@/lib/axios';
+import { invalidate } from '@/lib/cache';
 import { formatPrice } from '@/lib/utils';
 import { Product, Category } from '@/types';
 import toast from 'react-hot-toast';
@@ -96,6 +97,8 @@ export default function AdminProductsPage() {
         setProducts(prev => [res.data, ...prev]);
         toast.success('Product added successfully!');
       }
+      invalidate('products:');
+      invalidate('product:slug:');
       setShowForm(false);
       setEditId(null);
       setForm(EMPTY_FORM);
@@ -114,6 +117,8 @@ export default function AdminProductsPage() {
     try {
       await api.delete(`/api/products/${id}`);
       setProducts(prev => prev.filter(p => p.id !== id));
+      invalidate('products:');
+      invalidate('product:slug:');
       toast.success('Product deleted!');
     } catch {
       toast.error('Delete failed');

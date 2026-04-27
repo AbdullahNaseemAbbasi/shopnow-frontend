@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
-import api from '@/lib/axios';
+import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category } from '@/types';
 
 const GRADIENTS = [
@@ -26,18 +26,8 @@ const TAGS = ['Up to 50% OFF', 'Shop Now', 'Explore Collection', 'View Deals', '
 
 export default function HeroBanner() {
   const [current, setCurrent] = useState(0);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api.get('/api/categories')
-      .then(res => {
-        const data = res.data?.content || res.data;
-        if (Array.isArray(data)) setCategories(data.slice(0, 5));
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: allCategories, loading } = useCachedFetch<Category[]>('categories', '/api/categories');
+  const categories = Array.isArray(allCategories) ? allCategories.slice(0, 5) : [];
 
   useEffect(() => {
     if (categories.length === 0) return;

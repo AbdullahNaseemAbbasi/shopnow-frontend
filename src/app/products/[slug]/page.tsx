@@ -8,6 +8,7 @@ import { useCartStore } from '@/store/cartStore';
 import { formatPrice, getDiscountPercent } from '@/lib/utils';
 import { Product, Review } from '@/types';
 import api from '@/lib/axios';
+import { getCached, setCached } from '@/lib/cache';
 import toast from 'react-hot-toast';
 
 const EMOJIS: Record<string, string> = {
@@ -42,21 +43,49 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!slug) return;
-    setLoading(true);
-    api.get(`/api/products/slug/${slug}`)
-      .then(res => {
-        setProduct(res.data);
-        const sizes = res.data.sizes ? res.data.sizes.split(',').map((s: string) => s.trim()).filter(Boolean) : [];
-        if (sizes.length > 0) setSelectedSize(sizes[0]);
-        const colors = res.data.colors ? res.data.colors.split(',').map((c: string) => c.trim()).filter(Boolean) : [];
-        if (colors.length > 0) setSelectedColor(colors[0]);
+    let cancelled = false;
 
-        api.get(`/api/products/${res.data.id}/sold-recently`).then(r => setSoldCount(r.data.soldCount || 0)).catch(() => {});
-        return api.get(`/api/reviews/product/${res.data.id}`);
+    const productKey = `product:slug:${slug}`;
+    const cachedProduct = getCached<Product>(productKey);
+
+    const applyProduct = (p: Product) => {
+      if (cancelled) return;
+      setProduct(p);
+      const sizes = p.sizes ? p.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
+      if (sizes.length > 0) setSelectedSize(prev => prev || sizes[0]);
+      const colors = p.colors ? p.colors.split(',').map(c => c.trim()).filter(Boolean) : [];
+      if (colors.length > 0) setSelectedColor(prev => prev || colors[0]);
+    };
+
+    if (cachedProduct) {
+      applyProduct(cachedProduct);
+      setLoading(false);
+      const reviewsKey = `reviews:product:${cachedProduct.id}`;
+      const cachedReviews = getCached<Review[]>(reviewsKey);
+      if (cachedReviews) setReviews(cachedReviews);
+    } else {
+      setLoading(true);
+    }
+
+    api.get<Product>(`/api/products/slug/${slug}`)
+      .then(res => {
+        if (cancelled) return;
+        const p = res.data;
+        setCached(productKey, p);
+        applyProduct(p);
+        api.get(`/api/products/${p.id}/sold-recently`)
+          .then(r => { if (!cancelled) setSoldCount(r.data.soldCount || 0); })
+          .catch(() => {});
+        return api.get<Review[]>(`/api/reviews/product/${p.id}`).then(r => {
+          if (cancelled) return;
+          setReviews(r.data || []);
+          setCached(`reviews:product:${p.id}`, r.data || []);
+        });
       })
-      .then(res => setReviews(res.data || []))
       .catch(() => {})
-      .finally(() => setLoading(false));
+      .finally(() => { if (!cancelled) setLoading(false); });
+
+    return () => { cancelled = true; };
   }, [slug]);
 
   // Live views simulation

@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/types";
+import { invalidate } from "@/lib/cache";
 
 interface AuthState {
   user: User | null;
@@ -24,6 +25,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => {
         localStorage.removeItem("shopnow_token");
         document.cookie = "shopnow-auth=;path=/;max-age=0";
+        invalidate();
         set({ user: null, isLoggedIn: false });
       },
     }),

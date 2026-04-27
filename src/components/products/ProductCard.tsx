@@ -8,6 +8,7 @@ import { formatPrice, getDiscountPercent } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
 import api from "@/lib/axios";
+import { prefetch } from "@/lib/useCachedFetch";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -52,8 +53,17 @@ export default function ProductCard({ product }: Props) {
     }
   };
 
+  const handlePrefetch = () => {
+    prefetch(`product:slug:${product.slug}`, `/api/products/slug/${product.slug}`);
+  };
+
   return (
-    <Link href={`/products/${product.slug}`} className="block h-full">
+    <Link
+      href={`/products/${product.slug}`}
+      className="block h-full"
+      onMouseEnter={handlePrefetch}
+      onTouchStart={handlePrefetch}
+    >
       <div className="bg-white rounded-2xl border border-gray-300 overflow-hidden group cursor-pointer h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:border-blue-200">
 
         <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>

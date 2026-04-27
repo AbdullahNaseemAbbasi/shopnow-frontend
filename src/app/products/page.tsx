@@ -1,11 +1,12 @@
 'use client';
-import { useEffect, useState, useCallback, Suspense } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Search, Star, ShoppingCart, Heart } from 'lucide-react';
 import Link from 'next/link';
 import api from '@/lib/axios';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { useCachedFetch } from '@/lib/useCachedFetch';
 import { formatPrice, getDiscountPercent } from '@/lib/utils';
 import { Product, PageResponse } from '@/types';
 import toast from 'react-hot-toast';
@@ -89,41 +90,37 @@ function ProductsContent() {
   const categoryId = searchParams.get('categoryId') || '';
   const categoryName = searchParams.get('categoryName') || '';
 
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-  const [totalElements, setTotalElements] = useState(0);
   const [search, setSearch] = useState(keyword);
   const [wishlisted, setWishlisted] = useState<number[]>([]);
   const [addingId, setAddingId] = useState<number | null>(null);
   const { isLoggedIn } = useAuthStore();
   const { addToCart } = useCartStore();
 
-  const fetchProducts = useCallback(async () => {
-    setLoading(true);
-    try {
-      let url: string;
-      if (search) {
-        url = `/api/products/search?keyword=${encodeURIComponent(search)}&page=${page}&size=12`;
-      } else if (categoryId) {
-        url = `/api/products/category/${categoryId}?page=${page}&size=12`;
-      } else {
-        url = `/api/products?page=${page}&size=12`;
-      }
-      const res = await api.get(url);
-      const data: PageResponse<Product> = res.data;
-      setProducts(data.content || []);
-      setTotalPages(data.totalPages || 0);
-      setTotalElements(data.totalElements || 0);
-    } catch {
-      setProducts([]);
-    } finally {
-      setLoading(false);
+  const { url, cacheKey } = (() => {
+    if (search) {
+      return {
+        url: `/api/products/search?keyword=${encodeURIComponent(search)}&page=${page}&size=12`,
+        cacheKey: `products:search:${search}:p${page}`,
+      };
     }
-  }, [search, page, categoryId]);
+    if (categoryId) {
+      return {
+        url: `/api/products/category/${categoryId}?page=${page}&size=12`,
+        cacheKey: `products:cat:${categoryId}:p${page}`,
+      };
+    }
+    return {
+      url: `/api/products?page=${page}&size=12`,
+      cacheKey: `products:list:p${page}`,
+    };
+  })();
 
-  useEffect(() => { fetchProducts(); }, [fetchProducts]);
+  const { data: pageData, loading } = useCachedFetch<PageResponse<Product>>(cacheKey, url);
+  const products = pageData?.content || [];
+  const totalPages = pageData?.totalPages || 0;
+  const totalElements = pageData?.totalElements || 0;
+
   useEffect(() => { setSearch(keyword); setPage(0); }, [keyword]);
   useEffect(() => { setPage(0); }, [categoryId]);
 

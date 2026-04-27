@@ -1,9 +1,10 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Heart, ShoppingCart, Star, Zap } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { useCachedFetch } from '@/lib/useCachedFetch';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 import { Product } from '@/types';
@@ -39,22 +40,12 @@ function ProductImage({ imageUrl, emoji, name }: { imageUrl?: string; emoji: str
 }
 
 export default function FeaturedProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: productsData, loading } = useCachedFetch<Product[]>('products:featured', '/api/products/featured');
+  const products = Array.isArray(productsData) ? productsData : [];
   const [wishlisted, setWishlisted] = useState<number[]>([]);
   const [addingId, setAddingId] = useState<number | null>(null);
   const { isLoggedIn } = useAuthStore();
   const { addToCart } = useCartStore();
-
-  useEffect(() => {
-    api.get('/api/products/featured')
-      .then(res => {
-        const data = res.data?.content || res.data;
-        if (Array.isArray(data)) setProducts(data);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   const handleAddToCart = async (e: React.MouseEvent, product: Product) => {
     e.preventDefault();

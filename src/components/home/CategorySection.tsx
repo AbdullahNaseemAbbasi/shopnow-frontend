@@ -1,7 +1,6 @@
 'use client';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import api from '@/lib/axios';
+import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category } from '@/types';
 
 const CATEGORY_STYLES: Record<string, { color: string; emoji: string }> = {
@@ -27,18 +26,8 @@ const DEFAULT_COLORS = [
 const DEFAULT_EMOJIS = ['🛍️', '🎁', '✨', '🔥', '💫', '🎯'];
 
 export default function CategorySection() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    api.get('/api/categories')
-      .then(res => {
-        const data = res.data?.content || res.data;
-        setCategories(Array.isArray(data) ? data : []);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: categoriesData, loading } = useCachedFetch<Category[]>('categories', '/api/categories');
+  const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   return (
     <section className="py-12 bg-gray-50">
