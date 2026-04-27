@@ -12,18 +12,14 @@ const GRADIENTS = [
   'from-indigo-900 via-blue-900 to-slate-900',
   'from-slate-900 via-indigo-950 to-blue-900',
 ];
-
 const ACCENTS = ['bg-blue-600', 'bg-indigo-600', 'bg-blue-700', 'bg-indigo-700', 'bg-blue-600'];
-
 const EMOJIS: Record<string, string> = {
   'Electronics': '📱', 'Fashion': '👗', 'Ladies Fashion': '👗',
   'Gents Fashion': '👘', 'Beauty': '💄', 'Home & Living': '🏠',
   'Sports': '⚽', 'Books': '📚', 'Kids': '🧸', 'Groceries': '🛒',
 };
-
 const BADGES = ['Mega Sale', 'New Collection', 'Best Deals', 'Hot Picks', 'Top Rated'];
 const TAGS = ['Up to 50% OFF', 'Shop Now', 'Explore Collection', 'View Deals', 'Discover More'];
-
 export default function HeroBanner({ initialData }: { initialData?: Category[] }) {
   const [current, setCurrent] = useState(0);
   const { data: allCategories, loading } = useCachedFetch<Category[]>(
@@ -32,13 +28,11 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
     { initialData }
   );
   const categories = Array.isArray(allCategories) ? allCategories.slice(0, 5) : [];
-
   useEffect(() => {
     if (categories.length === 0) return;
     const timer = setInterval(() => setCurrent(prev => (prev + 1) % categories.length), 5000);
     return () => clearInterval(timer);
   }, [categories.length]);
-
   const prev = () => setCurrent(prev => (prev - 1 + categories.length) % categories.length);
   const next = () => setCurrent(prev => (prev + 1) % categories.length);
   if (loading) {
@@ -47,14 +41,12 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
     );
   }
   if (categories.length === 0) return null;
-
   const cat = categories[current];
   const emoji = EMOJIS[cat.name] || '🛍️';
   const bg = GRADIENTS[current % GRADIENTS.length];
   const accent = ACCENTS[current % ACCENTS.length];
   const badge = BADGES[current % BADGES.length];
   const tag = TAGS[current % TAGS.length];
-
   return (
     <div className={`relative bg-gradient-to-r ${bg} overflow-hidden transition-all duration-700`}>
       <div className="max-w-[1600px] mx-auto px-8 py-16 md:py-24">
@@ -93,7 +85,6 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
               </Link>
             </div>
           </div>
-
           <div className="md:w-1/2 flex justify-center">
             {cat.imageUrl ? (
               <img
@@ -107,7 +98,6 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
           </div>
         </div>
       </div>
-
       {categories.length > 1 && (
         <>
           <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all">
@@ -118,7 +108,6 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
           </button>
         </>
       )}
-
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
         {categories.map((_, i) => (
           <button key={i} onClick={() => setCurrent(i)}
