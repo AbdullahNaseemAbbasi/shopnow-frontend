@@ -51,18 +51,18 @@ export default function FeaturedProducts({ initialData }: { initialData?: Produc
   const [wishlisted, setWishlisted] = useState<number[]>([]);
   const [addingId, setAddingId] = useState<number | null>(null);
   const { isLoggedIn } = useAuthStore();
-  const { addToCart } = useCartStore();
+  const { addToCart } = useCartStore(); 
 
-  const handleAddToCart = async (e: React.MouseEvent, product: Product) => {
+  const handleAddToCart = async (e: React.MouseEvent, product: Product) => { 
     e.preventDefault();
-    if (!isLoggedIn) { toast.error('Please login first!'); return; }
-    if (product.stock === 0) { toast.error('Out of stock!'); return; }
+    if (!isLoggedIn) { toast.error('Please login first!'); return; } 
+    if (product.stock === 0) { toast.error('Out of stock!'); return; } 
     setAddingId(product.id);
     try {
       await addToCart(product.id, 1);
-      toast.success('Added to cart!');
+      toast.success('Added to cart!'); 
     } catch {
-      toast.error('Please try again');
+      toast.error('Please try again'); 
     } finally {
       setAddingId(null);
     }
@@ -72,7 +72,7 @@ export default function FeaturedProducts({ initialData }: { initialData?: Produc
     e.preventDefault();
     if (!isLoggedIn) { toast.error('Please login first!'); return; }
     try {
-      await api.post(`/api/wishlist/${id}`);
+      await api.post(`/api/wishlist/${id}`); 
       setWishlisted(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
       toast.success(wishlisted.includes(id) ? 'Removed from wishlist' : 'Added to wishlist!');
     } catch { toast.error('Please try again'); }
