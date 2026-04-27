@@ -24,9 +24,13 @@ const EMOJIS: Record<string, string> = {
 const BADGES = ['Mega Sale', 'New Collection', 'Best Deals', 'Hot Picks', 'Top Rated'];
 const TAGS = ['Up to 50% OFF', 'Shop Now', 'Explore Collection', 'View Deals', 'Discover More'];
 
-export default function HeroBanner() {
+export default function HeroBanner({ initialData }: { initialData?: Category[] }) {
   const [current, setCurrent] = useState(0);
-  const { data: allCategories, loading } = useCachedFetch<Category[]>('categories', '/api/categories');
+  const { data: allCategories, loading } = useCachedFetch<Category[]>(
+    'categories',
+    '/api/categories',
+    { initialData }
+  );
   const categories = Array.isArray(allCategories) ? allCategories.slice(0, 5) : [];
 
   useEffect(() => {

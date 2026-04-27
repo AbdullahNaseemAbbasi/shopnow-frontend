@@ -44,6 +44,8 @@ function ProductItem({
               <img
                 src={product.imageUrl}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 onLoad={() => setImgLoaded(true)}
                 onError={() => setImgError(true)}
                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-500 group-hover:scale-105 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}

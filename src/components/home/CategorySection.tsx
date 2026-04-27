@@ -25,8 +25,12 @@ const DEFAULT_COLORS = [
 
 const DEFAULT_EMOJIS = ['🛍️', '🎁', '✨', '🔥', '💫', '🎯'];
 
-export default function CategorySection() {
-  const { data: categoriesData, loading } = useCachedFetch<Category[]>('categories', '/api/categories');
+export default function CategorySection({ initialData }: { initialData?: Category[] }) {
+  const { data: categoriesData, loading } = useCachedFetch<Category[]>(
+    'categories',
+    '/api/categories',
+    { initialData }
+  );
   const categories = Array.isArray(categoriesData) ? categoriesData : [];
 
   return (

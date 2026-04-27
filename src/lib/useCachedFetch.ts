@@ -3,8 +3,11 @@ import { useEffect, useState } from "react";
 import api from "./axios";
 import { getCached, setCached, getInflight, setInflight, DEFAULT_TTL } from "./cache";
 
-interface Options {
+interface Options<T> {
   ttl?: number;
+  // Server-rendered seed data. Used as initial state when cache is empty;
+  // also written to cache so other components on the same key benefit.
+  initialData?: T;
 }
 
 // Stale-while-revalidate: returns cached data immediately if present,
@@ -12,12 +15,16 @@ interface Options {
 export function useCachedFetch<T>(
   key: string | null,
   url: string | null,
-  options: Options = {}
+  options: Options<T> = {}
 ) {
   const ttl = options.ttl ?? DEFAULT_TTL;
-  const initial = key ? getCached<T>(key, ttl) : null;
-  const [data, setData] = useState<T | null>(initial);
-  const [loading, setLoading] = useState(!initial && !!key && !!url);
+  // Initial state must be identical on server and client. Module-level memCache
+  // leaks state across server requests, so we never read it during initial render —
+  // only inside useEffect (client-only).
+  const [data, setData] = useState<T | null>(options.initialData ?? null);
+  const [loading, setLoading] = useState(
+    options.initialData === undefined && !!key && !!url
+  );
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
@@ -31,6 +38,9 @@ export function useCachedFetch<T>(
     if (cached) {
       setData(cached);
       setLoading(false);
+    } else if (options.initialData !== undefined) {
+      // Seed the client cache so other components on the same key benefit.
+      setCached(key, options.initialData);
     }
 
     let promise = getInflight<T>(key);
@@ -53,13 +63,13 @@ export function useCachedFetch<T>(
       .catch((err) => {
         if (cancelled) return;
         setError(err);
-        if (!cached) setLoading(false);
+        if (!cached && options.initialData === undefined) setLoading(false);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [key, url, ttl]);
+  }, [key, url, ttl, options.initialData]);
 
   return { data, loading, error };
 }

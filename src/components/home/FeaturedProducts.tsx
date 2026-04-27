@@ -30,6 +30,8 @@ function ProductImage({ imageUrl, emoji, name }: { imageUrl?: string; emoji: str
         <img
           src={imageUrl}
           alt={name}
+          loading="lazy"
+          decoding="async"
           onLoad={() => setImgLoaded(true)}
           onError={() => setImgError(true)}
           className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
@@ -39,8 +41,12 @@ function ProductImage({ imageUrl, emoji, name }: { imageUrl?: string; emoji: str
   );
 }
 
-export default function FeaturedProducts() {
-  const { data: productsData, loading } = useCachedFetch<Product[]>('products:featured', '/api/products/featured');
+export default function FeaturedProducts({ initialData }: { initialData?: Product[] }) {
+  const { data: productsData, loading } = useCachedFetch<Product[]>(
+    'products:featured',
+    '/api/products/featured',
+    { initialData }
+  );
   const products = Array.isArray(productsData) ? productsData : [];
   const [wishlisted, setWishlisted] = useState<number[]>([]);
   const [addingId, setAddingId] = useState<number | null>(null);
