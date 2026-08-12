@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Package, ShoppingBag, Tag, Ticket, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
+import { formatPrice } from '@/lib/utils';
+import { useRealtimeEvent } from '@/lib/useRealtime';
 import toast from 'react-hot-toast';
 
 const NAV_ITEMS = [
@@ -100,6 +102,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     toast.success('Logged out successfully!');
     router.push('/');
   };
+
+  // Global live alert for admins: fires once on any admin page when a customer places an order.
+  // The server only pushes order.created to admin streams, so no role check is needed here.
+  useRealtimeEvent('order.created', (data) => {
+    const amount = typeof data.totalAmount === 'number' ? ` · ${formatPrice(data.totalAmount)}` : '';
+    toast.success(`New order ${data.orderNumber ?? ''}${amount}`, { icon: '🛒', duration: 6000 });
+  });
 
   if (!mounted) return null;
   if (!isLoggedIn || user?.role !== 'ADMIN') return null;

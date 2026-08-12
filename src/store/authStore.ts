@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import { User } from "@/types";
 import { invalidate } from "@/lib/cache";
 import { useCartStore } from "@/store/cartStore";
+import { disconnectRealtime } from "@/lib/realtime";
 
 interface AuthState {
   user: User | null;
@@ -30,6 +31,8 @@ export const useAuthStore = create<AuthState>()(
         // Wipe the non-persisted cart store too, otherwise the previous user's items (and the
         // navbar badge counting them) leak into the next session on this tab.
         useCartStore.getState().reset();
+        // Close the SSE stream so the next user doesn't inherit this one's live connection.
+        disconnectRealtime();
         set({ user: null, isLoggedIn: false });
       },
     }),

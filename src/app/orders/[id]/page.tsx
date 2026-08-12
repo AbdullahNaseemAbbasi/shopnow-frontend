@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Package, ArrowLeft, Clock, CheckCircle, Truck, XCircle, MapPin, CreditCard } from 'lucide-react';
@@ -7,6 +7,9 @@ import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import { Order } from '@/types';
 import api from '@/lib/axios';
+import toast from 'react-hot-toast';
+import { useRealtimeEvent } from '@/lib/useRealtime';
+import LiveIndicator from '@/components/ui/LiveIndicator';
 
 const STATUS_CONFIG = {
   PENDING:   { label: 'Pending',   color: 'bg-yellow-100 text-yellow-700 border-yellow-200', icon: Clock },
@@ -32,17 +35,26 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const toast_error = () => {
-    import('react-hot-toast').then(({ default: toast }) => toast.error('Failed to load order'));
-  };
+  const fetchOrder = useCallback((silent = false) => {
+    if (!silent) setLoading(true);
+    return api.get(`/api/orders/${id}`)
+      .then(res => setOrder(res.data))
+      .catch(() => { if (!silent) toast.error('Failed to load order'); })
+      .finally(() => setLoading(false));
+  }, [id]);
 
   useEffect(() => {
     if (!isLoggedIn) { router.push('/auth/login'); return; }
-    api.get(`/api/orders/${id}`)
-      .then(res => setOrder(res.data))
-      .catch(() => toast_error())
-      .finally(() => setLoading(false));
-  }, [isLoggedIn, id, router]);
+    fetchOrder();
+  }, [isLoggedIn, router, fetchOrder]);
+
+  // Live: when an admin advances this order's status, the backend pushes order.updated over SSE.
+  // Silently refetch so the timeline and badge move without a page reload, and toast the change.
+  useRealtimeEvent('order.updated', (data) => {
+    if (Number(data.orderId) !== Number(id)) return;
+    fetchOrder(true);
+    toast.success(`Order status: ${String(data.status ?? '').toLowerCase()}`, { icon: '📦' });
+  });
 
   if (!isLoggedIn) return null;
 
@@ -85,8 +97,9 @@ export default function OrderDetailPage() {
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <Package size={20} className="text-blue-600" />
+                <Package size={20} className="text-brand" />
                 <h1 className="text-xl font-black text-gray-900">{order.orderNumber}</h1>
+                <LiveIndicator className="ml-1" />
               </div>
               <p className="text-sm text-gray-500">
                 {new Date(order.createdAt).toLocaleDateString('en-PK', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}

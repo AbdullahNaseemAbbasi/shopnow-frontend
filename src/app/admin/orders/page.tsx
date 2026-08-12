@@ -4,6 +4,8 @@ import { Clock, CheckCircle, Truck, XCircle, ChevronDown, RefreshCw } from 'luci
 import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
 import toast from 'react-hot-toast';
+import { useRealtimeEvent } from '@/lib/useRealtime';
+import LiveIndicator from '@/components/ui/LiveIndicator';
 
 interface AdminOrder {
   id: number;
@@ -48,6 +50,12 @@ export default function AdminOrdersPage() {
 
   useEffect(() => { fetchOrders(); }, []);
 
+  // Live: a customer placing an order pushes order.created to every admin, and a status change
+  // pushes order.updated. Pull the fresh list in on both. The global "new order" toast lives in
+  // the admin layout so it fires once regardless of which admin page is open.
+  useRealtimeEvent('order.created', () => fetchOrders());
+  useRealtimeEvent('order.updated', () => fetchOrders());
+
   const handleStatusUpdate = async (orderId: number, newStatus: string) => {
     setUpdatingId(orderId);
     try {
@@ -72,10 +80,13 @@ export default function AdminOrdersPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-black text-gray-900">Orders</h1>
+          <div className="flex items-center gap-2">
+            <h1 className="text-2xl font-black text-gray-900">Orders</h1>
+            <LiveIndicator />
+          </div>
           <p className="text-gray-500 text-sm">Manage all orders</p>
         </div>
-        <button onClick={fetchOrders} className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-xl text-sm font-semibold hover:border-blue-400 hover:text-blue-600 transition-colors">
+        <button onClick={fetchOrders} className="flex items-center gap-2 border border-gray-200 px-3 py-2 rounded-xl text-sm font-semibold hover:border-brand hover:text-brand transition-colors">
           <RefreshCw size={14} /> Refresh
         </button>
       </div>
