@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
-import { Plus, Pencil, Trash2, Search, X, Check, PackageSearch, Upload, Link, Camera, Image as ImageIcon } from 'lucide-react';
+import { Plus, Pencil, Trash2, Search, X, Check, PackageSearch, Upload, Camera, Image as ImageIcon } from 'lucide-react';
 import api from '@/lib/axios';
 import { invalidate } from '@/lib/cache';
 import { formatPrice } from '@/lib/utils';
@@ -28,14 +28,6 @@ export default function AdminProductsPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    fetchProducts();
-    api.get('/api/categories').then(res => {
-      const data = res.data?.content || res.data;
-      setCategories(Array.isArray(data) ? data : []);
-    }).catch(() => {});
-  }, [page]);
-
   const fetchProducts = () => {
     setLoading(true);
     api.get(`/api/products?page=${page}&size=10`)
@@ -46,6 +38,14 @@ export default function AdminProductsPage() {
       .catch(() => toast.error('Failed to load products'))
       .finally(() => setLoading(false));
   };
+
+  useEffect(() => {
+    fetchProducts();
+    api.get('/api/categories').then(res => {
+      const data = res.data?.content || res.data;
+      setCategories(Array.isArray(data) ? data : []);
+    }).catch(() => {});
+  }, [page]);
 
   const generateSlug = (name: string) =>
     name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');

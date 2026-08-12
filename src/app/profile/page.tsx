@@ -20,11 +20,6 @@ export default function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
 
-  useEffect(() => {
-    if (!isLoggedIn) { router.push('/auth/login'); return; }
-    fetchAddresses();
-  }, [isLoggedIn, router]);
-
   const fetchAddresses = () => {
     setLoading(true);
     api.get('/api/addresses')
@@ -32,6 +27,11 @@ export default function ProfilePage() {
       .catch(() => toast.error('Failed to load addresses'))
       .finally(() => setLoading(false));
   };
+
+  useEffect(() => {
+    if (!isLoggedIn) { router.push('/auth/login'); return; }
+    fetchAddresses();
+  }, [isLoggedIn, router]);
 
   const handleOpenAdd = () => {
     setEditId(null);

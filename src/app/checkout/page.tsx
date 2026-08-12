@@ -47,11 +47,19 @@ export default function CheckoutPage() {
       const payload: { shippingAddress: string; couponCode?: string } = { shippingAddress };
       if (couponCode) payload.couponCode = couponCode;
       const res = await api.post('/api/orders', payload);
+      // The order is now committed on the server. Everything after this point is cleanup that
+      // must NOT be able to surface an "order failed" error — otherwise a flaky DELETE /api/cart
+      // shows the success screen and a red "could not be placed" toast at the same time.
       setOrderNumber(res.data.orderNumber);
       setPlaced(true);
       sessionStorage.removeItem('shopnow_coupon');
-      await clearCart();
       toast.success('Order placed successfully! Please check your email.');
+      try {
+        await clearCart();
+      } catch {
+        // Order already succeeded; the backend also empties the cart on checkout, so a failure
+        // here is cosmetic. Swallow it rather than alarming the user.
+      }
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       toast.error(error?.response?.data?.message || 'Order could not be placed, please try again!');

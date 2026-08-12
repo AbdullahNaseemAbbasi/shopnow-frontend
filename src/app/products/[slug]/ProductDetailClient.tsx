@@ -102,22 +102,29 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
     return images;
   }, [product]);
 
-  const handleAddToCart = async () => {
-    if (!isLoggedIn) { toast.error('Please login first!'); router.push('/auth/login'); return; }
+  // Returns true only when the item actually made it into the cart, so callers like Buy Now
+  // can decide whether to proceed instead of navigating on a failed/blocked add.
+  const handleAddToCart = async (): Promise<boolean> => {
+    if (!isLoggedIn) { toast.error('Please login first!'); router.push('/auth/login'); return false; }
     setAdding(true);
     try {
       await addToCart(product.id, quantity);
       toast.success(`${product.name} added to cart!`);
+      return true;
     } catch {
       toast.error('Please try again');
+      return false;
     } finally {
       setAdding(false);
     }
   };
 
   const handleBuyNow = async () => {
-    await handleAddToCart();
-    router.push('/cart');
+    // Only head to checkout if the add succeeded; otherwise the user lands on /cart with
+    // nothing added, or gets bounced to /cart mid-redirect to the login page.
+    if (await handleAddToCart()) {
+      router.push('/cart');
+    }
   };
 
   const handleWishlist = async () => {

@@ -19,20 +19,20 @@ export default function AdminCategoriesPage() {
   const [uploading, setUploading] = useState(false); 
   const fileInputRef = useRef<HTMLInputElement>(null); 
 
-  useEffect(() => {
-    fetchCategories(); 
-  }, []); 
-
-  const fetchCategories = () => { 
-    setLoading(true); 
-    api.get('/api/categories') 
+  const fetchCategories = () => {
+    setLoading(true);
+    api.get('/api/categories')
       .then(res => {
-        const data = res.data?.content || res.data; 
+        const data = res.data?.content || res.data;
         setCategories(Array.isArray(data) ? data : []);
-      }) 
+      })
       .catch(() => toast.error('Failed to load categories'))
       .finally(() => setLoading(false));
   };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleOpenAdd = () => {
     setEditId(null);

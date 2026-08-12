@@ -31,7 +31,7 @@ export default function Footer() {
               <span className="text-xl font-black text-white">Shop<span className="text-blue-400">Now</span></span>
             </div>
             <p className="text-sm leading-relaxed mb-5 text-slate-400">
-              Pakistan's largest and most trusted online store. Quality products, fast delivery, and best prices guaranteed.
+              Pakistan&apos;s largest and most trusted online store. Quality products, fast delivery, and best prices guaranteed.
             </p>
             <div className="flex gap-3">
               {[Facebook, Instagram, Twitter, Youtube].map((Icon, i) => (

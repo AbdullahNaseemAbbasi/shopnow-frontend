@@ -25,10 +25,16 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoggedIn) { router.push('/auth/login'); return; }
-    Promise.all([
-      api.get('/api/orders').then(r => setOrders(r.data || [])),
-      api.get('/api/wishlist').then(r => setWishlist(r.data || [])),
-    ]).finally(() => setLoading(false));
+    // allSettled, not all: with Promise.all a single failing endpoint both rejects (an
+    // unhandled rejection, since there is no .catch) and leaves the other list unset. Settling
+    // each independently lets orders load even if wishlist 500s, and vice versa.
+    Promise.allSettled([
+      api.get('/api/orders'),
+      api.get('/api/wishlist'),
+    ]).then(([ordersRes, wishlistRes]) => {
+      if (ordersRes.status === 'fulfilled') setOrders(ordersRes.value.data || []);
+      if (wishlistRes.status === 'fulfilled') setWishlist(wishlistRes.value.data || []);
+    }).finally(() => setLoading(false));
   }, [isLoggedIn, router]);
 
   if (!isLoggedIn) return null;

@@ -42,7 +42,7 @@ export default function LoginPage() {
             </div>
             <span className="text-3xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
           </Link>
-          <p className="text-gray-500 mt-2">Pakistan's #1 Online Store</p>
+          <p className="text-gray-500 mt-2">Pakistan&apos;s #1 Online Store</p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-100">
@@ -95,7 +95,7 @@ export default function LoginPage() {
 
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-sm">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/auth/register" className="text-blue-600 font-semibold hover:underline">
                 Register
               </Link>

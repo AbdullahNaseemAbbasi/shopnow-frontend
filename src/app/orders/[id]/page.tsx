@@ -32,6 +32,10 @@ export default function OrderDetailPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const toast_error = () => {
+    import('react-hot-toast').then(({ default: toast }) => toast.error('Failed to load order'));
+  };
+
   useEffect(() => {
     if (!isLoggedIn) { router.push('/auth/login'); return; }
     api.get(`/api/orders/${id}`)
@@ -39,10 +43,6 @@ export default function OrderDetailPage() {
       .catch(() => toast_error())
       .finally(() => setLoading(false));
   }, [isLoggedIn, id, router]);
-
-  const toast_error = () => {
-    import('react-hot-toast').then(({ default: toast }) => toast.error('Failed to load order'));
-  };
 
   if (!isLoggedIn) return null;
 

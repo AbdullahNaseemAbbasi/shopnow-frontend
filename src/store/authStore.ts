@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User } from "@/types";
 import { invalidate } from "@/lib/cache";
+import { useCartStore } from "@/store/cartStore";
 
 interface AuthState {
   user: User | null;
@@ -26,6 +27,9 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem("shopnow_token");
         document.cookie = "shopnow-auth=;path=/;max-age=0";
         invalidate();
+        // Wipe the non-persisted cart store too, otherwise the previous user's items (and the
+        // navbar badge counting them) leak into the next session on this tab.
+        useCartStore.getState().reset();
         set({ user: null, isLoggedIn: false });
       },
     }),

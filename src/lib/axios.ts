@@ -17,12 +17,23 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-api.interceptors.response.use( 
+// 401 = not authenticated (no token, or it expired/was tampered with) -> session is dead,
+//       clear it and send the user to log in.
+// 403 = authenticated but not allowed (e.g. a USER hitting an admin route) -> the session is
+//       still valid, so do NOT log them out; let the caller show its own error.
+api.interceptors.response.use(
   (response) => response,
-  (error) => { 
-    if (error.response?.status === 401) { 
-      if (typeof window !== "undefined") { 
-        localStorage.removeItem("shopnow_token"); 
+  (error) => {
+    if (error.response?.status === 401 && typeof window !== "undefined") {
+      // The login/register calls themselves answer 401 on bad credentials. Redirecting here
+      // would reload the page and destroy the error toast before the user could read it.
+      const onAuthPage = window.location.pathname.startsWith("/auth/");
+      if (!onAuthPage) {
+        // The session lives in three places; clearing only the token leaves the UI
+        // believing the user is still signed in after the reload.
+        localStorage.removeItem("shopnow_token");   // raw JWT used by the request interceptor
+        localStorage.removeItem("shopnow-auth");    // zustand persist blob (authStore)
+        document.cookie = "shopnow-auth=;path=/;max-age=0"; // cookie middleware reads to gate /admin
         window.location.href = "/auth/login";
       }
     }

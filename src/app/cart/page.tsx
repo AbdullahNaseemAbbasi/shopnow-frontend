@@ -23,6 +23,22 @@ export default function CartPage() {
     fetchCart();
   }, [isLoggedIn, fetchCart, router]);
 
+  // The discount was computed server-side against the subtotal at apply time and is frozen in
+  // local state. Once the cart total changes (quantity edit, item removed) that number is stale,
+  // and finalAmount = total - discount becomes fiction. We can't recompute it on the client, so
+  // drop the coupon and ask the user to re-apply. Keyed only on totalAmount, so it never fires
+  // on the apply itself (which doesn't change the total).
+  useEffect(() => {
+    if (couponApplied) {
+      setDiscount(0);
+      setCouponApplied('');
+      setCouponCode('');
+      sessionStorage.removeItem('shopnow_coupon');
+      toast('Cart changed — please re-apply your coupon', { icon: '🔖' });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart?.totalAmount]);
+
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) return;
     setApplyingCoupon(true);

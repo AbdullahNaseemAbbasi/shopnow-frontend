@@ -42,6 +42,9 @@ export default function Navbar() {
     if (searchQuery.trim()) {
       router.push(`/products?keyword=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery('');
+      // The mobile drawer uses this same handler; without closing it the results page renders
+      // underneath a full-screen open menu.
+      setMobileOpen(false);
     }
   };
 
