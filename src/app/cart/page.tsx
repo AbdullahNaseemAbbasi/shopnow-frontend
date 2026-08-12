@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Tag } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
@@ -97,7 +98,7 @@ export default function CartPage() {
               {cart.items.map((item) => (
                 <div key={item.cartItemId} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex gap-4">
                   <div className="w-20 h-20 bg-gray-50 rounded-xl flex items-center justify-center flex-shrink-0 text-3xl">
-                    {item.imageUrl ? <img src={item.imageUrl} alt={item.productName} className="w-full h-full object-cover rounded-xl" /> : '📦'}
+                    {item.imageUrl ? <Image src={item.imageUrl} alt={item.productName} width={80} height={80} className="w-full h-full object-cover rounded-xl" /> : '📦'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <Link href={`/products/${item.productSlug}`}>

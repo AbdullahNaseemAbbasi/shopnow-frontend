@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { ShoppingBag, Users, Package, TrendingUp, Clock, DollarSign, LayoutDashboard, Tag, List, CheckCircle, Truck, XCircle, Star } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
@@ -98,15 +99,15 @@ export default function AdminPage() {
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-2 mb-2">
-            <Package size={16} className="text-blue-300" />
+            <Package size={16} className="text-white/80" />
             <span className="text-gray-300 text-xs font-semibold uppercase tracking-wide">Today&apos;s Orders</span>
           </div>
           <p className="text-3xl font-black">{stats.todayOrders}</p>
         </div>
         <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-2 mb-2">
-            <DollarSign size={16} className="text-blue-200" />
-            <span className="text-blue-200 text-xs font-semibold uppercase tracking-wide">Today&apos;s Revenue</span>
+            <DollarSign size={16} className="text-white/80" />
+            <span className="text-white/80 text-xs font-semibold uppercase tracking-wide">Today&apos;s Revenue</span>
           </div>
           <p className="text-3xl font-black">{formatPrice(stats.todayRevenue)}</p>
         </div>
@@ -199,7 +200,7 @@ export default function AdminPage() {
                     {i + 1}
                   </span>
                   <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0 text-xl">
-                    {product.imageUrl ? <img src={product.imageUrl} alt="" className="w-full h-full object-cover rounded-xl" /> : '📦'}
+                    {product.imageUrl ? <Image src={product.imageUrl} alt={product.productName} width={40} height={40} className="w-full h-full object-cover rounded-xl" /> : '📦'}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-900 text-xs line-clamp-1">{product.productName}</p>

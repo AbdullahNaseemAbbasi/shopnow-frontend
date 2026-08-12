@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
 import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category } from '@/types';
@@ -58,7 +59,7 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
             <h1 className="text-2xl md:text-4xl font-black leading-tight">
               {cat.name}
               {cat.description && (
-                <span className="block text-blue-300 text-sm md:text-base font-light mt-2 leading-relaxed max-w-md">
+                <span className="block text-white/90 text-sm md:text-base font-light mt-2 leading-relaxed max-w-md">
                   {cat.description}
                 </span>
               )}
@@ -87,11 +88,16 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
           </div>
           <div className="md:w-1/2 flex justify-center">
             {cat.imageUrl ? (
-              <img
-                src={cat.imageUrl}
-                alt={cat.name}
-                className="max-h-64 md:max-h-80 object-contain rounded-2xl animate-float"
-              />
+              <div className="relative w-full h-64 md:h-80 animate-float">
+                <Image
+                  src={cat.imageUrl}
+                  alt={cat.name}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  priority
+                  className="object-contain rounded-2xl"
+                />
+              </div>
             ) : (
               <div className="text-[120px] md:text-[200px] animate-float select-none">{emoji}</div>
             )}

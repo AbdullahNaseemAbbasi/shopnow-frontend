@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { formatPrice } from '@/lib/utils';
 import { WishlistItem } from '@/types';
+import ProductImage from '@/components/ui/ProductImage';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 
@@ -80,12 +81,13 @@ export default function WishlistPage() {
             {items.map((item) => (
               <div key={item.id} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-md transition-shadow group">
                 <Link href={item.productSlug ? `/products/${item.productSlug}` : '/products'}>
-                  <div className="relative h-48 bg-gray-50 flex items-center justify-center">
-                    {item.productImage ? (
-                      <img src={item.productImage} alt={item.productName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <span className="text-5xl">🛍️</span>
-                    )}
+                  <div className="relative h-48 bg-gray-50 flex items-center justify-center overflow-hidden">
+                    <ProductImage
+                      src={item.productImage}
+                      alt={item.productName}
+                      imgClassName="group-hover:scale-105"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
                     {!item.inStock && (
                       <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
                         <span className="bg-gray-700 text-white text-xs font-bold px-2 py-1 rounded-lg">Out of Stock</span>

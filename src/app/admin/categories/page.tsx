@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
+import Image from 'next/image';
 import { Plus, Pencil, Trash2, X, Check, Tag, Upload, Link } from 'lucide-react';
 import api from '@/lib/axios';
 import { invalidate } from '@/lib/cache';
@@ -138,7 +139,7 @@ export default function AdminCategoriesPage() {
                 <div className="flex gap-3 items-start">
                   <div className="w-16 h-16 rounded-xl border-2 border-gray-200 flex-shrink-0 overflow-hidden bg-gray-50 flex items-center justify-center">
                     {form.imageUrl ? (
-                      <img src={form.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                      <Image src={form.imageUrl} alt="preview" width={64} height={64} className="w-full h-full object-cover" />
                     ) : (
                       <Tag size={18} className="text-gray-400" />
                     )}
@@ -191,7 +192,7 @@ export default function AdminCategoriesPage() {
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
                   {cat.imageUrl ? (
-                    <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover rounded-xl" />
+                    <Image src={cat.imageUrl} alt={cat.name} width={48} height={48} className="w-full h-full object-cover rounded-xl" />
                   ) : (
                     <Tag size={20} className="text-gray-500" />
                   )}

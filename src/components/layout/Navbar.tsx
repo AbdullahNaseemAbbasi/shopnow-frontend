@@ -196,7 +196,18 @@ export default function Navbar() {
               </div>
             )}
 
-            <button onClick={() => setMobileOpen(!mobileOpen)} className="flex md:hidden p-2 hover:text-blue-600">
+            {!isAdmin && (
+              <Link href="/cart" aria-label="Cart" className="flex md:hidden relative p-2 hover:text-brand transition-colors">
+                <ShoppingCart size={24} />
+                {count > 0 && (
+                  <span className="absolute top-0 right-0 bg-brand text-white text-[10px] min-w-[18px] h-[18px] px-1 rounded-full flex items-center justify-center font-bold">
+                    {count > 99 ? '99+' : count}
+                  </span>
+                )}
+              </Link>
+            )}
+
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="flex md:hidden p-2 hover:text-brand">
               {mobileOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>

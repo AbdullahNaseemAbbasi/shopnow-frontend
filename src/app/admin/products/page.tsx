@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useRef } from 'react';
+import NextImage from 'next/image';
 import { Plus, Pencil, Trash2, Search, X, Check, PackageSearch, Upload, Camera, Image as ImageIcon } from 'lucide-react';
 import api from '@/lib/axios';
 import { invalidate } from '@/lib/cache';
@@ -249,7 +250,7 @@ export default function AdminProductsPage() {
                   <div className="flex gap-2 flex-wrap">
                     {imageUrls.map((url, i) => (
                       <div key={i} className="relative group w-20 h-20">
-                        <img src={url} alt={`img-${i}`} className="w-full h-full object-cover rounded-xl border-2 border-gray-200" />
+                        <NextImage src={url} alt={`img-${i}`} width={80} height={80} className="w-full h-full object-cover rounded-xl border-2 border-gray-200" />
                         <button type="button" onClick={() => removeImage(i)}
                           className="absolute -top-1.5 -right-1.5 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                           <X size={12} />
@@ -377,7 +378,7 @@ export default function AdminProductsPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-xl flex-shrink-0">
-                          {product.imageUrl ? <img src={product.imageUrl} alt="" className="w-full h-full object-cover rounded-xl" /> : '📦'}
+                          {product.imageUrl ? <NextImage src={product.imageUrl} alt={product.name} width={40} height={40} className="w-full h-full object-cover rounded-xl" /> : '📦'}
                         </div>
                         <div>
                           <p className="font-semibold text-gray-900 text-sm line-clamp-1">{product.name}</p>

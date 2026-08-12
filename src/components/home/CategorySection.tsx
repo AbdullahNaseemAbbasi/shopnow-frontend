@@ -1,5 +1,6 @@
 'use client';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category } from '@/types';
 
@@ -63,9 +64,9 @@ export default function CategorySection({ initialData }: { initialData?: Categor
                 <Link key={cat.id} href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`}
                   className="category-card bg-white rounded-2xl p-4 flex flex-col items-center text-center shadow-sm hover:shadow-md cursor-pointer"
                   style={{ animationDelay: `${i * 0.1}s` }}>
-                  <div className={`w-14 h-14 bg-gradient-to-br ${style.color} rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-lg`}>
+                  <div className={`w-14 h-14 bg-gradient-to-br ${style.color} rounded-2xl flex items-center justify-center text-2xl mb-3 shadow-lg overflow-hidden`}>
                     {cat.imageUrl ? (
-                      <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover rounded-2xl" />
+                      <Image src={cat.imageUrl} alt={cat.name} width={56} height={56} className="w-full h-full object-cover rounded-2xl" />
                     ) : (
                       style.emoji
                     )}

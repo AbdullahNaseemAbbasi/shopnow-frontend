@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Eye, Flame, MessageCircle } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
@@ -190,9 +191,16 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 md:p-8 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="relative">
-              <div className="bg-gray-50 rounded-2xl h-80 md:h-[450px] flex items-center justify-center overflow-hidden mb-3">
+              <div className="relative bg-gray-50 rounded-2xl h-80 md:h-[450px] flex items-center justify-center overflow-hidden mb-3">
                 {images.length > 0 ? (
-                  <img src={images[selectedImage] || images[0]} alt={product.name} className="w-full h-full object-contain" loading="eager" decoding="async" />
+                  <Image
+                    src={images[selectedImage] || images[0]}
+                    alt={product.name}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    priority
+                    className="object-contain"
+                  />
                 ) : (
                   <span className="text-8xl">{emoji}</span>
                 )}
@@ -212,8 +220,8 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
                   {images.map((img, i) => (
                     <button key={i} onClick={() => setSelectedImage(i)}
-                      className={`w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all ${i === selectedImage ? 'border-blue-600 shadow-md' : 'border-gray-200 hover:border-gray-400'}`}>
-                      <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" loading="lazy" decoding="async" />
+                      className={`w-16 h-16 flex-shrink-0 rounded-xl overflow-hidden border-2 transition-all ${i === selectedImage ? 'border-brand shadow-md' : 'border-gray-200 hover:border-gray-400'}`}>
+                      <Image src={img} alt={`${product.name} ${i + 1}`} width={64} height={64} className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
