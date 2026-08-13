@@ -2,19 +2,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Package, ChevronRight, Clock, CheckCircle, Truck, XCircle } from 'lucide-react';
+import { Package, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import { Order } from '@/types';
 import api from '@/lib/axios';
-
-const STATUS_CONFIG = {
-  PENDING: { label: 'Pending', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
-  CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700', icon: CheckCircle },
-  SHIPPED: { label: 'Shipped', color: 'bg-purple-100 text-purple-700', icon: Truck },
-  DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-red-100 text-red-700', icon: XCircle },
-};
+import { ORDER_STATUS_META, FULFILLMENT_STEPS, isTerminalNonDelivered } from '@/lib/orderStatus';
+import type { OrderStatus } from '@/types';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -60,8 +54,8 @@ export default function OrdersPage() {
         ) : (
           <div className="space-y-4">
             {orders.map((order) => {
-              const status = STATUS_CONFIG[order.status] || STATUS_CONFIG.PENDING;
-              const StatusIcon = status.icon;
+              const meta = ORDER_STATUS_META[order.status] ?? ORDER_STATUS_META.PENDING;
+              const StatusIcon = meta.Icon;
               return (
                 <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                   <div className="p-5">
@@ -69,8 +63,8 @@ export default function OrdersPage() {
                       <div>
                         <div className="flex items-center gap-3 mb-1">
                           <h3 className="font-black text-gray-900">{order.orderNumber}</h3>
-                          <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${status.color}`}>
-                            <StatusIcon size={12} /> {status.label}
+                          <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${meta.badge}`}>
+                            <StatusIcon size={12} /> {meta.label}
                           </span>
                         </div>
                         <p className="text-sm text-gray-500">
@@ -109,25 +103,23 @@ export default function OrdersPage() {
                     </div>
                   </div>
 
-                  {order.status !== 'CANCELLED' && (
+                  {!isTerminalNonDelivered(order.status) && (
                     <div className="px-5 pb-4">
                       <div className="flex items-center gap-1">
-                        {['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'].map((s, i) => {
-                          const steps = ['PENDING', 'CONFIRMED', 'SHIPPED', 'DELIVERED'];
-                          const currentIdx = steps.indexOf(order.status);
+                        {FULFILLMENT_STEPS.map((s, i) => {
+                          const currentIdx = FULFILLMENT_STEPS.indexOf(order.status);
                           const active = i <= currentIdx;
                           return (
-                            <div key={s} className="flex items-center flex-1">
-                              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${active ? 'bg-blue-600' : 'bg-gray-200'}`} />
-                              {i < 3 && <div className={`flex-1 h-0.5 ${i < currentIdx ? 'bg-blue-600' : 'bg-gray-200'}`} />}
+                            <div key={s} className="flex items-center flex-1 last:flex-none">
+                              <div className={`w-2 h-2 rounded-full flex-shrink-0 ${active ? 'bg-brand' : 'bg-gray-200'}`} />
+                              {i < FULFILLMENT_STEPS.length - 1 && <div className={`flex-1 h-0.5 ${i < currentIdx ? 'bg-brand' : 'bg-gray-200'}`} />}
                             </div>
                           );
                         })}
                       </div>
                       <div className="flex justify-between mt-1">
-                        {['Placed', 'Confirmed', 'Shipped', 'Delivered'].map((label) => (
-                          <span key={label} className="text-xs text-gray-400">{label}</span>
-                        ))}
+                        <span className="text-xs text-gray-400">Placed</span>
+                        <span className="text-xs text-gray-400">Delivered</span>
                       </div>
                     </div>
                   )}

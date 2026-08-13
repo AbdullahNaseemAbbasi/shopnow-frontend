@@ -2,19 +2,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Package, Heart, MapPin, ShoppingBag, ChevronRight, Clock, CheckCircle, Truck, XCircle } from 'lucide-react';
+import { Package, Heart, MapPin, ShoppingBag, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import { Order, WishlistItem } from '@/types';
 import api from '@/lib/axios';
-
-const STATUS_CONFIG = {
-  PENDING:   { label: 'Pending',   color: 'bg-yellow-100 text-yellow-700', icon: Clock },
-  CONFIRMED: { label: 'Confirmed', color: 'bg-blue-100 text-blue-700',     icon: CheckCircle },
-  SHIPPED:   { label: 'Shipped',   color: 'bg-purple-100 text-purple-700', icon: Truck },
-  DELIVERED: { label: 'Delivered', color: 'bg-green-100 text-green-700',   icon: CheckCircle },
-  CANCELLED: { label: 'Cancelled', color: 'bg-red-100 text-red-700',       icon: XCircle },
-};
+import { ORDER_STATUS_META } from '@/lib/orderStatus';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -120,8 +113,8 @@ export default function DashboardPage() {
           ) : (
             <div className="space-y-3">
               {recentOrders.map(order => {
-                const status = STATUS_CONFIG[order.status] || STATUS_CONFIG.PENDING;
-                const StatusIcon = status.icon;
+                const meta = ORDER_STATUS_META[order.status] ?? ORDER_STATUS_META.PENDING;
+                const StatusIcon = meta.Icon;
                 return (
                   <Link key={order.id} href={`/orders/${order.id}`}
                     className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 transition-colors group">
@@ -135,8 +128,8 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full ${status.color}`}>
-                        <StatusIcon size={10} /> {status.label}
+                      <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full border ${meta.badge}`}>
+                        <StatusIcon size={10} /> {meta.label}
                       </span>
                       <span className="font-black text-blue-600 text-sm">{formatPrice(order.totalAmount)}</span>
                       <ChevronRight size={14} className="text-gray-300 group-hover:text-blue-600 transition-colors" />

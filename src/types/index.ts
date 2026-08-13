@@ -62,15 +62,35 @@ export interface OrderItem {
   subtotal: number;
 }
 
+export type OrderStatus =
+  | "PENDING"
+  | "CONFIRMED"
+  | "PROCESSING"
+  | "PACKED"
+  | "SHIPPED"
+  | "OUT_FOR_DELIVERY"
+  | "DELIVERED"
+  | "CANCELLED"
+  | "RETURNED"
+  | "REFUNDED"
+  | "EXCHANGE";
+
+export interface OrderStatusHistory {
+  status: OrderStatus;
+  note?: string;
+  createdAt: string;
+}
+
 export interface Order {
   id: number;
   orderNumber: string;
-  status: "PENDING" | "CONFIRMED" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+  status: OrderStatus;
   paymentStatus: "UNPAID" | "PAID" | "REFUNDED";
   shippingAddress: string;
   totalAmount: number;
   items: OrderItem[];
   totalItems: number;
+  statusHistory?: OrderStatusHistory[];
   createdAt: string;
   updatedAt: string;
 }
