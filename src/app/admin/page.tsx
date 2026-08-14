@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, Users, Package, TrendingUp, Clock, DollarSign, LayoutDashboard, Tag, List, CheckCircle, Truck, XCircle, Star } from 'lucide-react';
+import { ShoppingBag, Users, Package, TrendingUp, Clock, DollarSign, LayoutDashboard, Tag, List, CheckCircle, Truck, XCircle, Star, BarChart3 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import api from '@/lib/axios';
@@ -93,7 +93,12 @@ export default function AdminPage() {
           <h1 className="text-2xl font-black text-gray-900">Dashboard</h1>
           <p className="text-gray-500 text-sm mt-0.5">Welcome back, {user?.firstName}!</p>
         </div>
-        <span className="text-xs bg-blue-50 text-blue-700 font-black px-3 py-1.5 rounded-full border border-blue-200">ADMIN</span>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/analytics" className="inline-flex items-center gap-1.5 text-xs bg-brand text-white font-bold px-3 py-1.5 rounded-full hover:bg-brand-700 transition-colors shadow-sm">
+            <BarChart3 size={14} /> View Analytics
+          </Link>
+          <span className="text-xs bg-blue-50 text-blue-700 font-black px-3 py-1.5 rounded-full border border-blue-200">ADMIN</span>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
