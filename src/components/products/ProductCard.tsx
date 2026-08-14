@@ -105,12 +105,16 @@ export default function ProductCard({ product }: Props) {
             </div>
           )}
 
-          <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-2 mb-2">
             <span className="text-sm font-bold text-brand">{formatPrice(displayPrice)}</span>
             {product.salePrice && (
               <span className="text-xs text-slate-400 line-through">{formatPrice(product.price)}</span>
             )}
           </div>
+
+          {product.stock > 0 && product.stock <= 5 && (
+            <p className="text-xs font-bold text-brand mb-3 flex items-center gap-1">🔥 Only {product.stock} left!</p>
+          )}
 
           <button
             onClick={handleAddToCart}

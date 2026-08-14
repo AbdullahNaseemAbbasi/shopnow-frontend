@@ -271,10 +271,15 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
               <div className="mb-4">
                 {inStock ? (
-                  <span className="text-green-600 font-semibold text-sm flex items-center gap-1">
-                    <div className="w-2 h-2 bg-green-500 rounded-full" />
-                    {product.stock <= 10 ? `Only ${product.stock} left in stock!` : 'In Stock'}
-                  </span>
+                  product.stock <= 10 ? (
+                    <span className="text-brand font-bold text-sm flex items-center gap-1">
+                      🔥 Hurry — only {product.stock} left in stock!
+                    </span>
+                  ) : (
+                    <span className="text-green-600 font-semibold text-sm flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full" /> In Stock
+                    </span>
+                  )
                 ) : (
                   <span className="text-red-600 font-semibold text-sm">Out of Stock</span>
                 )}
