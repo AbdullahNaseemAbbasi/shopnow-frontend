@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Package, ShoppingBag, Tag, Ticket, Menu, X, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Package, ShoppingBag, Tag, Ticket, RotateCcw, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import { useRealtimeEvent } from '@/lib/useRealtime';
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: '/admin',            label: 'Dashboard',   icon: LayoutDashboard },
   { href: '/admin/products',   label: 'Products',    icon: ShoppingBag },
   { href: '/admin/orders',     label: 'Orders',      icon: Package },
+  { href: '/admin/returns',    label: 'Returns',     icon: RotateCcw },
   { href: '/admin/categories', label: 'Categories',  icon: Tag },
   { href: '/admin/coupons',    label: 'Coupons',     icon: Ticket },
 ];
@@ -108,6 +109,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useRealtimeEvent('order.created', (data) => {
     const amount = typeof data.totalAmount === 'number' ? ` · ${formatPrice(data.totalAmount)}` : '';
     toast.success(`New order ${data.orderNumber ?? ''}${amount}`, { icon: '🛒', duration: 6000 });
+  });
+
+  // Live alert when a customer opens a return/exchange request.
+  useRealtimeEvent('return.created', (data) => {
+    toast(`New ${String(data.type ?? '').toLowerCase()} request · ${data.orderNumber ?? ''}`, { icon: '↩️', duration: 6000 });
   });
 
   if (!mounted) return null;

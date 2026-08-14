@@ -10,6 +10,7 @@ import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 import { useRealtimeEvent } from '@/lib/useRealtime';
 import LiveIndicator from '@/components/ui/LiveIndicator';
+import ReturnSection from '@/components/orders/ReturnSection';
 import {
   ORDER_STATUS_META, FULFILLMENT_STEPS, CUSTOMER_CANCELLABLE, isTerminalNonDelivered,
 } from '@/lib/orderStatus';
@@ -208,6 +209,8 @@ export default function OrderDetailPage() {
             ))}
           </div>
         </div>
+
+        <ReturnSection orderId={order.id} orderStatus={order.status} />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">

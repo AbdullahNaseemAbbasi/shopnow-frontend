@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Search, Heart, User, Menu, X, ChevronDown, LogOut, Package, LayoutDashboard, UserCircle, MapPin } from 'lucide-react';
+import { ShoppingCart, Search, Heart, User, Menu, X, ChevronDown, LogOut, Package, LayoutDashboard, UserCircle, MapPin, RotateCcw } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { useCachedFetch } from '@/lib/useCachedFetch';
@@ -158,6 +158,9 @@ export default function Navbar() {
                           <Link href="/orders" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
                             <Package size={15} /> My Orders
                           </Link>
+                          <Link href="/returns" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
+                            <RotateCcw size={15} /> My Returns
+                          </Link>
                           <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
                             <Heart size={15} /> Wishlist
                           </Link>
@@ -301,6 +304,7 @@ export default function Navbar() {
                       </div>
                       <Link href="/dashboard" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><UserCircle size={18} /> My Dashboard</Link>
                       <Link href="/orders" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><Package size={18} /> My Orders</Link>
+                      <Link href="/returns" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><RotateCcw size={18} /> My Returns</Link>
                       <Link href="/wishlist" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><Heart size={18} /> Wishlist</Link>
                       <Link href="/profile" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><MapPin size={18} /> My Addresses</Link>
                       <button onClick={handleLogout} className="flex items-center gap-3 py-2 px-2 text-blue-600 text-sm w-full text-left">

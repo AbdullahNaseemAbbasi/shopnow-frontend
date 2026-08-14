@@ -95,6 +95,26 @@ export interface Order {
   updatedAt: string;
 }
 
+export type ReturnType = "RETURN" | "EXCHANGE";
+export type ReturnReason = "DAMAGED" | "WRONG_ITEM" | "WRONG_SIZE" | "QUALITY_ISSUE" | "OTHER";
+export type ReturnStatus = "SUBMITTED" | "APPROVED" | "REJECTED" | "RECEIVED" | "COMPLETED";
+
+export interface ReturnRequest {
+  id: number;
+  orderId: number;
+  orderNumber: string;
+  customerName: string;
+  type: ReturnType;
+  reason: ReturnReason;
+  description?: string;
+  evidenceImages: string[];
+  status: ReturnStatus;
+  inspectionNote?: string;
+  refundAmount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface Review {
   id: number;
   rating: number;
