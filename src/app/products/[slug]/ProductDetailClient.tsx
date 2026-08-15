@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Eye, Flame, MessageCircle, BadgeCheck, ImagePlus, X, Loader2, Ruler } from 'lucide-react';
+import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Flame, MessageCircle, BadgeCheck, ImagePlus, X, Loader2, Ruler } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { formatPrice, getDiscountPercent } from '@/lib/utils';
@@ -60,7 +60,6 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(initialSizes[0] || '');
   const [selectedColor, setSelectedColor] = useState(initialColors[0] || '');
-  const [liveViews, setLiveViews] = useState(0);
   const [soldCount, setSoldCount] = useState(0);
 
   // Background revalidation + secondary fetches (sold count).
@@ -107,12 +106,17 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   useEffect(() => {
     const vs = (product.variants ?? []).filter(v => v.active !== false);
     if (vs.length === 0) return;
-    const sizeSet = new Set(vs.map(v => v.size).filter(Boolean));
-    const colorSet = new Set(vs.map(v => v.color).filter(Boolean));
+    const hasSize = vs.some(v => v.size);
+    const hasColor = vs.some(v => v.color);
+    // Does the current size+colour actually resolve to a real variant COMBINATION?
+    const resolves = vs.some(v =>
+      (!hasSize || v.size === selectedSize) && (!hasColor || v.color === selectedColor));
+    if (resolves) return;
+    // If not (e.g. a sparse matrix on first load), snap to a complete in-stock variant.
     const pick = vs.find(v => v.stock > 0) ?? vs[0];
-    setSelectedSize(prev => (sizeSet.size === 0 || sizeSet.has(prev)) ? prev : (pick.size ?? ''));
-    setSelectedColor(prev => (colorSet.size === 0 || colorSet.has(prev)) ? prev : (pick.color ?? ''));
-  }, [product.variants]);
+    if (pick.size) setSelectedSize(pick.size);
+    if (pick.color) setSelectedColor(pick.color);
+  }, [product.variants, selectedSize, selectedColor]);
 
   // Delivery estimate (3–5 days). Computed client-side in an effect so the date never differs
   // between server and client render (no hydration mismatch).
@@ -122,18 +126,6 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
     const to = new Date(); to.setDate(to.getDate() + 5);
     setDeliveryEstimate(`${fmt(from)} – ${fmt(to)}`);
   }, []);
-
-  // Live views simulation (unchanged)
-  useEffect(() => {
-    setLiveViews(Math.floor(Math.random() * 40) + 15);
-    const interval = setInterval(() => {
-      setLiveViews(prev => {
-        const change = Math.floor(Math.random() * 7) - 3;
-        return Math.max(8, Math.min(80, prev + change));
-      });
-    }, 4000);
-    return () => clearInterval(interval);
-  }, [slug]);
 
   const getAllImages = useCallback(() => {
     const images: string[] = [];
@@ -187,7 +179,8 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   };
 
   const handleWhatsApp = () => {
-    const message = `Hi! I'm interested in *${product.name}*${selectedSize ? ` (Size: ${selectedSize})` : ''}${selectedColor ? ` (Color: ${selectedColor})` : ''} - ${formatPrice(product.salePrice || product.price)}\n\nProduct link: ${window.location.href}`;
+    const enquiryPrice = selectedVariant?.effectivePrice ?? (product.salePrice || product.price);
+    const message = `Hi! I'm interested in *${product.name}*${selectedSize ? ` (Size: ${selectedSize})` : ''}${selectedColor ? ` (Color: ${selectedColor})` : ''} - ${formatPrice(enquiryPrice)}\n\nProduct link: ${window.location.href}`;
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -274,8 +267,30 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
         ? selectedVariant.price : null)
     : (product.salePrice ? product.price : null);
   const activeSku = selectedVariant?.sku ?? product.sku ?? null;
-  // When variants exist the customer must land on a valid, in-stock combination before adding.
-  const needsVariantChoice = hasVariants && (!selectedVariant || selectedVariant.stock <= 0);
+
+  // Combination-aware chip selection: when a product has BOTH size and colour, picking one dimension
+  // auto-corrects the other to a value that actually exists together (preferring in-stock), so the
+  // shopper can never get stranded on a size/colour pair that maps to no variant (sparse matrices).
+  const pickSize = (size: string) => {
+    setSelectedSize(size);
+    if (variantColors.length > 0) {
+      const forSize = variants.filter(v => v.size === size);
+      if (!forSize.some(v => v.color === selectedColor)) {
+        const next = (forSize.find(v => v.stock > 0) ?? forSize[0])?.color;
+        if (next) setSelectedColor(next);
+      }
+    }
+  };
+  const pickColor = (color: string) => {
+    setSelectedColor(color);
+    if (variantSizes.length > 0) {
+      const forColor = variants.filter(v => v.color === color);
+      if (!forColor.some(v => v.size === selectedSize)) {
+        const next = (forColor.find(v => v.stock > 0) ?? forColor[0])?.size;
+        if (next) setSelectedSize(next);
+      }
+    }
+  };
 
   const images = getAllImages();
   const sizes = hasVariants ? variantSizes : (product.sizes ? product.sizes.split(',').map(s => s.trim()).filter(Boolean) : []);
@@ -357,18 +372,14 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 </div>
               )}
 
-              <div className="flex items-center gap-4 mb-4 flex-wrap">
-                <div className="flex items-center gap-1.5 text-sm bg-orange-50 text-orange-700 px-3 py-1.5 rounded-full font-semibold">
-                  <Eye size={14} className="animate-pulse" />
-                  <span>{liveViews} people viewing now</span>
-                </div>
-                {soldCount > 0 && (
+              {soldCount > 0 && (
+                <div className="flex items-center gap-4 mb-4 flex-wrap">
                   <div className="flex items-center gap-1.5 text-sm bg-red-50 text-red-600 px-3 py-1.5 rounded-full font-semibold">
                     <Flame size={14} />
                     <span>{soldCount} sold in last 24 hours</span>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className="flex items-baseline gap-3 mb-2">
                 {hasVariants && !selectedVariant && <span className="text-sm text-gray-400 font-semibold">From</span>}
@@ -415,7 +426,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                     {sizes.map(size => {
                       const soldOut = hasVariants && sizeSoldOut(size);
                       return (
-                        <button key={size} onClick={() => setSelectedSize(size)} disabled={soldOut}
+                        <button key={size} onClick={() => pickSize(size)} disabled={soldOut}
                           title={soldOut ? 'Out of stock' : undefined}
                           className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${selectedSize === size ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 text-gray-700 hover:border-blue-400'} ${soldOut ? 'opacity-40 line-through cursor-not-allowed hover:border-gray-200' : ''}`}>
                           {size}
@@ -433,7 +444,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                     {colors.map(color => {
                       const soldOut = hasVariants && colorSoldOut(color);
                       return (
-                      <button key={color} onClick={() => setSelectedColor(color)} disabled={soldOut}
+                      <button key={color} onClick={() => pickColor(color)} disabled={soldOut}
                         className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${selectedColor === color ? 'border-blue-600 ring-2 ring-blue-300 ring-offset-1' : 'border-gray-300 hover:border-gray-500'} ${soldOut ? 'opacity-40 cursor-not-allowed' : ''}`}
                         style={{ backgroundColor: color.toLowerCase() }}
                         title={soldOut ? `${color} — out of stock` : color}>

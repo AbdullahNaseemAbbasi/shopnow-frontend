@@ -111,11 +111,19 @@ export default function WishlistPage() {
                     {item.salePrice && <span className="text-gray-400 line-through text-xs">{formatPrice(item.price)}</span>}
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => handleAddToCart(item)} disabled={addingId === item.productId || !item.inStock}
-                      className="flex-1 btn-primary text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 disabled:opacity-60">
-                      <ShoppingCart size={13} />
-                      {addingId === item.productId ? '...' : 'Add'}
-                    </button>
+                    {item.hasVariants ? (
+                      // Variant products need a size/colour chosen — send the shopper to the PDP.
+                      <Link href={item.productSlug ? `/products/${item.productSlug}` : '/products'}
+                        className="flex-1 btn-primary text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1">
+                        <ShoppingCart size={13} /> Options
+                      </Link>
+                    ) : (
+                      <button onClick={() => handleAddToCart(item)} disabled={addingId === item.productId || !item.inStock}
+                        className="flex-1 btn-primary text-white py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1 disabled:opacity-60">
+                        <ShoppingCart size={13} />
+                        {addingId === item.productId ? '...' : 'Add'}
+                      </button>
+                    )}
                     <button onClick={() => handleRemove(item.productId)}
                       className="p-2 rounded-xl border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-red-300 transition-colors">
                       <Trash2 size={14} />

@@ -217,6 +217,7 @@ export interface WishlistItem {
   price: number;
   salePrice?: number;
   inStock: boolean;
+  hasVariants?: boolean;
   addedAt: string;
 }
 

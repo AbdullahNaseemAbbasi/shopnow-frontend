@@ -13,6 +13,10 @@ export default function FeaturedProducts({ initialData }: { initialData?: Produc
   );
   const products = Array.isArray(productsData) ? productsData : [];
 
+  // Once loaded, hide the whole section if there's nothing featured (consistent with ProductRail) —
+  // a live storefront shouldn't show an empty "Top Picks" block.
+  if (!loading && products.length === 0) return null;
+
   return (
     <section className="py-12 bg-white">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
