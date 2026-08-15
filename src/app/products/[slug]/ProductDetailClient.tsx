@@ -10,6 +10,7 @@ import { formatPrice, getDiscountPercent } from '@/lib/utils';
 import { Product, Review, ReviewSummary } from '@/types';
 import api from '@/lib/axios';
 import { setCached } from '@/lib/cache';
+import RelatedProducts from '@/components/products/RelatedProducts';
 import toast from 'react-hot-toast';
 
 const EMOJIS: Record<string, string> = {
@@ -564,6 +565,8 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
           </div>
         </div>
       </div>
+
+      <RelatedProducts productId={product.id} />
 
       {lightbox && (
         <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
