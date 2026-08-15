@@ -16,14 +16,12 @@ export default async function ProductsPage({ searchParams }: PageProps) {
   const categoryId = params.categoryId || "";
   const categoryName = params.categoryName || "";
 
-  let url: string;
-  if (keyword) {
-    url = `/api/products/search?keyword=${encodeURIComponent(keyword)}&page=0&size=12`;
-  } else if (categoryId) {
-    url = `/api/products/category/${categoryId}?page=0&size=12`;
-  } else {
-    url = `/api/products?page=0&size=12`;
-  }
+  // Mirror the client's default filter query (no facets, newest-first) so the SSR'd first page
+  // hydrates cleanly. The client swaps to a live request the moment any facet/sort is applied.
+  const query = new URLSearchParams({ page: "0", size: "12", sort: "newest" });
+  if (keyword) query.set("keyword", keyword);
+  if (categoryId) query.set("categoryId", categoryId);
+  const url = `/api/products/filter?${query.toString()}`;
 
   const initialData = await serverFetch<PageResponse<Product>>(url, { revalidate: 120 });
 
