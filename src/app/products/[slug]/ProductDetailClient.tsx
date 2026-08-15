@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Eye, Flame, MessageCircle, BadgeCheck, ImagePlus, X, Loader2 } from 'lucide-react';
+import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Eye, Flame, MessageCircle, BadgeCheck, ImagePlus, X, Loader2, Ruler } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { formatPrice, getDiscountPercent } from '@/lib/utils';
@@ -11,6 +11,7 @@ import { Product, Review, ReviewSummary } from '@/types';
 import api from '@/lib/axios';
 import { setCached } from '@/lib/cache';
 import RelatedProducts from '@/components/products/RelatedProducts';
+import SizeGuideModal from '@/components/products/SizeGuideModal';
 import toast from 'react-hot-toast';
 
 const EMOJIS: Record<string, string> = {
@@ -46,6 +47,8 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   const [submittingReview, setSubmittingReview] = useState(false);
   const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
+  const [deliveryEstimate, setDeliveryEstimate] = useState('');
   const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
 
   const [selectedImage, setSelectedImage] = useState(0);
@@ -88,6 +91,15 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
     return () => { cancelled = true; };
   }, [slug, initialProduct, initialReviews]);
+
+  // Delivery estimate (3–5 days). Computed client-side in an effect so the date never differs
+  // between server and client render (no hydration mismatch).
+  useEffect(() => {
+    const fmt = (d: Date) => d.toLocaleDateString('en-PK', { weekday: 'short', day: 'numeric', month: 'short' });
+    const from = new Date(); from.setDate(from.getDate() + 3);
+    const to = new Date(); to.setDate(to.getDate() + 5);
+    setDeliveryEstimate(`${fmt(from)} – ${fmt(to)}`);
+  }, []);
 
   // Live views simulation (unchanged)
   useEffect(() => {
@@ -326,7 +338,13 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
               {sizes.length > 0 && (
                 <div className="mb-4">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Size:</p>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-sm font-semibold text-gray-700">Size:</p>
+                    <button onClick={() => setSizeGuideOpen(true)}
+                      className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:underline">
+                      <Ruler size={13} /> Size guide
+                    </button>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {sizes.map(size => (
                       <button key={size} onClick={() => setSelectedSize(size)}
@@ -393,6 +411,16 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                   className="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white py-4 rounded-xl font-bold transition-all text-sm mb-4">
                   Buy Now
                 </button>
+              )}
+
+              {inStock && deliveryEstimate && (
+                <div className="flex items-center gap-2 rounded-xl bg-green-50 border border-green-100 px-4 py-3 mb-4">
+                  <Truck size={18} className="text-green-600 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">
+                    Get it by <span className="font-bold text-gray-900">{deliveryEstimate}</span>
+                    <span className="text-gray-400"> · if you order now</span>
+                  </p>
+                </div>
               )}
 
               <div className="pt-4 border-t border-gray-100 grid grid-cols-3 gap-3">
@@ -567,6 +595,8 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
       </div>
 
       <RelatedProducts productId={product.id} />
+
+      <SizeGuideModal open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />
 
       {lightbox && (
         <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
