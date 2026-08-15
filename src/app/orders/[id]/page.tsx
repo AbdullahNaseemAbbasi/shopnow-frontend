@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Package, ArrowLeft, MapPin, CreditCard, Ban, FileText } from 'lucide-react';
+import { Package, ArrowLeft, MapPin, CreditCard, Ban, FileText, Truck } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import { Order } from '@/types';
@@ -254,6 +254,16 @@ export default function OrderDetailPage() {
               <MapPin size={16} className="text-blue-600" /> Shipping Address
             </h2>
             <p className="text-sm text-gray-700 leading-relaxed">{order.shippingAddress}</p>
+            {order.trackingNumber && (
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1.5">Tracking</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Truck size={15} className="text-brand flex-shrink-0" />
+                  {order.courier && <span className="text-sm text-gray-600">{order.courier} ·</span>}
+                  <span className="text-sm font-bold text-gray-900 font-mono">{order.trackingNumber}</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

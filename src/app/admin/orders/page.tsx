@@ -18,6 +18,9 @@ interface AdminOrder {
   totalAmount: number;
   status: string;
   createdAt: string;
+  trackingNumber?: string;
+  courier?: string;
+  internalNote?: string;
 }
 
 const FILTERS = ['ALL', ...Object.keys(ORDER_STATUS_META)];
@@ -28,6 +31,32 @@ export default function AdminOrdersPage() {
   const [filter, setFilter] = useState('ALL');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [fulfill, setFulfill] = useState({ trackingNumber: '', courier: '', internalNote: '' });
+  const [savingFulfill, setSavingFulfill] = useState(false);
+
+  const toggleExpand = (order: AdminOrder) => {
+    if (expandedId === order.id) { setExpandedId(null); return; }
+    setExpandedId(order.id);
+    setFulfill({
+      trackingNumber: order.trackingNumber || '',
+      courier: order.courier || '',
+      internalNote: order.internalNote || '',
+    });
+  };
+
+  const saveFulfillment = async (orderId: number) => {
+    setSavingFulfill(true);
+    try {
+      await api.patch(`/api/orders/${orderId}/fulfillment`, fulfill);
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, ...fulfill } : o));
+      toast.success('Fulfilment details saved');
+    } catch (err: unknown) {
+      const e = err as { response?: { data?: { message?: string } } };
+      toast.error(e?.response?.data?.message || 'Could not save');
+    } finally {
+      setSavingFulfill(false);
+    }
+  };
 
   const fetchOrders = () => {
     setLoading(true);
@@ -112,7 +141,7 @@ export default function AdminOrdersPage() {
                   <div className="flex items-start justify-between flex-wrap gap-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
-                        <button onClick={() => setExpandedId(isExpanded ? null : order.id)} className="flex items-center gap-1">
+                        <button onClick={() => toggleExpand(order)} className="flex items-center gap-1">
                           <span className="font-black text-gray-900 text-sm">{order.orderNumber}</span>
                           <ChevronDown size={13} className={`text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                         </button>
@@ -142,12 +171,32 @@ export default function AdminOrdersPage() {
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t border-gray-100 px-5 py-3 bg-gray-50 flex items-center justify-between gap-3">
-                    <p className="text-xs text-gray-500">Order ID: #{order.id}</p>
-                    <Link href={`/admin/orders/${order.id}/invoice`}
-                      className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:underline">
-                      <FileText size={13} /> Invoice / Packing slip
-                    </Link>
+                  <div className="border-t border-gray-100 px-5 py-4 bg-gray-50 space-y-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs text-gray-500">Order ID: #{order.id}</p>
+                      <Link href={`/admin/orders/${order.id}/invoice`}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:underline">
+                        <FileText size={13} /> Invoice / Packing slip
+                      </Link>
+                    </div>
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Fulfilment</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <input value={fulfill.courier} onChange={(e) => setFulfill(f => ({ ...f, courier: e.target.value }))}
+                        placeholder="Courier (e.g. TCS, Leopards)" aria-label="Courier"
+                        className="px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-brand bg-white" />
+                      <input value={fulfill.trackingNumber} onChange={(e) => setFulfill(f => ({ ...f, trackingNumber: e.target.value }))}
+                        placeholder="Tracking number" aria-label="Tracking number"
+                        className="px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-brand bg-white" />
+                    </div>
+                    <textarea value={fulfill.internalNote} onChange={(e) => setFulfill(f => ({ ...f, internalNote: e.target.value }))}
+                      placeholder="Internal note (not visible to the customer)" rows={2} aria-label="Internal note"
+                      className="w-full px-3 py-2 rounded-lg border border-gray-200 text-sm outline-none focus:border-brand resize-none bg-white" />
+                    <div className="flex justify-end">
+                      <button onClick={() => saveFulfillment(order.id)} disabled={savingFulfill}
+                        className="px-4 py-2 rounded-xl bg-gray-900 text-white text-sm font-bold hover:bg-gray-800 disabled:opacity-60 transition-colors">
+                        {savingFulfill ? 'Saving…' : 'Save fulfilment'}
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

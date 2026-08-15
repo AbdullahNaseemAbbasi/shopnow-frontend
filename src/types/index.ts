@@ -92,6 +92,9 @@ export interface Order {
   discountAmount?: number;
   shippingFee?: number;
   couponCode?: string;
+  trackingNumber?: string;
+  courier?: string;
+  internalNote?: string;
   items: OrderItem[];
   totalItems: number;
   statusHistory?: OrderStatusHistory[];
