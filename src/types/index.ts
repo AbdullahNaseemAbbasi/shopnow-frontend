@@ -164,6 +164,7 @@ export type NotificationType =
   | "ORDER_STATUS"
   | "RETURN_REQUESTED"
   | "RETURN_UPDATE"
+  | "BACK_IN_STOCK"
   | "GENERAL";
 
 export interface AppNotification {

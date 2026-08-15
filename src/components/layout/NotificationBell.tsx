@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  Bell, Package, Truck, RotateCcw, RefreshCw, CheckCheck, type LucideIcon,
+  Bell, Package, Truck, RotateCcw, RefreshCw, CheckCheck, PackageCheck, type LucideIcon,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { useRealtimeEvent } from "@/lib/useRealtime";
@@ -15,6 +15,7 @@ const META: Record<NotificationType, { Icon: LucideIcon; tint: string }> = {
   ORDER_STATUS:     { Icon: Truck,     tint: "bg-brand-50 text-brand" },
   RETURN_REQUESTED: { Icon: RotateCcw, tint: "bg-amber-50 text-amber-600" },
   RETURN_UPDATE:    { Icon: RefreshCw, tint: "bg-amber-50 text-amber-600" },
+  BACK_IN_STOCK:    { Icon: PackageCheck, tint: "bg-green-50 text-green-600" },
   GENERAL:          { Icon: Bell,      tint: "bg-slate-100 text-slate-600" },
 };
 
