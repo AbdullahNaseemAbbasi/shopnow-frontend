@@ -12,9 +12,13 @@ import api from '@/lib/axios';
 import { setCached } from '@/lib/cache';
 import RelatedProducts from '@/components/products/RelatedProducts';
 import RecentlyViewed from '@/components/products/RecentlyViewed';
-import SizeGuideModal from '@/components/products/SizeGuideModal';
+import dynamic from 'next/dynamic';
 import { recordView } from '@/lib/recentlyViewed';
 import toast from 'react-hot-toast';
+
+// Only needed when the shopper opens the size guide — code-split so it stays out of the initial
+// product-page bundle and loads on demand.
+const SizeGuideModal = dynamic(() => import('@/components/products/SizeGuideModal'), { ssr: false });
 
 const EMOJIS: Record<string, string> = {
   'Electronics': '📱', 'Fashion': '👗', 'Ladies Fashion': '👗', 'Gents Fashion': '👘',
@@ -282,7 +286,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[1600px] mx-auto px-8 py-6">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
           <Link href="/" className="hover:text-blue-600">Home</Link>
           <span>/</span>

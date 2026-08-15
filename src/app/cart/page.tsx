@@ -71,7 +71,7 @@ export default function CartPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-[1600px] mx-auto px-8 py-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
           <ShoppingBag size={24} className="text-blue-600" /> My Cart
           {cart && cart.items.length > 0 && (

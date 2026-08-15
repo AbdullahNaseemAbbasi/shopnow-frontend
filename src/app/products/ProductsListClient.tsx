@@ -143,7 +143,7 @@ export default function ProductsListClient({
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b shadow-sm">
-        <div className="max-w-[1600px] mx-auto px-8 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row gap-4 items-center justify-between">
           <div>
             <h1 className="text-xl font-black text-gray-900">{pageTitle}</h1>
             {!loading && <p className="text-sm text-gray-500">{totalElements} products found</p>}
@@ -157,7 +157,7 @@ export default function ProductsListClient({
         </div>
       </div>
 
-      <div className="max-w-[1600px] mx-auto px-8 py-8 flex gap-8">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex gap-8">
         {/* Desktop sidebar */}
         <aside className="hidden lg:block w-64 flex-shrink-0">
           <div className="sticky top-24 bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
@@ -224,8 +224,9 @@ export default function ProductsListClient({
           ) : (
             <>
               <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-                {products.map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {products.map((product, i) => (
+                  // First row (up to 4 cols) is above the fold — eager-load for a faster LCP.
+                  <ProductCard key={product.id} product={product} priority={i < 4} />
                 ))}
               </div>
               {totalPages > 1 && (

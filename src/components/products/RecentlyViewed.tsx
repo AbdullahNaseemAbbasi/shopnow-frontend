@@ -25,7 +25,7 @@ export default function RecentlyViewed({ excludeId, title = "Recently viewed", a
 
   return (
     <section className={altBg ? "bg-slate-50" : ""}>
-      <div className="max-w-[1600px] mx-auto px-8 py-12">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <h2 className="text-2xl md:text-3xl font-black text-ink mb-6 flex items-center gap-2">
           <Clock size={22} className="text-brand" /> {title}
         </h2>

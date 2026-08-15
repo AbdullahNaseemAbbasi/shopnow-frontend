@@ -15,9 +15,11 @@ import Badge from "@/components/ui/Badge";
 
 interface Props {
   product: Product;
+  /** Set for above-the-fold cards (first grid row) so their image isn't lazy-loaded — improves LCP. */
+  priority?: boolean;
 }
 
-export default function ProductCard({ product }: Props) {
+export default function ProductCard({ product, priority = false }: Props) {
   const { addToCart } = useCartStore();
   const { isLoggedIn } = useAuthStore();
   const [wishlisted, setWishlisted] = useState(false);
@@ -67,7 +69,7 @@ export default function ProductCard({ product }: Props) {
       <div className="bg-white rounded-2xl border border-line overflow-hidden group cursor-pointer h-full flex flex-col shadow-card transition-all duration-300 hover:shadow-card-hover hover:border-brand-200">
 
         <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>
-          <ProductImage src={product.imageUrl} alt={product.name} imgClassName="group-hover:scale-105" />
+          <ProductImage src={product.imageUrl} alt={product.name} imgClassName="group-hover:scale-105" priority={priority} />
 
           {product.stock === 0 ? (
             <Badge tone="ink" className="absolute top-2.5 left-2.5 z-10 shadow-sm">Out of Stock</Badge>

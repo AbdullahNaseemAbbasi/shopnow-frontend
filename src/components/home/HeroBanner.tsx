@@ -75,7 +75,7 @@ export default function HeroBanner({ initialData, initialBanners }: Props) {
             <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/20" />
           </>
         )}
-        <div className="relative max-w-[1600px] mx-auto px-8 py-16 md:py-28">
+        <div className="relative max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-28">
           <div className="text-white space-y-4 max-w-xl animate-fade-in-up">
             <h1 className="text-3xl md:text-5xl font-black leading-tight">{b.title}</h1>
             {b.subtitle && <p className="text-white/90 text-base md:text-lg font-light leading-relaxed">{b.subtitle}</p>}
@@ -99,7 +99,7 @@ export default function HeroBanner({ initialData, initialBanners }: Props) {
   const emoji = EMOJIS[cat.name] || '🛍️';
   return (
     <div className="relative hero-gradient overflow-hidden transition-all duration-700">
-      <div className="max-w-[1600px] mx-auto px-8 py-16 md:py-24">
+      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-white space-y-4 md:w-1/2 animate-fade-in-up">
             <span className="inline-block bg-white/15 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
