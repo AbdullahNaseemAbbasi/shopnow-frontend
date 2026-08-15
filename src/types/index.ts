@@ -26,10 +26,26 @@ export interface Banner {
   endsAt?: string;
 }
 
+export interface ProductVariant {
+  id: number;
+  sku?: string;
+  size?: string;
+  color?: string;
+  label: string;
+  price: number;
+  salePrice?: number;
+  effectivePrice: number;
+  priceOverride?: number;
+  salePriceOverride?: number;
+  stock: number;
+  active: boolean;
+}
+
 export interface Product {
   id: number;
   name: string;
   slug: string;
+  sku?: string;
   description?: string;
   price: number;
   salePrice?: number;
@@ -44,6 +60,7 @@ export interface Product {
   categoryName: string;
   averageRating: number;
   totalReviews: number;
+  variants?: ProductVariant[];
 }
 
 export interface CartItem {
@@ -57,6 +74,11 @@ export interface CartItem {
   stock: number;
   quantity: number;
   subtotal: number;
+  variantId?: number;
+  variantSize?: string;
+  variantColor?: string;
+  variantLabel?: string;
+  sku?: string;
 }
 
 export interface Cart {
@@ -73,6 +95,9 @@ export interface OrderItem {
   quantity: number;
   price: number;
   subtotal: number;
+  variantSize?: string;
+  variantColor?: string;
+  sku?: string;
 }
 
 export type OrderStatus =

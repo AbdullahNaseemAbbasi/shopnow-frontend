@@ -204,6 +204,12 @@ export default function OrderDetailPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900 text-sm">{item.productName}</p>
+                    {(item.variantSize || item.variantColor) && (
+                      <p className="text-xs text-gray-500 font-medium">
+                        {[item.variantSize, item.variantColor].filter(Boolean).join(' / ')}
+                        {item.sku ? ` · ${item.sku}` : ''}
+                      </p>
+                    )}
                     <p className="text-xs text-gray-400">{formatPrice(item.price)} × {item.quantity}</p>
                   </div>
                 </div>

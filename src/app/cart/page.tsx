@@ -104,6 +104,11 @@ export default function CartPage() {
                     <Link href={`/products/${item.productSlug}`}>
                       <h3 className="font-semibold text-gray-900 text-sm hover:text-blue-600 transition-colors line-clamp-2">{item.productName}</h3>
                     </Link>
+                    {item.variantLabel && (
+                      <span className="inline-block mt-1 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full px-2 py-0.5">
+                        {item.variantLabel}
+                      </span>
+                    )}
                     <div className="flex items-center gap-2 mt-1">
                       <span className="font-black text-blue-600 text-sm">{formatPrice(item.salePrice || item.price)}</span>
                       {item.salePrice && <span className="text-xs text-gray-400 line-through">{formatPrice(item.price)}</span>}

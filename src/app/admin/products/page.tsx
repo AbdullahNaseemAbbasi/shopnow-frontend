@@ -8,9 +8,14 @@ import { formatPrice } from '@/lib/utils';
 import { Product, Category } from '@/types';
 import toast from 'react-hot-toast';
 
-const EMPTY_FORM = { name: '', slug: '', description: '', price: '', salePrice: '', stock: '', imageUrl: '', categoryId: '', featured: false, active: true, sizes: '', colors: '' };
+const EMPTY_FORM = { name: '', slug: '', sku: '', description: '', price: '', salePrice: '', stock: '', imageUrl: '', categoryId: '', featured: false, active: true, sizes: '', colors: '' };
 
 const PRESET_COLORS = ['Red', 'Blue', 'Green', 'Black', 'White', 'Grey', 'Navy', 'Brown', 'Pink', 'Purple', 'Yellow', 'Orange', 'Beige', 'Maroon', 'Teal', 'Olive'];
+
+// One editable row in the admin variant editor. salePrice has no field in the UI (rare for a clothing
+// store) but is still round-tripped so an override set via the API isn't lost on save.
+type VariantRow = { id?: number; sku: string; size: string; color: string; price: string; salePrice: string; stock: string };
+const BLANK_VARIANT: VariantRow = { sku: '', size: '', color: '', price: '', salePrice: '', stock: '0' };
 
 export default function AdminProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -21,6 +26,7 @@ export default function AdminProductsPage() {
   const [editId, setEditId] = useState<number | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [variants, setVariants] = useState<VariantRow[]>([]);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [page, setPage] = useState(0);
@@ -55,22 +61,38 @@ export default function AdminProductsPage() {
     setEditId(null);
     setForm(EMPTY_FORM);
     setImageUrls([]);
+    setVariants([]);
     setShowForm(true);
   };
 
   const handleOpenEdit = (p: Product) => {
     setEditId(p.id);
     setForm({
-      name: p.name, slug: p.slug, description: p.description || '',
+      name: p.name, slug: p.slug, sku: p.sku || '', description: p.description || '',
       price: String(p.price), salePrice: p.salePrice ? String(p.salePrice) : '',
       stock: String(p.stock), imageUrl: p.imageUrl || '',
       categoryId: String(p.categoryId), featured: p.featured, active: p.active,
       sizes: p.sizes || '', colors: p.colors || '',
     });
     setImageUrls(p.imageUrls || []);
+    // Pre-fill the variant editor from the raw overrides (blank = inherit), active variants only.
+    setVariants((p.variants ?? []).filter(v => v.active !== false).map(v => ({
+      id: v.id,
+      sku: v.sku ?? '',
+      size: v.size ?? '',
+      color: v.color ?? '',
+      price: v.priceOverride != null ? String(v.priceOverride) : '',
+      salePrice: v.salePriceOverride != null ? String(v.salePriceOverride) : '',
+      stock: String(v.stock ?? 0),
+    })));
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const addVariant = () => setVariants(prev => [...prev, { ...BLANK_VARIANT }]);
+  const updateVariant = (i: number, field: keyof VariantRow, value: string) =>
+    setVariants(prev => prev.map((v, idx) => (idx === i ? { ...v, [field]: value } : v)));
+  const removeVariant = (i: number) => setVariants(prev => prev.filter((_, idx) => idx !== i));
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,14 +101,29 @@ export default function AdminProductsPage() {
       return;
     }
     setSaving(true);
+    // Only rows with at least a size, colour or SKU are real variants; blank rows are dropped.
+    const variantsPayload = variants
+      .filter(v => v.size.trim() || v.color.trim() || v.sku.trim())
+      .map(v => ({
+        id: v.id,
+        sku: v.sku.trim() || null,
+        size: v.size.trim() || null,
+        color: v.color.trim() || null,
+        price: v.price.trim() ? Number(v.price) : null,
+        salePrice: v.salePrice.trim() ? Number(v.salePrice) : null,
+        stock: v.stock.trim() ? Math.max(0, Number(v.stock)) : 0,
+      }));
     const payload = {
       name: form.name, slug: form.slug || generateSlug(form.name),
+      sku: form.sku.trim() || null,
       description: form.description, price: Number(form.price),
       salePrice: form.salePrice ? Number(form.salePrice) : null,
       stock: Number(form.stock), imageUrl: form.imageUrl || (imageUrls.length > 0 ? imageUrls[0] : ''),
       categoryId: Number(form.categoryId), featured: form.featured, active: form.active,
       sizes: form.sizes, colors: form.colors,
       imageUrls: imageUrls,
+      // Always the full desired set (empty = no variants). The backend upserts + soft-deletes.
+      variants: variantsPayload,
     };
     try {
       if (editId) {
@@ -104,6 +141,7 @@ export default function AdminProductsPage() {
       setEditId(null);
       setForm(EMPTY_FORM);
       setImageUrls([]);
+      setVariants([]);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       toast.error(error?.response?.data?.message || 'Failed to save');
@@ -229,6 +267,12 @@ export default function AdminProductsPage() {
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Stock *</label>
                 <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
                   placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
+                {variants.length > 0 && <p className="text-[11px] text-gray-400 mt-1">Ignored at checkout — variant stock applies.</p>}
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-600 mb-1">Base SKU (optional)</label>
+                <input value={form.sku} onChange={e => setForm(f => ({ ...f, sku: e.target.value }))}
+                  placeholder="TSHIRT-001" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-blue-500 font-mono text-xs" />
               </div>
 
               {/* MULTI IMAGE UPLOAD */}
@@ -311,6 +355,51 @@ export default function AdminProductsPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* VARIANTS — per size/colour SKU + stock */}
+              <div className="sm:col-span-2">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-gray-600">Variants (own SKU &amp; stock per size/colour)</label>
+                  <button type="button" onClick={addVariant}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline">
+                    <Plus size={13} /> Add variant
+                  </button>
+                </div>
+                {variants.length === 0 ? (
+                  <p className="text-xs text-gray-400">No variants — simple product using the price &amp; stock above. Add variants to track stock per size/colour.</p>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="hidden sm:grid grid-cols-12 gap-2 text-[10px] font-bold text-gray-400 uppercase px-1">
+                      <span className="col-span-3">Size</span>
+                      <span className="col-span-3">Colour</span>
+                      <span className="col-span-3">SKU</span>
+                      <span className="col-span-1">Price</span>
+                      <span className="col-span-1">Stock</span>
+                      <span className="col-span-1" />
+                    </div>
+                    {variants.map((v, i) => (
+                      <div key={i} className="grid grid-cols-12 gap-2 items-center">
+                        <input value={v.size} onChange={e => updateVariant(i, 'size', e.target.value)} placeholder="M"
+                          className="col-span-6 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                        <input value={v.color} onChange={e => updateVariant(i, 'color', e.target.value)} placeholder="Black"
+                          className="col-span-6 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                        <input value={v.sku} onChange={e => updateVariant(i, 'sku', e.target.value)} placeholder="SKU (optional)"
+                          className="col-span-5 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500 font-mono" />
+                        <input type="number" value={v.price} onChange={e => updateVariant(i, 'price', e.target.value)} placeholder="—"
+                          title="Leave blank to inherit the product price"
+                          className="col-span-3 sm:col-span-1 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                        <input type="number" value={v.stock} onChange={e => updateVariant(i, 'stock', e.target.value)} placeholder="0"
+                          className="col-span-3 sm:col-span-1 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                        <button type="button" onClick={() => removeVariant(i)}
+                          className="col-span-1 flex items-center justify-center text-gray-400 hover:text-red-600 p-1">
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    <p className="text-[11px] text-gray-400">Blank price inherits the product price. Variant stock replaces the base stock at checkout.</p>
+                  </div>
+                )}
               </div>
 
               <div className="sm:col-span-2">

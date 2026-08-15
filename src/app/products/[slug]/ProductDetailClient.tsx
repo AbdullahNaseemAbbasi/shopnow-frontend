@@ -97,6 +97,19 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   // Record this product in the client-side "recently viewed" history.
   useEffect(() => { recordView(initialProduct); }, [initialProduct]);
 
+  // For a variant-driven product, default the size/colour selection to the first in-stock variant
+  // (falling back to the first). Only rewrites a selection that isn't a valid variant value, so it
+  // seeds sensible defaults on load without ever fighting a choice the customer has made.
+  useEffect(() => {
+    const vs = (product.variants ?? []).filter(v => v.active !== false);
+    if (vs.length === 0) return;
+    const sizeSet = new Set(vs.map(v => v.size).filter(Boolean));
+    const colorSet = new Set(vs.map(v => v.color).filter(Boolean));
+    const pick = vs.find(v => v.stock > 0) ?? vs[0];
+    setSelectedSize(prev => (sizeSet.size === 0 || sizeSet.has(prev)) ? prev : (pick.size ?? ''));
+    setSelectedColor(prev => (colorSet.size === 0 || colorSet.has(prev)) ? prev : (pick.color ?? ''));
+  }, [product.variants]);
+
   // Delivery estimate (3–5 days). Computed client-side in an effect so the date never differs
   // between server and client render (no hydration mismatch).
   useEffect(() => {
@@ -133,9 +146,15 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   // can decide whether to proceed instead of navigating on a failed/blocked add.
   const handleAddToCart = async (): Promise<boolean> => {
     if (!isLoggedIn) { toast.error('Please login first!'); router.push('/auth/login'); return false; }
+    // Variant-driven products require a valid, in-stock size/colour before adding.
+    const vs = (product.variants ?? []).filter(v => v.active !== false);
+    if (vs.length > 0) {
+      if (!selectedVariant) { toast.error('Please select an available option first'); return false; }
+      if (selectedVariant.stock <= 0) { toast.error('That option is out of stock'); return false; }
+    }
     setAdding(true);
     try {
-      await addToCart(product.id, quantity);
+      await addToCart(product.id, quantity, selectedVariant?.id);
       toast.success(`${product.name} added to cart!`);
       return true;
     } catch {
@@ -220,12 +239,46 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
     }
   };
 
+  // ── Variants ─────────────────────────────────────────────────────────────
+  // A product is "variant-driven" once it has active variants; then size/colour, price and stock all
+  // come from the chosen variant. A product with none behaves exactly as before (free-text options,
+  // product-level price/stock).
+  const variants = (product.variants ?? []).filter(v => v.active !== false);
+  const hasVariants = variants.length > 0;
+  const variantSizes = [...new Set(variants.map(v => v.size).filter((s): s is string => !!s))];
+  const variantColors = [...new Set(variants.map(v => v.color).filter((c): c is string => !!c))];
+  const selectedVariant = hasVariants
+    ? (variants.find(v =>
+        (variantSizes.length === 0 || v.size === selectedSize) &&
+        (variantColors.length === 0 || v.color === selectedColor)) ?? null)
+    : null;
+  // A size/colour chip is "sold out" only when EVERY variant carrying it is out of stock.
+  const sizeSoldOut = (s: string) => !variants.some(v => v.size === s && v.stock > 0);
+  const colorSoldOut = (c: string) => !variants.some(v => v.color === c && v.stock > 0);
+
   const disc = product.salePrice ? getDiscountPercent(product.price, product.salePrice) : 0;
   const emoji = EMOJIS[product.categoryName] || '🛍️';
-  const inStock = product.stock > 0;
+
+  // Effective stock / prices honour the chosen variant when the product is variant-driven.
+  const effStock = hasVariants ? (selectedVariant?.stock ?? 0) : product.stock;
+  const inStock = effStock > 0;
+  const displayPrice = hasVariants
+    ? (selectedVariant?.effectivePrice ?? Math.min(...variants.map(v => v.effectivePrice)))
+    : (product.salePrice ?? product.price);
+  const displayOriginal = hasVariants
+    ? (selectedVariant && selectedVariant.salePrice != null && selectedVariant.salePrice < selectedVariant.price
+        ? selectedVariant.price : null)
+    : (product.salePrice ? product.price : null);
+  const activeSku = selectedVariant?.sku ?? product.sku ?? null;
+  // When variants exist the customer must land on a valid, in-stock combination before adding.
+  const needsVariantChoice = hasVariants && (!selectedVariant || selectedVariant.stock <= 0);
+
   const images = getAllImages();
-  const sizes = product.sizes ? product.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
-  const colors = product.colors ? product.colors.split(',').map(c => c.trim()).filter(Boolean) : [];
+  const sizes = hasVariants ? variantSizes : (product.sizes ? product.sizes.split(',').map(s => s.trim()).filter(Boolean) : []);
+  const colors = hasVariants ? variantColors : (product.colors ? product.colors.split(',').map(c => c.trim()).filter(Boolean) : []);
+
+  // Keep the chosen quantity within the (possibly variant-specific) stock ceiling as the selection changes.
+  useEffect(() => { setQuantity(q => Math.min(Math.max(1, q), Math.max(1, effStock))); }, [effStock]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -313,29 +366,33 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 )}
               </div>
 
-              <div className="flex items-baseline gap-3 mb-4">
-                <span className="text-3xl font-black text-blue-600">{formatPrice(product.salePrice || product.price)}</span>
-                {product.salePrice && (
+              <div className="flex items-baseline gap-3 mb-2">
+                {hasVariants && !selectedVariant && <span className="text-sm text-gray-400 font-semibold">From</span>}
+                <span className="text-3xl font-black text-blue-600">{formatPrice(displayPrice)}</span>
+                {displayOriginal != null && (
                   <>
-                    <span className="text-xl text-gray-400 line-through">{formatPrice(product.price)}</span>
+                    <span className="text-xl text-gray-400 line-through">{formatPrice(displayOriginal)}</span>
                     <span className="text-green-600 font-bold text-sm">
-                      Save {formatPrice(product.price - product.salePrice)}!
+                      Save {formatPrice(displayOriginal - displayPrice)}!
                     </span>
                   </>
                 )}
               </div>
+              {activeSku && <p className="text-xs text-gray-400 font-medium mb-4">SKU: {activeSku}</p>}
 
               <div className="mb-4">
                 {inStock ? (
-                  product.stock <= 10 ? (
+                  effStock <= 10 ? (
                     <span className="text-brand font-bold text-sm flex items-center gap-1">
-                      🔥 Hurry — only {product.stock} left in stock!
+                      🔥 Hurry — only {effStock} left in stock!
                     </span>
                   ) : (
                     <span className="text-green-600 font-semibold text-sm flex items-center gap-1">
                       <div className="w-2 h-2 bg-green-500 rounded-full" /> In Stock
                     </span>
                   )
+                ) : hasVariants && !selectedVariant ? (
+                  <span className="text-gray-500 font-semibold text-sm">Selected option is unavailable</span>
                 ) : (
                   <span className="text-red-600 font-semibold text-sm">Out of Stock</span>
                 )}
@@ -351,12 +408,16 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                     </button>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    {sizes.map(size => (
-                      <button key={size} onClick={() => setSelectedSize(size)}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${selectedSize === size ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 text-gray-700 hover:border-blue-400'}`}>
-                        {size}
-                      </button>
-                    ))}
+                    {sizes.map(size => {
+                      const soldOut = hasVariants && sizeSoldOut(size);
+                      return (
+                        <button key={size} onClick={() => setSelectedSize(size)} disabled={soldOut}
+                          title={soldOut ? 'Out of stock' : undefined}
+                          className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${selectedSize === size ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 text-gray-700 hover:border-blue-400'} ${soldOut ? 'opacity-40 line-through cursor-not-allowed hover:border-gray-200' : ''}`}>
+                          {size}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -365,18 +426,21 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 <div className="mb-4">
                   <p className="text-sm font-semibold text-gray-700 mb-2">Color: <span className="text-blue-600">{selectedColor}</span></p>
                   <div className="flex flex-wrap gap-2">
-                    {colors.map(color => (
-                      <button key={color} onClick={() => setSelectedColor(color)}
-                        className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${selectedColor === color ? 'border-blue-600 ring-2 ring-blue-300 ring-offset-1' : 'border-gray-300 hover:border-gray-500'}`}
+                    {colors.map(color => {
+                      const soldOut = hasVariants && colorSoldOut(color);
+                      return (
+                      <button key={color} onClick={() => setSelectedColor(color)} disabled={soldOut}
+                        className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${selectedColor === color ? 'border-blue-600 ring-2 ring-blue-300 ring-offset-1' : 'border-gray-300 hover:border-gray-500'} ${soldOut ? 'opacity-40 cursor-not-allowed' : ''}`}
                         style={{ backgroundColor: color.toLowerCase() }}
-                        title={color}>
+                        title={soldOut ? `${color} — out of stock` : color}>
                         {selectedColor === color && (
                           <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
                             <path d="M6 10l3 3 5-6" stroke={['white','yellow','beige','cream','ivory','lightyellow','snow','linen','floralwhite','ghostwhite','mintcream','azure','aliceblue','lavenderblush','seashell','cornsilk','lemonchiffon','honeydew','oldlace','papayawhip','blanchedalmond','bisque','wheat','moccasin','peachpuff','mistyrose','lavender','thistle','pink','lightpink','lightsalmon','lightyellow','lightgoldenrodyellow','lightcyan','lightblue','lightsteelblue','lightgray','lightgrey','silver','gainsboro','whitesmoke'].includes(color.toLowerCase()) ? '#111' : '#fff'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                           </svg>
                         )}
                       </button>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -389,7 +453,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                       <Minus size={16} />
                     </button>
                     <span className="w-12 text-center font-bold">{quantity}</span>
-                    <button onClick={() => setQuantity(q => Math.min(product.stock, q + 1))} className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                    <button onClick={() => setQuantity(q => Math.min(effStock, q + 1))} className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors">
                       <Plus size={16} />
                     </button>
                   </div>
