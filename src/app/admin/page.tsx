@@ -44,8 +44,8 @@ interface DashboardStats {
 
 const STATUS_STYLES: Record<string, string> = {
   PENDING:   'bg-gray-100 text-gray-600',
-  CONFIRMED: 'bg-blue-50 text-blue-700',
-  SHIPPED:   'bg-blue-100 text-blue-800',
+  CONFIRMED: 'bg-brand-50 text-brand-700',
+  SHIPPED:   'bg-brand-100 text-brand-700',
   DELIVERED: 'bg-gray-200 text-gray-800',
   CANCELLED: 'bg-red-50 text-red-600',
 };
@@ -97,19 +97,19 @@ export default function AdminPage() {
           <Link href="/admin/analytics" className="inline-flex items-center gap-1.5 text-xs bg-brand text-white font-bold px-3 py-1.5 rounded-full hover:bg-brand-700 transition-colors shadow-sm">
             <BarChart3 size={14} /> View Analytics
           </Link>
-          <span className="text-xs bg-blue-50 text-blue-700 font-black px-3 py-1.5 rounded-full border border-blue-200">ADMIN</span>
+          <span className="text-xs bg-brand-50 text-brand-700 font-black px-3 py-1.5 rounded-full border border-brand-200">ADMIN</span>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-2 mb-2">
             <Package size={16} className="text-white/80" />
-            <span className="text-gray-300 text-xs font-semibold uppercase tracking-wide">Today&apos;s Orders</span>
+            <span className="text-white/70 text-xs font-semibold uppercase tracking-wide">Today&apos;s Orders</span>
           </div>
           <p className="text-3xl font-black">{stats.todayOrders}</p>
         </div>
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white">
+        <div className="bg-gradient-to-br from-brand to-brand-700 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-2 mb-2">
             <Banknote size={16} className="text-white/80" />
             <span className="text-white/80 text-xs font-semibold uppercase tracking-wide">Today&apos;s Revenue</span>
@@ -120,12 +120,12 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Revenue',  value: formatPrice(stats.totalRevenue),  icon: Banknote,  color: 'bg-blue-50 text-blue-600' },
+          { label: 'Total Revenue',  value: formatPrice(stats.totalRevenue),  icon: Banknote,  color: 'bg-brand-50 text-brand' },
           { label: 'Total Orders',   value: stats.totalOrders,                icon: Package,     color: 'bg-gray-100 text-gray-700' },
-          { label: 'Total Users',    value: stats.totalUsers,                 icon: Users,       color: 'bg-blue-50 text-blue-600' },
+          { label: 'Total Users',    value: stats.totalUsers,                 icon: Users,       color: 'bg-brand-50 text-brand' },
           { label: 'Total Products', value: stats.totalProducts,              icon: ShoppingBag, color: 'bg-gray-100 text-gray-700' },
         ].map(({ label, value, icon: Icon, color }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 hover:border-blue-200 hover:shadow-md transition-all">
+          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 hover:border-brand-200 hover:shadow-md transition-all">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${color}`}>
               <Icon size={20} />
             </div>
@@ -137,13 +137,13 @@ export default function AdminPage() {
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
         <h2 className="font-black text-gray-900 mb-4 flex items-center gap-2">
-          <TrendingUp size={18} className="text-blue-600" /> Order Status Breakdown
+          <TrendingUp size={18} className="text-brand" /> Order Status Breakdown
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           {[
             { label: 'Pending',   value: stats.pendingOrders,   icon: Clock,         color: 'bg-gray-50 text-gray-700 border-gray-200' },
-            { label: 'Confirmed', value: stats.confirmedOrders, icon: CheckCircle,   color: 'bg-blue-50 text-blue-700 border-blue-200' },
-            { label: 'Shipped',   value: stats.shippedOrders,   icon: Truck,         color: 'bg-blue-50 text-blue-800 border-blue-200' },
+            { label: 'Confirmed', value: stats.confirmedOrders, icon: CheckCircle,   color: 'bg-brand-50 text-brand-700 border-brand-200' },
+            { label: 'Shipped',   value: stats.shippedOrders,   icon: Truck,         color: 'bg-brand-50 text-brand-700 border-brand-200' },
             { label: 'Delivered', value: stats.deliveredOrders, icon: CheckCircle,   color: 'bg-gray-100 text-gray-800 border-gray-300' },
             { label: 'Cancelled', value: stats.cancelledOrders, icon: XCircle,       color: 'bg-red-50 text-red-600 border-red-200' },
           ].map(({ label, value, icon: Icon, color }) => (
@@ -161,9 +161,9 @@ export default function AdminPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-gray-900 flex items-center gap-2">
-              <List size={16} className="text-blue-600" /> Recent Orders
+              <List size={16} className="text-brand" /> Recent Orders
             </h2>
-            <Link href="/admin/orders" className="text-blue-600 text-xs font-semibold hover:underline">View All</Link>
+            <Link href="/admin/orders" className="text-brand text-xs font-semibold hover:underline">View All</Link>
           </div>
           {stats.recentOrders.length === 0 ? (
             <p className="text-gray-400 text-sm text-center py-8">No orders yet</p>
@@ -191,9 +191,9 @@ export default function AdminPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-gray-900 flex items-center gap-2">
-              <Star size={16} className="text-blue-600" /> Best Sellers
+              <Star size={16} className="text-brand" /> Best Sellers
             </h2>
-            <Link href="/admin/products" className="text-blue-600 text-xs font-semibold hover:underline">View All</Link>
+            <Link href="/admin/products" className="text-brand text-xs font-semibold hover:underline">View All</Link>
           </div>
           {stats.bestSellers.length === 0 ? (
             <p className="text-gray-400 text-sm text-center py-8">No data available yet</p>
@@ -229,9 +229,9 @@ export default function AdminPage() {
             { href: '/admin/coupons',    icon: LayoutDashboard, label: 'Coupons', desc: 'Create discounts' },
           ].map(({ href, icon: Icon, label, desc }) => (
             <Link key={href} href={href}
-              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all group">
-              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-3 group-hover:bg-blue-600 transition-colors">
-                <Icon size={22} className="text-blue-600 group-hover:text-white transition-colors" />
+              className="bg-white rounded-2xl p-5 shadow-sm border border-gray-200 hover:border-brand-300 hover:shadow-md transition-all group">
+              <div className="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center mb-3 group-hover:bg-brand transition-colors">
+                <Icon size={22} className="text-brand group-hover:text-white transition-colors" />
               </div>
               <p className="font-bold text-gray-900 text-sm">{label}</p>
               <p className="text-xs text-gray-400 mt-0.5">{desc}</p>

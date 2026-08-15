@@ -292,7 +292,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 <div className="flex items-center gap-2 mb-4">
                   <div className="flex">
                     {[1,2,3,4,5].map(s => (
-                      <Star key={s} size={16} className={s <= Math.round(product.averageRating) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'} />
+                      <Star key={s} size={16} className={s <= Math.round(product.averageRating) ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'} />
                     ))}
                   </div>
                   <span className="font-bold text-sm">{product.averageRating}</span>
@@ -480,7 +480,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                       <p className="text-5xl font-black text-gray-900">{reviewSummary.average.toFixed(1)}</p>
                       <div className="flex justify-center my-1.5">
                         {[1,2,3,4,5].map(s => (
-                          <Star key={s} size={16} className={s <= Math.round(reviewSummary.average) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'} />
+                          <Star key={s} size={16} className={s <= Math.round(reviewSummary.average) ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'} />
                         ))}
                       </div>
                       <p className="text-xs text-gray-500">{reviewSummary.total} review{reviewSummary.total === 1 ? '' : 's'}</p>
@@ -492,9 +492,9 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                         return (
                           <div key={star} className="flex items-center gap-2">
                             <span className="text-xs text-gray-500 w-3 text-right">{star}</span>
-                            <Star size={11} className="text-yellow-400 fill-yellow-400 flex-shrink-0" />
+                            <Star size={11} className="text-amber-400 fill-amber-400 flex-shrink-0" />
                             <div className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
-                              <div className="h-full rounded-full bg-yellow-400 transition-all" style={{ width: `${pct}%` }} />
+                              <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: `${pct}%` }} />
                             </div>
                             <span className="text-xs text-gray-400 w-8 text-right">{count}</span>
                           </div>
@@ -511,7 +511,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                       <span className="text-sm text-gray-600 font-medium">Rating:</span>
                       {[1,2,3,4,5].map(s => (
                         <button key={s} type="button" onClick={() => setReviewRating(s)}>
-                          <Star size={24} className={s <= reviewRating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-300 fill-gray-300'} />
+                          <Star size={24} className={s <= reviewRating ? 'text-amber-400 fill-amber-400' : 'text-gray-300 fill-gray-300'} />
                         </button>
                       ))}
                     </div>
@@ -570,7 +570,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                             </div>
                             <div className="flex mt-1">
                               {[1,2,3,4,5].map(s => (
-                                <Star key={s} size={12} className={s <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'} />
+                                <Star key={s} size={12} className={s <= review.rating ? 'text-amber-400 fill-amber-400' : 'text-gray-200 fill-gray-200'} />
                               ))}
                             </div>
                           </div>
