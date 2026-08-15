@@ -28,7 +28,8 @@ export default function Invoice({ order, mode = "invoice" }: Props) {
   const date = new Date(order.createdAt).toLocaleDateString("en-PK", { day: "numeric", month: "long", year: "numeric" });
 
   const itemsSubtotal = order.items.reduce((sum, it) => sum + (it.subtotal ?? it.price * it.quantity), 0);
-  const adjustment = order.totalAmount - itemsSubtotal; // shipping (+) or discount (−) not stored separately
+  const adjustment = order.totalAmount - itemsSubtotal; // legacy fallback: shipping (+) or discount (−)
+  const hasBreakdown = order.subtotal != null; // new orders persist subtotal/discount/shipping
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -113,13 +114,28 @@ export default function Invoice({ order, mode = "invoice" }: Props) {
             <div className="w-64 space-y-1.5 text-sm">
               <div className="flex justify-between text-gray-500">
                 <span>Subtotal ({order.totalItems} item{order.totalItems === 1 ? "" : "s"})</span>
-                <span>{formatPrice(itemsSubtotal)}</span>
+                <span>{formatPrice(hasBreakdown ? order.subtotal! : itemsSubtotal)}</span>
               </div>
-              {Math.abs(adjustment) >= 1 && (
-                <div className="flex justify-between text-gray-500">
-                  <span>{adjustment > 0 ? "Delivery / adjustment" : "Discount"}</span>
-                  <span>{adjustment > 0 ? formatPrice(adjustment) : `− ${formatPrice(-adjustment)}`}</span>
-                </div>
+              {hasBreakdown ? (
+                <>
+                  {(order.discountAmount ?? 0) > 0 && (
+                    <div className="flex justify-between text-gray-500">
+                      <span>Discount{order.couponCode ? ` (${order.couponCode})` : ""}</span>
+                      <span>− {formatPrice(order.discountAmount!)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-gray-500">
+                    <span>Delivery</span>
+                    <span>{(order.shippingFee ?? 0) === 0 ? "Free" : formatPrice(order.shippingFee!)}</span>
+                  </div>
+                </>
+              ) : (
+                Math.abs(adjustment) >= 1 && (
+                  <div className="flex justify-between text-gray-500">
+                    <span>{adjustment > 0 ? "Delivery / adjustment" : "Discount"}</span>
+                    <span>{adjustment > 0 ? formatPrice(adjustment) : `− ${formatPrice(-adjustment)}`}</span>
+                  </div>
+                )
               )}
               <div className="flex justify-between font-black text-gray-900 text-base border-t border-gray-200 pt-2 mt-1">
                 <span>Total payable</span>

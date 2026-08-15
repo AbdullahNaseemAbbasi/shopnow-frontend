@@ -219,17 +219,32 @@ export default function OrderDetailPage() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="font-black text-gray-900 mb-4">Order Summary</h2>
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between text-gray-600">
-                <span>Subtotal</span>
-                <span>{formatPrice(order.totalAmount)}</span>
-              </div>
-              <div className="flex justify-between text-gray-600">
-                <span>Delivery</span>
-                <span className="text-green-600 font-semibold">{order.totalAmount >= 2000 ? 'Free' : formatPrice(200)}</span>
-              </div>
+              {order.subtotal != null ? (
+                <>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Subtotal</span><span>{formatPrice(order.subtotal)}</span>
+                  </div>
+                  {(order.discountAmount ?? 0) > 0 && (
+                    <div className="flex justify-between text-green-600 font-semibold">
+                      <span>Discount{order.couponCode ? ` (${order.couponCode})` : ''}</span>
+                      <span>− {formatPrice(order.discountAmount!)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-gray-600">
+                    <span>Delivery</span>
+                    <span className={(order.shippingFee ?? 0) === 0 ? 'text-green-600 font-semibold' : ''}>
+                      {(order.shippingFee ?? 0) === 0 ? 'Free' : formatPrice(order.shippingFee!)}
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span><span>{formatPrice(order.totalAmount)}</span>
+                </div>
+              )}
               <div className="border-t pt-2 flex justify-between font-black text-base">
                 <span>Total</span>
-                <span className="text-blue-600">{formatPrice(order.totalAmount + (order.totalAmount < 2000 ? 200 : 0))}</span>
+                <span className="text-brand">{formatPrice(order.totalAmount)}</span>
               </div>
             </div>
           </div>

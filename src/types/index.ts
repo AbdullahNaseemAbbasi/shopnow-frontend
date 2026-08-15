@@ -88,6 +88,10 @@ export interface Order {
   paymentStatus: "UNPAID" | "PAID" | "REFUNDED";
   shippingAddress: string;
   totalAmount: number;
+  subtotal?: number;
+  discountAmount?: number;
+  shippingFee?: number;
+  couponCode?: string;
   items: OrderItem[];
   totalItems: number;
   statusHistory?: OrderStatusHistory[];
