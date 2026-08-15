@@ -7,6 +7,7 @@ import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Tru
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { formatPrice, getDiscountPercent } from '@/lib/utils';
+import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping';
 import { Product, Review, ReviewSummary } from '@/types';
 import api from '@/lib/axios';
 import { setCached } from '@/lib/cache';
@@ -510,7 +511,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
               <div className="pt-4 border-t border-gray-100 grid grid-cols-3 gap-3">
                 <div className="flex flex-col items-center text-center gap-1">
                   <Truck size={20} className="text-blue-600" />
-                  <span className="text-xs text-gray-600 font-medium">Free Delivery<br />Rs. 2000+</span>
+                  <span className="text-xs text-gray-600 font-medium">Free Delivery<br />Rs. {FREE_SHIPPING_THRESHOLD.toLocaleString('en-PK')}+</span>
                 </div>
                 <div className="flex flex-col items-center text-center gap-1">
                   <RotateCcw size={20} className="text-blue-600" />

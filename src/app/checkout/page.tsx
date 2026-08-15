@@ -8,10 +8,8 @@ import { formatPrice } from '@/lib/utils';
 import { Address } from '@/types';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
-
-// Mirrors the server-side rule (OrderService). The server is authoritative; this is preview only.
-const FREE_SHIPPING_THRESHOLD = 2000;
-const FLAT_SHIPPING_FEE = 200;
+// Server-authoritative rule mirrored for preview only — single source in lib/shipping.
+import { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING_FEE } from '@/lib/shipping';
 
 export default function CheckoutPage() {
   const { cart, fetchCart, clearCart } = useCartStore();

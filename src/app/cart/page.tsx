@@ -7,6 +7,7 @@ import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Tag } from 'lucide-react'
 import { useCartStore } from '@/store/cartStore';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
+import { FREE_SHIPPING_THRESHOLD, FLAT_SHIPPING_FEE, shippingFeeFor } from '@/lib/shipping';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 
@@ -176,16 +177,16 @@ export default function CartPage() {
                   )}
                   <div className="flex justify-between text-gray-600">
                     <span>Delivery</span>
-                    <span className="text-green-600 font-semibold">{total >= 2000 ? 'Free' : formatPrice(200)}</span>
+                    <span className="text-green-600 font-semibold">{shippingFeeFor(total) === 0 ? 'Free' : formatPrice(FLAT_SHIPPING_FEE)}</span>
                   </div>
                   <div className="border-t pt-3 flex justify-between font-black text-lg">
                     <span>Total</span>
-                    <span className="text-blue-600">{formatPrice(finalAmount + (total < 2000 ? 200 : 0))}</span>
+                    <span className="text-blue-600">{formatPrice(finalAmount + shippingFeeFor(total))}</span>
                   </div>
                 </div>
-                {total < 2000 && (
+                {total < FREE_SHIPPING_THRESHOLD && (
                   <p className="text-xs text-orange-500 mt-2 text-center">
-                    Add {formatPrice(2000 - total)} more for free delivery!
+                    Add {formatPrice(FREE_SHIPPING_THRESHOLD - total)} more for free delivery!
                   </p>
                 )}
                 <button onClick={handleCheckout}

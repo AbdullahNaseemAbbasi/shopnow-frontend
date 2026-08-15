@@ -14,7 +14,7 @@ const PRESET_COLORS = ['Red', 'Blue', 'Green', 'Black', 'White', 'Grey', 'Navy',
 
 // One editable row in the admin variant editor. salePrice has no field in the UI (rare for a clothing
 // store) but is still round-tripped so an override set via the API isn't lost on save.
-type VariantRow = { id?: number; sku: string; size: string; color: string; price: string; salePrice: string; stock: string };
+type VariantRow = { id?: number; sku: string; size: string; color: string; price: string; salePrice: string; stock: string; stockBaseline?: number };
 const BLANK_VARIANT: VariantRow = { sku: '', size: '', color: '', price: '', salePrice: '', stock: '0' };
 
 export default function AdminProductsPage() {
@@ -84,6 +84,8 @@ export default function AdminProductsPage() {
       price: v.priceOverride != null ? String(v.priceOverride) : '',
       salePrice: v.salePriceOverride != null ? String(v.salePriceOverride) : '',
       stock: String(v.stock ?? 0),
+      // Remember the loaded stock so the backend applies only the admin's intended change as a delta.
+      stockBaseline: v.stock ?? 0,
     })));
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -112,6 +114,8 @@ export default function AdminProductsPage() {
         price: v.price.trim() ? Number(v.price) : null,
         salePrice: v.salePrice.trim() ? Number(v.salePrice) : null,
         stock: v.stock.trim() ? Math.max(0, Number(v.stock)) : 0,
+        // Baseline for existing variants → backend applies (stock − baseline) atomically. Null for new.
+        stockBaseline: v.stockBaseline ?? null,
       }));
     const payload = {
       name: form.name, slug: form.slug || generateSlug(form.name),
