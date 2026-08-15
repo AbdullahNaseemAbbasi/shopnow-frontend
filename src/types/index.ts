@@ -151,6 +151,23 @@ export interface WishlistItem {
   addedAt: string;
 }
 
+export type NotificationType =
+  | "ORDER_PLACED"
+  | "ORDER_STATUS"
+  | "RETURN_REQUESTED"
+  | "RETURN_UPDATE"
+  | "GENERAL";
+
+export interface AppNotification {
+  id: number;
+  type: NotificationType;
+  title: string;
+  message?: string;
+  link?: string;
+  read: boolean;
+  createdAt: string;
+}
+
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;

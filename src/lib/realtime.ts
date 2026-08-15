@@ -8,7 +8,7 @@ type Payload = Record<string, unknown>;
 type Handler = (data: Payload) => void;
 
 // Every event name the server can emit. Add new ones here so the manager attaches a listener.
-const EVENTS = ["order.created", "order.updated"] as const;
+const EVENTS = ["order.created", "order.updated", "return.updated", "notification"] as const;
 
 const listeners = new Map<string, Set<Handler>>();
 const statusListeners = new Set<(connected: boolean) => void>();

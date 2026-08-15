@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category } from '@/types';
+import NotificationBell from '@/components/layout/NotificationBell';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
@@ -104,7 +105,8 @@ export default function Navbar() {
                 <Link href="/admin" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors">
                   <LayoutDashboard size={16} /> Admin Panel
                 </Link>
-                <div className="relative">  
+                <NotificationBell />
+                <div className="relative">
                   <button onClick={() => setAccountOpen(!accountOpen)}
                     className="flex items-center gap-2 p-2 hover:text-blue-600 transition-colors">
                     <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
@@ -133,6 +135,7 @@ export default function Navbar() {
 
             {!isAdmin && (
               <div className="hidden md:flex items-center gap-1">
+                {isLoggedIn && <NotificationBell />}
                 <Link href="/wishlist" className="flex flex-col items-center p-2 hover:text-blue-600 transition-colors group">
                   <Heart size={22} className="group-hover:scale-110 transition-transform" />
                   <span className="text-xs mt-0.5">Wishlist</span>
@@ -209,6 +212,8 @@ export default function Navbar() {
                 )}
               </Link>
             )}
+
+            {isLoggedIn && <div className="flex md:hidden"><NotificationBell /></div>}
 
             <button onClick={() => setMobileOpen(!mobileOpen)} className="flex md:hidden p-2 hover:text-brand">
               {mobileOpen ? <X size={24} /> : <Menu size={24} />}
