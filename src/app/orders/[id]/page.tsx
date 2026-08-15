@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Package, ArrowLeft, MapPin, CreditCard, Ban } from 'lucide-react';
+import { Package, ArrowLeft, MapPin, CreditCard, Ban, FileText } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import { Order } from '@/types';
@@ -128,6 +128,9 @@ export default function OrderDetailPage() {
               <span className={`text-xs font-semibold px-3 py-1 rounded-full ${payment.color}`}>
                 <CreditCard size={11} className="inline mr-1" />{payment.label}
               </span>
+              <Link href={`/orders/${order.id}/invoice`} className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:underline mt-0.5">
+                <FileText size={13} /> Invoice
+              </Link>
             </div>
           </div>
 

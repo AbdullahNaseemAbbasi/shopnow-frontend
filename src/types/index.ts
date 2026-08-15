@@ -91,6 +91,8 @@ export interface Order {
   items: OrderItem[];
   totalItems: number;
   statusHistory?: OrderStatusHistory[];
+  customerName?: string;
+  customerEmail?: string;
   createdAt: string;
   updatedAt: string;
 }

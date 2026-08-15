@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { ChevronDown, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import { ChevronDown, RefreshCw, FileText } from 'lucide-react';
 import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
 import toast from 'react-hot-toast';
@@ -141,8 +142,12 @@ export default function AdminOrdersPage() {
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t border-gray-100 px-5 py-3 bg-gray-50">
+                  <div className="border-t border-gray-100 px-5 py-3 bg-gray-50 flex items-center justify-between gap-3">
                     <p className="text-xs text-gray-500">Order ID: #{order.id}</p>
+                    <Link href={`/admin/orders/${order.id}/invoice`}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-brand hover:underline">
+                      <FileText size={13} /> Invoice / Packing slip
+                    </Link>
                   </div>
                 )}
               </div>
