@@ -119,11 +119,19 @@ export interface Review {
   id: number;
   rating: number;
   comment: string;
+  images?: string[];
+  verifiedPurchase?: boolean;
   productId: number;
   productName: string;
   userId: number;
   userName: string;
   createdAt: string;
+}
+
+export interface ReviewSummary {
+  average: number;
+  total: number;
+  distribution: Record<string, number>; // "5".."1" -> count
 }
 
 export interface Address {

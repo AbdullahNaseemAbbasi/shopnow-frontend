@@ -3,11 +3,11 @@ import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Eye, Flame, MessageCircle } from 'lucide-react';
+import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Eye, Flame, MessageCircle, BadgeCheck, ImagePlus, X, Loader2 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { formatPrice, getDiscountPercent } from '@/lib/utils';
-import { Product, Review } from '@/types';
+import { Product, Review, ReviewSummary } from '@/types';
 import api from '@/lib/axios';
 import { setCached } from '@/lib/cache';
 import toast from 'react-hot-toast';
@@ -40,7 +40,11 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   const [wishlisted, setWishlisted] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
+  const [reviewImages, setReviewImages] = useState<string[]>([]);
+  const [uploadingReviewImage, setUploadingReviewImage] = useState(false);
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [reviewSummary, setReviewSummary] = useState<ReviewSummary | null>(null);
+  const [lightbox, setLightbox] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
 
   const [selectedImage, setSelectedImage] = useState(0);
@@ -75,6 +79,10 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
         setReviews(res.data || []);
         setCached(`reviews:product:${initialProduct.id}`, res.data || []);
       })
+      .catch(() => {});
+
+    api.get<ReviewSummary>(`/api/reviews/product/${initialProduct.id}/summary`)
+      .then(res => { if (!cancelled) setReviewSummary(res.data); })
       .catch(() => {});
 
     return () => { cancelled = true; };
@@ -142,20 +150,50 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
+  const handleReviewImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    e.target.value = ''; // allow re-selecting the same file after removal
+    if (files.length === 0) return;
+    const room = 4 - reviewImages.length;
+    if (room <= 0) { toast.error('Up to 4 photos'); return; }
+    setUploadingReviewImage(true);
+    try {
+      for (const file of files.slice(0, room)) {
+        if (!file.type.startsWith('image/')) { toast.error('Images only'); continue; }
+        if (file.size > 10 * 1024 * 1024) { toast.error(`${file.name} is too large (max 10MB)`); continue; }
+        const form = new FormData();
+        form.append('file', file);
+        const res = await api.post<{ url: string }>('/api/upload/review', form, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        if (res.data?.url) setReviewImages(prev => [...prev, res.data.url]);
+      }
+    } catch {
+      toast.error('Photo upload failed');
+    } finally {
+      setUploadingReviewImage(false);
+    }
+  };
+
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isLoggedIn) { toast.error('Please login first!'); return; }
     if (!reviewComment.trim()) { toast.error('Please write a review!'); return; }
     setSubmittingReview(true);
     try {
-      const res = await api.post(`/api/reviews/product/${product.id}`, {
+      const res = await api.post<Review>(`/api/reviews/product/${product.id}`, {
         rating: reviewRating,
         comment: reviewComment,
+        images: reviewImages,
       });
       setReviews(prev => [res.data, ...prev]);
       setReviewComment('');
       setReviewRating(5);
+      setReviewImages([]);
       toast.success('Review submitted! Thank you!');
+      // Refresh the aggregate so the histogram + product stars reflect the new review.
+      api.get<ReviewSummary>(`/api/reviews/product/${product.id}/summary`)
+        .then(r => setReviewSummary(r.data)).catch(() => {});
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       toast.error(error?.response?.data?.message || 'Failed to submit review');
@@ -402,6 +440,36 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
               </div>
             ) : (
               <div>
+                {reviewSummary && reviewSummary.total > 0 && (
+                  <div className="mb-8 flex flex-col sm:flex-row gap-6 items-center sm:items-start bg-gray-50 rounded-2xl p-5">
+                    <div className="text-center flex-shrink-0">
+                      <p className="text-5xl font-black text-gray-900">{reviewSummary.average.toFixed(1)}</p>
+                      <div className="flex justify-center my-1.5">
+                        {[1,2,3,4,5].map(s => (
+                          <Star key={s} size={16} className={s <= Math.round(reviewSummary.average) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'} />
+                        ))}
+                      </div>
+                      <p className="text-xs text-gray-500">{reviewSummary.total} review{reviewSummary.total === 1 ? '' : 's'}</p>
+                    </div>
+                    <div className="flex-1 w-full space-y-1.5">
+                      {[5,4,3,2,1].map(star => {
+                        const count = reviewSummary.distribution[String(star)] || 0;
+                        const pct = reviewSummary.total ? (count / reviewSummary.total) * 100 : 0;
+                        return (
+                          <div key={star} className="flex items-center gap-2">
+                            <span className="text-xs text-gray-500 w-3 text-right">{star}</span>
+                            <Star size={11} className="text-yellow-400 fill-yellow-400 flex-shrink-0" />
+                            <div className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
+                              <div className="h-full rounded-full bg-yellow-400 transition-all" style={{ width: `${pct}%` }} />
+                            </div>
+                            <span className="text-xs text-gray-400 w-8 text-right">{count}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 {isLoggedIn && (
                   <form onSubmit={handleSubmitReview} className="mb-8 p-5 bg-gray-50 rounded-2xl">
                     <h3 className="font-bold text-gray-900 mb-4">Write a Review</h3>
@@ -416,6 +484,29 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                     <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)}
                       placeholder="Share your experience with this product..."
                       rows={3} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 resize-none mb-3" />
+
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-2">
+                        {reviewImages.map((url, i) => (
+                          <div key={url} className="relative w-16 h-16 rounded-lg overflow-hidden border border-gray-200">
+                            <Image src={url} alt={`Review photo ${i + 1}`} fill sizes="64px" className="object-cover" />
+                            <button type="button" onClick={() => setReviewImages(prev => prev.filter(u => u !== url))}
+                              aria-label="Remove photo"
+                              className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80">
+                              <X size={11} />
+                            </button>
+                          </div>
+                        ))}
+                        {reviewImages.length < 4 && (
+                          <label className="w-16 h-16 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-brand text-gray-400 hover:text-brand transition-colors">
+                            {uploadingReviewImage ? <Loader2 size={18} className="animate-spin" /> : <ImagePlus size={18} />}
+                            <input type="file" accept="image/*" multiple className="hidden" onChange={handleReviewImages} disabled={uploadingReviewImage} />
+                          </label>
+                        )}
+                      </div>
+                      <p className="text-xs text-gray-400 mt-1.5">Add up to 4 photos (optional)</p>
+                    </div>
+
                     <button type="submit" disabled={submittingReview || !reviewComment.trim()}
                       className="btn-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm disabled:opacity-60">
                       {submittingReview ? 'Submitting...' : 'Submit Review'}
@@ -435,7 +526,14 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                       <div key={review.id} className="border border-gray-100 rounded-2xl p-5">
                         <div className="flex items-start justify-between mb-2">
                           <div>
-                            <p className="font-bold text-gray-900 text-sm">{review.userName}</p>
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className="font-bold text-gray-900 text-sm">{review.userName}</p>
+                              {review.verifiedPurchase && (
+                                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full">
+                                  <BadgeCheck size={12} /> Verified Purchase
+                                </span>
+                              )}
+                            </div>
                             <div className="flex mt-1">
                               {[1,2,3,4,5].map(s => (
                                 <Star key={s} size={12} className={s <= review.rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-200 fill-gray-200'} />
@@ -447,6 +545,16 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                           </span>
                         </div>
                         <p className="text-sm text-gray-700 leading-relaxed">{review.comment}</p>
+                        {review.images && review.images.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mt-3">
+                            {review.images.map((url, i) => (
+                              <button key={url} type="button" onClick={() => setLightbox(url)}
+                                className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 hover:opacity-90 transition-opacity">
+                                <Image src={url} alt={`Review photo ${i + 1}`} fill sizes="80px" className="object-cover" />
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -456,6 +564,17 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
           </div>
         </div>
       </div>
+
+      {lightbox && (
+        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
+          <button onClick={() => setLightbox(null)} aria-label="Close" className="absolute top-4 right-4 text-white/80 hover:text-white">
+            <X size={28} />
+          </button>
+          <div className="relative w-full max-w-3xl h-[80vh]" onClick={(e) => e.stopPropagation()}>
+            <Image src={lightbox} alt="Review photo" fill sizes="768px" className="object-contain" />
+          </div>
+        </div>
+      )}
 
       <button onClick={handleWhatsApp}
         className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2 group">
