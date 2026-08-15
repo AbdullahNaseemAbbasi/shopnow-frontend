@@ -4,21 +4,22 @@ import FeaturedProducts from "@/components/home/FeaturedProducts";
 import ProductRail from "@/components/home/ProductRail";
 import PromoStrip from "@/components/home/PromoStrip";
 import { serverFetch } from "@/lib/serverFetch";
-import type { Category, Product } from "@/types";
+import type { Category, Product, Banner } from "@/types";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [categories, featured, newArrivals, bestSellers] = await Promise.all([
+  const [categories, featured, newArrivals, bestSellers, banners] = await Promise.all([
     serverFetch<Category[]>("/api/categories", { revalidate: 300 }),
     serverFetch<Product[]>("/api/products/featured", { revalidate: 120 }),
     serverFetch<Product[]>("/api/products/new-arrivals?limit=8", { revalidate: 120 }),
     serverFetch<Product[]>("/api/products/best-sellers?limit=8", { revalidate: 120 }),
+    serverFetch<Banner[]>("/api/banners", { revalidate: 60 }),
   ]);
 
   return (
     <div className="min-h-screen">
-      <HeroBanner initialData={categories ?? undefined} />
+      <HeroBanner initialData={categories ?? undefined} initialBanners={banners ?? undefined} />
       <PromoStrip />
       <CategorySection initialData={categories ?? undefined} />
       <FeaturedProducts initialData={featured ?? undefined} />

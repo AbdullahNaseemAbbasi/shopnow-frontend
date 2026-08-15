@@ -2,59 +2,108 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, ShoppingBag } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useCachedFetch } from '@/lib/useCachedFetch';
-import { Category } from '@/types';
+import { Category, Banner } from '@/types';
 
-const GRADIENTS = [
-  'from-slate-900 via-blue-950 to-slate-900',
-  'from-blue-900 via-indigo-900 to-slate-900',
-  'from-slate-900 via-blue-900 to-indigo-900',
-  'from-indigo-900 via-blue-900 to-slate-900',
-  'from-slate-900 via-indigo-950 to-blue-900',
-];
-const ACCENTS = ['bg-blue-600', 'bg-indigo-600', 'bg-blue-700', 'bg-indigo-700', 'bg-blue-600'];
 const EMOJIS: Record<string, string> = {
   'Electronics': '📱', 'Fashion': '👗', 'Ladies Fashion': '👗',
   'Gents Fashion': '👘', 'Beauty': '💄', 'Home & Living': '🏠',
   'Sports': '⚽', 'Books': '📚', 'Kids': '🧸', 'Groceries': '🛒',
 };
-const BADGES = ['Mega Sale', 'New Collection', 'Best Deals', 'Hot Picks', 'Top Rated'];
-const TAGS = ['Up to 50% OFF', 'Shop Now', 'Explore Collection', 'View Deals', 'Discover More'];
-export default function HeroBanner({ initialData }: { initialData?: Category[] }) {
-  const [current, setCurrent] = useState(0);
-  const { data: allCategories, loading } = useCachedFetch<Category[]>(
-    'categories',
-    '/api/categories',
-    { initialData }
-  );
+
+interface Props {
+  initialData?: Category[];
+  initialBanners?: Banner[];
+}
+
+export default function HeroBanner({ initialData, initialBanners }: Props) {
+  // CMS banners take precedence; fall back to a category-driven hero when none are configured.
+  const { data: bannerData } = useCachedFetch<Banner[]>('banners', '/api/banners',
+    initialBanners ? { initialData: initialBanners } : {});
+  const banners = Array.isArray(bannerData) ? bannerData : [];
+  const useBanners = banners.length > 0;
+
+  const { data: allCategories, loading } = useCachedFetch<Category[]>('categories', '/api/categories',
+    initialData ? { initialData } : {});
   const categories = Array.isArray(allCategories) ? allCategories.slice(0, 5) : [];
+
+  const count = useBanners ? banners.length : categories.length;
+  const [current, setCurrent] = useState(0);
+
+  useEffect(() => { setCurrent(0); }, [useBanners]);
   useEffect(() => {
-    if (categories.length === 0) return;
-    const timer = setInterval(() => setCurrent(prev => (prev + 1) % categories.length), 5000);
+    if (count <= 1) return;
+    const timer = setInterval(() => setCurrent((p) => (p + 1) % count), 5500);
     return () => clearInterval(timer);
-  }, [categories.length]);
-  const prev = () => setCurrent(prev => (prev - 1 + categories.length) % categories.length);
-  const next = () => setCurrent(prev => (prev + 1) % categories.length);
-  if (loading) {
+  }, [count]);
+
+  const prev = () => setCurrent((p) => (p - 1 + count) % count);
+  const next = () => setCurrent((p) => (p + 1) % count);
+
+  if (loading && !useBanners) return <div className="h-64 md:h-80 hero-gradient animate-pulse" />;
+  if (count === 0) return null;
+
+  const Arrows = count > 1 ? (
+    <>
+      <button onClick={prev} aria-label="Previous slide" className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all z-10">
+        <ChevronLeft size={24} />
+      </button>
+      <button onClick={next} aria-label="Next slide" className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all z-10">
+        <ChevronRight size={24} />
+      </button>
+    </>
+  ) : null;
+
+  const Dots = (
+    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+      {Array.from({ length: count }).map((_, i) => (
+        <button key={i} onClick={() => setCurrent(i)} aria-label={`Go to slide ${i + 1}`}
+          className={`transition-all rounded-full ${i === current ? 'w-8 h-2 bg-white' : 'w-2 h-2 bg-white/40'}`} />
+      ))}
+    </div>
+  );
+
+  // ===== CMS banners =====
+  if (useBanners) {
+    const b = banners[current];
     return (
-      <div className="h-64 md:h-80 bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 animate-pulse" />
+      <div className="relative hero-gradient overflow-hidden">
+        {b.imageUrl && (
+          <>
+            <Image src={b.imageUrl} alt={b.title} fill priority sizes="100vw" className="object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-black/20" />
+          </>
+        )}
+        <div className="relative max-w-[1600px] mx-auto px-8 py-16 md:py-28">
+          <div className="text-white space-y-4 max-w-xl animate-fade-in-up">
+            <h1 className="text-3xl md:text-5xl font-black leading-tight">{b.title}</h1>
+            {b.subtitle && <p className="text-white/90 text-base md:text-lg font-light leading-relaxed">{b.subtitle}</p>}
+            {b.ctaText && b.ctaLink && (
+              <div className="pt-2">
+                <Link href={b.ctaLink} className="btn-primary text-white px-8 py-3 rounded-xl font-bold text-sm hover:scale-105 transition-transform inline-block">
+                  {b.ctaText}
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+        {Arrows}
+        {Dots}
+      </div>
     );
   }
-  if (categories.length === 0) return null;
+
+  // ===== Category fallback =====
   const cat = categories[current];
   const emoji = EMOJIS[cat.name] || '🛍️';
-  const bg = GRADIENTS[current % GRADIENTS.length];
-  const accent = ACCENTS[current % ACCENTS.length];
-  const badge = BADGES[current % BADGES.length];
-  const tag = TAGS[current % TAGS.length];
   return (
-    <div className={`relative bg-gradient-to-r ${bg} overflow-hidden transition-all duration-700`}>
+    <div className="relative hero-gradient overflow-hidden transition-all duration-700">
       <div className="max-w-[1600px] mx-auto px-8 py-16 md:py-24">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-white space-y-4 md:w-1/2 animate-fade-in-up">
-            <span className={`inline-block ${accent} text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide`}>
-              {badge}
+            <span className="inline-block bg-white/15 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+              Shop by category
             </span>
             <h1 className="text-2xl md:text-4xl font-black leading-tight">
               {cat.name}
@@ -65,20 +114,11 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
               )}
             </h1>
             {!cat.description && (
-              <p className="text-gray-300 text-sm max-w-md">
-                Best quality products at the best prices. Shop now!
-              </p>
+              <p className="text-white/80 text-sm max-w-md">Quality products at the best prices. Shop now!</p>
             )}
-            <div className="flex items-center gap-3">
-              <span className="bg-blue-600 text-white text-sm font-bold px-3 py-1.5 rounded-lg flex items-center gap-1">
-                <ShoppingBag size={14} /> {tag}
-              </span>
-            </div>
             <div className="flex gap-3 pt-2">
-              <Link
-                href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`}
-                className="btn-primary text-white px-8 py-3 rounded-xl font-bold text-sm hover:scale-105 transition-transform inline-block"
-              >
+              <Link href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`}
+                className="btn-primary text-white px-8 py-3 rounded-xl font-bold text-sm hover:scale-105 transition-transform inline-block">
                 Shop {cat.name}
               </Link>
               <Link href="/products" className="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-xl font-bold text-sm transition-all inline-block">
@@ -89,14 +129,7 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
           <div className="md:w-1/2 flex justify-center">
             {cat.imageUrl ? (
               <div className="relative w-full h-64 md:h-80 animate-float">
-                <Image
-                  src={cat.imageUrl}
-                  alt={cat.name}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  priority
-                  className="object-contain rounded-2xl"
-                />
+                <Image src={cat.imageUrl} alt={cat.name} fill sizes="(max-width: 768px) 100vw, 50vw" priority className="object-contain rounded-2xl" />
               </div>
             ) : (
               <div className="text-[120px] md:text-[200px] animate-float select-none">{emoji}</div>
@@ -104,22 +137,8 @@ export default function HeroBanner({ initialData }: { initialData?: Category[] }
           </div>
         </div>
       </div>
-      {categories.length > 1 && (
-        <>
-          <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all">
-            <ChevronLeft size={24} />
-          </button>
-          <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all">
-            <ChevronRight size={24} />
-          </button>
-        </>
-      )}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-        {categories.map((_, i) => (
-          <button key={i} onClick={() => setCurrent(i)}
-            className={`transition-all rounded-full ${i === current ? 'w-8 h-2 bg-blue-400' : 'w-2 h-2 bg-white/40'}`} />
-        ))}
-      </div>
+      {Arrows}
+      {Dots}
     </div>
   );
 }

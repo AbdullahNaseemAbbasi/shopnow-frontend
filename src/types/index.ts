@@ -13,6 +13,19 @@ export interface Category {
   imageUrl?: string;
 }
 
+export interface Banner {
+  id: number;
+  title: string;
+  subtitle?: string;
+  imageUrl?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  active: boolean;
+  sortOrder: number;
+  startsAt?: string;
+  endsAt?: string;
+}
+
 export interface Product {
   id: number;
   name: string;
