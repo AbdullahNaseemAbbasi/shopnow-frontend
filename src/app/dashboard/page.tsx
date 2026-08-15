@@ -45,14 +45,14 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
 
-        <div className="bg-gradient-to-r from-red-600 to-red-700 rounded-2xl p-6 mb-6 text-white">
+        <div className="bg-gradient-to-r from-brand to-brand-700 rounded-2xl p-6 mb-6 text-white">
           <div className="flex items-center gap-4">
             <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-black">
               {user?.firstName?.[0]?.toUpperCase()}
             </div>
             <div>
               <h1 className="text-xl font-black">Welcome back, {user?.firstName}!</h1>
-              <p className="text-red-100 text-sm mt-0.5">{user?.email}</p>
+              <p className="text-brand-100 text-sm mt-0.5">{user?.email}</p>
             </div>
           </div>
         </div>

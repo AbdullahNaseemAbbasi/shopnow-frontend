@@ -7,8 +7,10 @@
 type Payload = Record<string, unknown>;
 type Handler = (data: Payload) => void;
 
-// Every event name the server can emit. Add new ones here so the manager attaches a listener.
-const EVENTS = ["order.created", "order.updated", "return.updated", "notification"] as const;
+// Every event name the server can emit. Add new ones here so the manager attaches a listener —
+// EventSource only dispatches named events to listeners registered for that exact name, so a
+// missing entry here silently drops that event (this is why admin returns weren't live-updating).
+const EVENTS = ["order.created", "order.updated", "return.created", "return.updated", "notification"] as const;
 
 const listeners = new Map<string, Set<Handler>>();
 const statusListeners = new Set<(connected: boolean) => void>();

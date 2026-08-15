@@ -180,7 +180,7 @@ export default function CartPage() {
                 </div>
                 {total < 2000 && (
                   <p className="text-xs text-orange-500 mt-2 text-center">
-                    Add Rs. {formatPrice(2000 - total)} more for free delivery!
+                    Add {formatPrice(2000 - total)} more for free delivery!
                   </p>
                 )}
                 <button onClick={handleCheckout}
