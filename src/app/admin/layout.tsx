@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, BarChart3, Package, ShoppingBag, Tag, Ticket, RotateCcw, Star, Menu, X, LogOut, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Package, ShoppingBag, Tag, Ticket, RotateCcw, Star, Users, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import { useRealtimeEvent } from '@/lib/useRealtime';
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
   { href: '/admin/orders',     label: 'Orders',      icon: Package },
   { href: '/admin/reviews',    label: 'Reviews',     icon: Star },
   { href: '/admin/returns',    label: 'Returns',     icon: RotateCcw },
+  { href: '/admin/customers',  label: 'Customers',   icon: Users },
   { href: '/admin/categories', label: 'Categories',  icon: Tag },
   { href: '/admin/coupons',    label: 'Coupons',     icon: Ticket },
 ];

@@ -197,6 +197,17 @@ export interface AppNotification {
   createdAt: string;
 }
 
+export interface CustomerSummary {
+  id: number;
+  name: string;
+  email: string;
+  registeredAt: string;
+  orderCount: number;
+  totalSpend: number;
+  avgOrderValue: number;
+  lastOrderAt?: string;
+}
+
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
