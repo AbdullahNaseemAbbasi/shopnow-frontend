@@ -117,12 +117,16 @@ export interface ReturnRequest {
   updatedAt: string;
 }
 
+export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
+
 export interface Review {
   id: number;
   rating: number;
   comment: string;
   images?: string[];
   verifiedPurchase?: boolean;
+  status?: ReviewStatus;
+  rejectionReason?: string;
   productId: number;
   productName: string;
   userId: number;
