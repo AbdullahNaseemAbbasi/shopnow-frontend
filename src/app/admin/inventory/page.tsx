@@ -1,13 +1,23 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, PackageX, RefreshCw, Boxes } from 'lucide-react';
+import { AlertTriangle, PackageX, RefreshCw, Boxes, History } from 'lucide-react';
 import api from '@/lib/axios';
 import { formatPrice } from '@/lib/utils';
-import type { Product } from '@/types';
+import type { Product, InventoryTransaction } from '@/types';
 import ProductImage from '@/components/ui/ProductImage';
 import toast from 'react-hot-toast';
 
 const THRESHOLDS = [5, 10, 20];
+
+const REASON_META: Record<string, { label: string; badge: string }> = {
+  SALE:         { label: 'Sale',        badge: 'bg-red-50 text-red-600 border-red-200' },
+  CANCELLATION: { label: 'Cancellation', badge: 'bg-green-50 text-green-700 border-green-200' },
+  RETURN:       { label: 'Return',      badge: 'bg-amber-50 text-amber-700 border-amber-200' },
+  ADJUSTMENT:   { label: 'Adjustment',  badge: 'bg-brand-50 text-brand-700 border-brand-200' },
+};
+
+const fmtWhen = (iso: string) =>
+  new Date(iso).toLocaleString('en-PK', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 
 export default function AdminInventoryPage() {
   const [items, setItems] = useState<Product[]>([]);
@@ -15,6 +25,17 @@ export default function AdminInventoryPage() {
   const [threshold, setThreshold] = useState(5);
   const [values, setValues] = useState<Record<number, string>>({});
   const [savingId, setSavingId] = useState<number | null>(null);
+  const [log, setLog] = useState<InventoryTransaction[]>([]);
+  const [logLoading, setLogLoading] = useState(true);
+
+  const fetchLog = () => {
+    setLogLoading(true);
+    api.get<InventoryTransaction[]>('/api/products/inventory-log')
+      .then((res) => setLog(res.data || []))
+      .catch(() => {})
+      .finally(() => setLogLoading(false));
+  };
+  useEffect(() => { fetchLog(); }, []);
 
   const fetchLowStock = (t = threshold) => {
     setLoading(true);
@@ -40,6 +61,7 @@ export default function AdminInventoryPage() {
       await api.patch(`/api/products/${p.id}/stock?quantity=${qty}`);
       toast.success(`${p.name} stock set to ${qty}`);
       fetchLowStock(threshold); // item drops off once it's back above the threshold
+      fetchLog(); // the adjustment shows up in the movement log
     } catch {
       toast.error('Update failed');
     } finally {
@@ -124,6 +146,49 @@ export default function AdminInventoryPage() {
           })}
         </div>
       )}
+
+      {/* Recent stock movements — immutable audit log */}
+      <div className="mt-8">
+        <h2 className="font-black text-gray-900 mb-4 flex items-center gap-2">
+          <History size={18} className="text-brand" /> Recent stock movements
+        </h2>
+        {logLoading ? (
+          <div className="space-y-2">{[...Array(4)].map((_, i) => <div key={i} className="skeleton h-12 rounded-xl" />)}</div>
+        ) : log.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-gray-200 text-center py-10 text-gray-400 text-sm">No stock movements yet.</div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
+            <table className="w-full text-sm min-w-[640px]">
+              <thead>
+                <tr className="text-left text-xs text-gray-400 uppercase tracking-wide border-b border-gray-100">
+                  <th className="px-4 py-3 font-bold">When</th>
+                  <th className="px-4 py-3 font-bold">Product</th>
+                  <th className="px-4 py-3 font-bold">Reason</th>
+                  <th className="px-4 py-3 font-bold text-right">Change</th>
+                  <th className="px-4 py-3 font-bold text-right">Stock after</th>
+                  <th className="px-4 py-3 font-bold">By</th>
+                </tr>
+              </thead>
+              <tbody>
+                {log.map((t) => {
+                  const meta = REASON_META[t.reason] ?? { label: t.reason, badge: 'bg-gray-100 text-gray-600 border-gray-200' };
+                  const up = t.quantityDelta > 0;
+                  return (
+                    <tr key={t.id} className="border-b border-gray-50 last:border-0">
+                      <td className="px-4 py-2.5 text-gray-500 whitespace-nowrap">{fmtWhen(t.createdAt)}</td>
+                      <td className="px-4 py-2.5 font-medium text-gray-900">{t.productName}</td>
+                      <td className="px-4 py-2.5"><span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${meta.badge}`}>{meta.label}</span></td>
+                      <td className={`px-4 py-2.5 text-right font-black ${up ? 'text-green-600' : 'text-red-600'}`}>{up ? `+${t.quantityDelta}` : t.quantityDelta}</td>
+                      <td className="px-4 py-2.5 text-right text-gray-700">{t.resultingStock ?? '—'}</td>
+                      <td className="px-4 py-2.5 text-gray-400 truncate max-w-[160px]">{t.actor || 'system'}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

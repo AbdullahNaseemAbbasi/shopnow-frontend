@@ -197,6 +197,20 @@ export interface AppNotification {
   createdAt: string;
 }
 
+export type InventoryReason = "SALE" | "CANCELLATION" | "RETURN" | "ADJUSTMENT";
+
+export interface InventoryTransaction {
+  id: number;
+  productId: number;
+  productName: string;
+  quantityDelta: number;
+  resultingStock?: number;
+  reason: InventoryReason;
+  note?: string;
+  actor?: string;
+  createdAt: string;
+}
+
 export interface CustomerSummary {
   id: number;
   name: string;
