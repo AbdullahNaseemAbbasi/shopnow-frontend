@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  DollarSign, Package, ShoppingCart, Users, TrendingUp, TrendingDown, Minus, Activity,
+  Banknote, Package, ShoppingCart, Users, TrendingUp, TrendingDown, Minus, Activity,
 } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import { formatPrice } from "@/lib/utils";
@@ -114,7 +114,7 @@ export default function AnalyticsPage() {
   );
 
   const kpis = [
-    { label: "Revenue", value: formatPrice(data.revenue), delta: data.revenueGrowthPct, icon: DollarSign, tint: "bg-brand-50 text-brand" },
+    { label: "Revenue", value: formatPrice(data.revenue), delta: data.revenueGrowthPct, icon: Banknote, tint: "bg-brand-50 text-brand" },
     { label: "Orders", value: String(data.orders), delta: data.ordersGrowthPct, icon: Package, tint: "bg-slate-100 text-slate-700" },
     { label: "Avg Order Value", value: formatPrice(data.avgOrderValue), delta: null, icon: ShoppingCart, tint: "bg-brand-50 text-brand" },
     { label: "New Customers", value: String(data.newCustomers), delta: null, icon: Users, tint: "bg-slate-100 text-slate-700" },

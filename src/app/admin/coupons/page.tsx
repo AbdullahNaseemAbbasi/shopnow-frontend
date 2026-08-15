@@ -1,7 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Plus, Trash2, X, Check, Ticket, Calendar, Percent, DollarSign } from 'lucide-react';
+import { Plus, Trash2, X, Check, Ticket, Calendar, Percent, Banknote } from 'lucide-react';
 import api from '@/lib/axios';
+import { formatPrice } from '@/lib/utils';
 import toast from 'react-hot-toast';
 
 interface Coupon {
@@ -186,15 +187,15 @@ export default function AdminCouponsPage() {
                       <div className="flex items-center gap-2 flex-wrap mb-1">
                         <span className="font-black text-gray-900 text-lg font-mono tracking-widest">{coupon.code}</span>
                         <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${coupon.discountType === 'PERCENTAGE' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
-                          {coupon.discountType === 'PERCENTAGE' ? <Percent size={11} /> : <DollarSign size={11} />}
-                          {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}% OFF` : `Rs. ${coupon.discountValue} OFF`}
+                          {coupon.discountType === 'PERCENTAGE' ? <Percent size={11} /> : <Banknote size={11} />}
+                          {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}% OFF` : `${formatPrice(coupon.discountValue)} OFF`}
                         </span>
                         {expired && <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full font-bold">Expired</span>}
                       </div>
                       {coupon.description && <p className="text-xs text-gray-500 mb-2">{coupon.description}</p>}
                       <div className="flex flex-wrap gap-3 text-xs text-gray-500">
-                        {coupon.minimumAmount > 0 && <span>Min order: Rs. {coupon.minimumAmount.toLocaleString()}</span>}
-                        {coupon.maximumDiscount > 0 && <span>Max discount: Rs. {coupon.maximumDiscount.toLocaleString()}</span>}
+                        {coupon.minimumAmount > 0 && <span>Min order: {formatPrice(coupon.minimumAmount)}</span>}
+                        {coupon.maximumDiscount > 0 && <span>Max discount: {formatPrice(coupon.maximumDiscount)}</span>}
                         <span className="flex items-center gap-1"><Ticket size={11} /> {coupon.usedCount || 0}/{coupon.usageLimit} used</span>
                         {coupon.expiresAt && (
                           <span className="flex items-center gap-1"><Calendar size={11} /> {new Date(coupon.expiresAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })}</span>

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { ShoppingBag, Users, Package, TrendingUp, Clock, DollarSign, LayoutDashboard, Tag, List, CheckCircle, Truck, XCircle, Star, BarChart3 } from 'lucide-react';
+import { ShoppingBag, Users, Package, TrendingUp, Clock, Banknote, LayoutDashboard, Tag, List, CheckCircle, Truck, XCircle, Star, BarChart3 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import api from '@/lib/axios';
@@ -111,7 +111,7 @@ export default function AdminPage() {
         </div>
         <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white">
           <div className="flex items-center gap-2 mb-2">
-            <DollarSign size={16} className="text-white/80" />
+            <Banknote size={16} className="text-white/80" />
             <span className="text-white/80 text-xs font-semibold uppercase tracking-wide">Today&apos;s Revenue</span>
           </div>
           <p className="text-3xl font-black">{formatPrice(stats.todayRevenue)}</p>
@@ -120,7 +120,7 @@ export default function AdminPage() {
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: 'Total Revenue',  value: formatPrice(stats.totalRevenue),  icon: DollarSign,  color: 'bg-blue-50 text-blue-600' },
+          { label: 'Total Revenue',  value: formatPrice(stats.totalRevenue),  icon: Banknote,  color: 'bg-blue-50 text-blue-600' },
           { label: 'Total Orders',   value: stats.totalOrders,                icon: Package,     color: 'bg-gray-100 text-gray-700' },
           { label: 'Total Users',    value: stats.totalUsers,                 icon: Users,       color: 'bg-blue-50 text-blue-600' },
           { label: 'Total Products', value: stats.totalProducts,              icon: ShoppingBag, color: 'bg-gray-100 text-gray-700' },

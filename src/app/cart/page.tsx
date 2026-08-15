@@ -50,7 +50,7 @@ export default function CartPage() {
       setDiscount(res.data.discountAmount);
       setCouponApplied(code);
       sessionStorage.setItem('shopnow_coupon', code);
-      toast.success(res.data.message || `Rs. ${res.data.discountAmount} discount applied!`);
+      toast.success(res.data.message || `${formatPrice(res.data.discountAmount)} discount applied!`);
     } catch (err: unknown) {
       const error = err as { response?: { data?: { message?: string } } };
       toast.error(error?.response?.data?.message || 'Invalid coupon code!');
