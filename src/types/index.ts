@@ -128,6 +128,16 @@ export interface Review {
   createdAt: string;
 }
 
+export interface ProductSuggestion {
+  id: number;
+  name: string;
+  slug: string;
+  imageUrl?: string;
+  price: number;
+  salePrice?: number;
+  categoryName: string;
+}
+
 export interface ReviewSummary {
   average: number;
   total: number;

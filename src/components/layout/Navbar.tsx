@@ -2,18 +2,18 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShoppingCart, Search, Heart, User, Menu, X, ChevronDown, LogOut, Package, LayoutDashboard, UserCircle, MapPin, RotateCcw } from 'lucide-react';
+import { ShoppingCart, Heart, User, Menu, X, ChevronDown, LogOut, Package, LayoutDashboard, UserCircle, MapPin, RotateCcw } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
 import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category } from '@/types';
 import NotificationBell from '@/components/layout/NotificationBell';
+import SearchAutocomplete from '@/components/search/SearchAutocomplete';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [accountOpen, setAccountOpen] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
@@ -37,17 +37,6 @@ export default function Navbar() {
   useEffect(() => {
     if (isLoggedIn && !isAdmin) fetchCart();
   }, [isLoggedIn, isAdmin, fetchCart]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      router.push(`/products?keyword=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-      // The mobile drawer uses this same handler; without closing it the results page renders
-      // underneath a full-screen open menu.
-      setMobileOpen(false);
-    }
-  };
 
   const handleLogout = () => {
     logout();
@@ -83,21 +72,8 @@ export default function Navbar() {
               <span className="text-xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
             </Link>
 
-            {!isAdmin && (  
-              <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-2xl">
-                <div className="flex w-full rounded-xl overflow-hidden border-2 border-blue-600 focus-within:shadow-lg transition-shadow"> 
-                  <input
-                    type="text" 
-                    placeholder="Search products, brands, categories..." 
-                    className="flex-1 px-4 py-2.5 text-sm outline-none"
-                    value={searchQuery} 
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  /> 
-                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 px-5 text-white transition-colors"> 
-                    <Search size={18} /> 
-                  </button>
-                </div>
-              </form>
+            {!isAdmin && (
+              <SearchAutocomplete className="hidden md:block flex-1 max-w-2xl" />
             )}
 
             {isAdmin && ( 
@@ -291,10 +267,7 @@ export default function Navbar() {
                 </>
               ) : (
                 <>
-                  <form onSubmit={handleSearch} className="flex rounded-xl overflow-hidden border-2 border-blue-600 mb-3">
-                    <input type="text" placeholder="Search..." className="flex-1 px-4 py-2 text-sm outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-                    <button type="submit" className="bg-blue-600 px-4 text-white"><Search size={18} /></button>
-                  </form>
+                  <SearchAutocomplete className="mb-3" onNavigate={() => setMobileOpen(false)} />
 
                   {isLoggedIn ? (
                     <>
