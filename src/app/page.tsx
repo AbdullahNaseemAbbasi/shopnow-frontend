@@ -2,6 +2,7 @@ import HeroBanner from "@/components/home/HeroBanner";
 import CategorySection from "@/components/home/CategorySection";
 import FeaturedProducts from "@/components/home/FeaturedProducts";
 import ProductRail from "@/components/home/ProductRail";
+import RecentlyViewed from "@/components/products/RecentlyViewed";
 import PromoStrip from "@/components/home/PromoStrip";
 import { serverFetch } from "@/lib/serverFetch";
 import type { Category, Product, Banner } from "@/types";
@@ -42,6 +43,7 @@ export default async function HomePage() {
         initialData={bestSellers ?? undefined}
         viewAllHref="/products"
       />
+      <RecentlyViewed altBg />
     </div>
   );
 }

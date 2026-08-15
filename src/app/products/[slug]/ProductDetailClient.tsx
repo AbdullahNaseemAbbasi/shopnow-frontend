@@ -11,7 +11,9 @@ import { Product, Review, ReviewSummary } from '@/types';
 import api from '@/lib/axios';
 import { setCached } from '@/lib/cache';
 import RelatedProducts from '@/components/products/RelatedProducts';
+import RecentlyViewed from '@/components/products/RecentlyViewed';
 import SizeGuideModal from '@/components/products/SizeGuideModal';
+import { recordView } from '@/lib/recentlyViewed';
 import toast from 'react-hot-toast';
 
 const EMOJIS: Record<string, string> = {
@@ -91,6 +93,9 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
     return () => { cancelled = true; };
   }, [slug, initialProduct, initialReviews]);
+
+  // Record this product in the client-side "recently viewed" history.
+  useEffect(() => { recordView(initialProduct); }, [initialProduct]);
 
   // Delivery estimate (3–5 days). Computed client-side in an effect so the date never differs
   // between server and client render (no hydration mismatch).
@@ -595,6 +600,8 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
       </div>
 
       <RelatedProducts productId={product.id} />
+
+      <RecentlyViewed excludeId={product.id} altBg />
 
       <SizeGuideModal open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />
 
