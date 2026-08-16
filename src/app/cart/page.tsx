@@ -19,6 +19,20 @@ export default function CartPage() {
   const [discount, setDiscount] = useState(0);
   const [couponApplied, setCouponApplied] = useState('');
   const [applyingCoupon, setApplyingCoupon] = useState(false);
+  // Which line is mid-update. Locks that row's steppers so a fast double-click can't fire two
+  // PUTs that both derive the next quantity from the same last-rendered value (net +1, not +2).
+  const [busyId, setBusyId] = useState<number | null>(null);
+
+  const changeQty = async (cartItemId: number, nextQty: number) => {
+    if (busyId !== null) return;
+    setBusyId(cartItemId);
+    try {
+      if (nextQty <= 0) await removeItem(cartItemId);
+      else await updateItem(cartItemId, nextQty);
+    } finally {
+      setBusyId(null);
+    }
+  };
 
   useEffect(() => {
     if (!isLoggedIn) { router.push('/auth/login'); return; }
@@ -47,7 +61,7 @@ export default function CartPage() {
     try {
       const total = cart?.totalAmount || 0;
       const code = couponCode.toUpperCase();
-      const res = await api.post(`/api/coupons/apply?code=${code}&amount=${total}`);
+      const res = await api.post('/api/coupons/apply', null, { params: { code, amount: total } });
       setDiscount(res.data.discountAmount);
       setCouponApplied(code);
       sessionStorage.setItem('shopnow_coupon', code);
@@ -88,7 +102,7 @@ export default function CartPage() {
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
             <div className="text-7xl mb-4">🛒</div>
             <h3 className="text-xl font-bold text-gray-700 mb-2">Your cart is empty!</h3>
-            <p className="text-gray-400 mb-8">Add some products to get started</p>
+            <p className="text-gray-500 mb-8">Add some products to get started</p>
             <Link href="/products" className="btn-primary text-white px-8 py-3 rounded-xl font-bold text-sm inline-block">
               Start Shopping
             </Link>
@@ -112,24 +126,27 @@ export default function CartPage() {
                     )}
                     <div className="flex items-center gap-2 mt-1">
                       <span className="font-black text-blue-600 text-sm">{formatPrice(item.salePrice || item.price)}</span>
-                      {item.salePrice && <span className="text-xs text-gray-400 line-through">{formatPrice(item.price)}</span>}
+                      {item.salePrice && <span className="text-xs text-gray-500 line-through">{formatPrice(item.price)}</span>}
                     </div>
                     <div className="flex items-center justify-between mt-3">
-                      <div className="flex items-center gap-2 border-2 border-gray-200 rounded-xl overflow-hidden">
-                        <button onClick={() => { if (item.quantity <= 1) removeItem(item.cartItemId); else updateItem(item.cartItemId, item.quantity - 1); }}
-                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center gap-1 border-2 border-gray-200 rounded-xl overflow-hidden">
+                        <button onClick={() => changeQty(item.cartItemId, item.quantity - 1)}
+                          disabled={busyId === item.cartItemId}
+                          aria-label="Decrease quantity"
+                          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-40">
                           <Minus size={14} />
                         </button>
-                        <span className="w-8 text-center text-sm font-bold">{item.quantity}</span>
-                        <button onClick={() => updateItem(item.cartItemId, item.quantity + 1)}
-                          disabled={item.quantity >= item.stock}
-                          className="w-8 h-8 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-40">
+                        <span className="w-9 text-center text-sm font-bold" aria-live="polite">{item.quantity}</span>
+                        <button onClick={() => changeQty(item.cartItemId, item.quantity + 1)}
+                          disabled={busyId === item.cartItemId || item.quantity >= item.stock}
+                          aria-label="Increase quantity"
+                          className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-40">
                           <Plus size={14} />
                         </button>
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-gray-900 text-sm">{formatPrice(item.subtotal)}</span>
-                        <button onClick={() => removeItem(item.cartItemId)} className="text-gray-400 hover:text-blue-600 transition-colors p-1">
+                        <button onClick={() => removeItem(item.cartItemId)} aria-label="Remove item" className="text-gray-500 hover:text-blue-600 transition-colors p-2">
                           <Trash2 size={16} />
                         </button>
                       </div>

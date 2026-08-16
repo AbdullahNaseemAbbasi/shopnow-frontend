@@ -173,9 +173,12 @@ export default function CheckoutPage() {
                 <div className="flex-1">
                   <p className="font-semibold text-sm text-gray-900 flex items-center gap-1"><Plus size={14} /> New Address</p>
                   {useCustom && (
-                    <textarea value={customAddress} onChange={(e) => setCustomAddress(e.target.value)}
-                      placeholder="Enter full address (house number, street, area, city)"
-                      rows={3} className="w-full mt-2 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-brand resize-none" />
+                    <>
+                      <label htmlFor="custom-address" className="sr-only">Delivery address</label>
+                      <textarea id="custom-address" value={customAddress} onChange={(e) => setCustomAddress(e.target.value)}
+                        placeholder="Enter full address (house number, street, area, city)"
+                        rows={3} className="w-full mt-2 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-brand resize-none" />
+                    </>
                   )}
                 </div>
               </label>
@@ -207,7 +210,9 @@ export default function CheckoutPage() {
                 </div>
               ) : (
                 <div className="flex gap-2">
+                  <label htmlFor="coupon-code" className="sr-only">Coupon code</label>
                   <input
+                    id="coupon-code"
                     value={couponInput}
                     onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
                     onKeyDown={(e) => { if (e.key === 'Enter') previewCoupon(couponInput, subtotal); }}

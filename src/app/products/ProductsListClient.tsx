@@ -215,7 +215,7 @@ export default function ProductsListClient({
             <div className="text-center py-20">
               <div className="text-6xl mb-4">🔍</div>
               <h3 className="text-xl font-bold text-gray-700 mb-2">No products found</h3>
-              <p className="text-gray-400 mb-6">Try adjusting your filters or search</p>
+              <p className="text-gray-500 mb-6">Try adjusting your filters or search</p>
               <button onClick={clearAll}
                 className="btn-primary text-white px-6 py-3 rounded-xl font-semibold text-sm">
                 Clear filters

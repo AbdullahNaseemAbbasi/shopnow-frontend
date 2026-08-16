@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category, Banner } from '@/types';
 
@@ -30,16 +30,28 @@ export default function HeroBanner({ initialData, initialBanners }: Props) {
 
   const count = useBanners ? banners.length : categories.length;
   const [current, setCurrent] = useState(0);
+  const [paused, setPaused] = useState(false);       // manual play/pause toggle
+  const [hoverFocus, setHoverFocus] = useState(false); // transient: paused while hovered/focused
 
   useEffect(() => { setCurrent(0); }, [useBanners]);
   useEffect(() => {
-    if (count <= 1) return;
+    // WCAG 2.2.2: honour the pause toggle and stop auto-advancing while the shopper is
+    // interacting with (hovering/focusing) the carousel.
+    if (count <= 1 || paused || hoverFocus) return;
     const timer = setInterval(() => setCurrent((p) => (p + 1) % count), 5500);
     return () => clearInterval(timer);
-  }, [count]);
+  }, [count, paused, hoverFocus]);
 
   const prev = () => setCurrent((p) => (p - 1 + count) % count);
   const next = () => setCurrent((p) => (p + 1) % count);
+
+  // Handlers applied to both hero variants so hover/focus pauses the timer.
+  const pauseProps = {
+    onMouseEnter: () => setHoverFocus(true),
+    onMouseLeave: () => setHoverFocus(false),
+    onFocus: () => setHoverFocus(true),
+    onBlur: () => setHoverFocus(false),
+  };
 
   if (loading && !useBanners) return <div className="h-64 md:h-80 hero-gradient animate-pulse" />;
   if (count === 0) return null;
@@ -55,20 +67,30 @@ export default function HeroBanner({ initialData, initialBanners }: Props) {
     </>
   ) : null;
 
+  // Each dot keeps its small visual but is wrapped in a >=24px padded tap target.
   const Dots = (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center z-10">
       {Array.from({ length: count }).map((_, i) => (
-        <button key={i} onClick={() => setCurrent(i)} aria-label={`Go to slide ${i + 1}`}
-          className={`transition-all rounded-full ${i === current ? 'w-8 h-2 bg-white' : 'w-2 h-2 bg-white/40'}`} />
+        <button key={i} onClick={() => setCurrent(i)} aria-label={`Go to slide ${i + 1}`} aria-current={i === current}
+          className="p-2.5 flex items-center group/dot">
+          <span className={`block transition-all rounded-full ${i === current ? 'w-8 h-2 bg-white' : 'w-2 h-2 bg-white/50 group-hover/dot:bg-white/80'}`} />
+        </button>
       ))}
     </div>
   );
+
+  const PauseToggle = count > 1 ? (
+    <button onClick={() => setPaused((p) => !p)} aria-label={paused ? 'Play slideshow' : 'Pause slideshow'}
+      className="absolute bottom-4 right-4 bg-white/20 hover:bg-white/40 text-white p-2 rounded-full transition-all z-10">
+      {paused ? <Play size={16} /> : <Pause size={16} />}
+    </button>
+  ) : null;
 
   // ===== CMS banners =====
   if (useBanners) {
     const b = banners[current];
     return (
-      <div className="relative hero-gradient overflow-hidden">
+      <div className="relative hero-gradient overflow-hidden" {...pauseProps}>
         {b.imageUrl && (
           <>
             <Image src={b.imageUrl} alt={b.title} fill priority sizes="100vw" className="object-cover" />
@@ -90,6 +112,7 @@ export default function HeroBanner({ initialData, initialBanners }: Props) {
         </div>
         {Arrows}
         {Dots}
+        {PauseToggle}
       </div>
     );
   }
@@ -98,7 +121,7 @@ export default function HeroBanner({ initialData, initialBanners }: Props) {
   const cat = categories[current];
   const emoji = EMOJIS[cat.name] || '🛍️';
   return (
-    <div className="relative hero-gradient overflow-hidden transition-all duration-700">
+    <div className="relative hero-gradient overflow-hidden transition-all duration-700" {...pauseProps}>
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
         <div className="flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="text-white space-y-4 md:w-1/2 animate-fade-in-up">
@@ -139,6 +162,7 @@ export default function HeroBanner({ initialData, initialBanners }: Props) {
       </div>
       {Arrows}
       {Dots}
+      {PauseToggle}
     </div>
   );
 }

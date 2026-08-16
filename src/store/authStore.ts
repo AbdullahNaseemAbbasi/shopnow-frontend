@@ -4,6 +4,9 @@ import { User } from "@/types";
 import { invalidate } from "@/lib/cache";
 import { useCartStore } from "@/store/cartStore";
 import { disconnectRealtime } from "@/lib/realtime";
+import { setAuthToken } from "@/lib/authToken";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 interface AuthState {
   user: User | null;
@@ -19,23 +22,39 @@ export const useAuthStore = create<AuthState>()(
       isLoggedIn: false,
 
       login: (user: User) => {
-        localStorage.setItem("shopnow_token", user.token);
-        document.cookie = `shopnow-auth=${encodeURIComponent(JSON.stringify({ state: { user } }))};path=/;max-age=86400`;
-        set({ user, isLoggedIn: true });
+        // The durable session is the HttpOnly cookie the backend set on this response. Keep the
+        // JWT only in memory for the Bearer fallback — never in localStorage.
+        setAuthToken(user.token);
+        set({ user: { ...user, token: "" }, isLoggedIn: true });
       },
 
       logout: () => {
-        localStorage.removeItem("shopnow_token");
-        document.cookie = "shopnow-auth=;path=/;max-age=0";
+        setAuthToken(null);
+        // The JWT lives in an HttpOnly cookie; only the backend can clear it. Fire-and-forget.
+        fetch(`${API_URL}/api/auth/logout`, { method: "POST", credentials: "include" }).catch(() => {});
         invalidate();
-        // Wipe the non-persisted cart store too, otherwise the previous user's items (and the
-        // navbar badge counting them) leak into the next session on this tab.
+        // Wipe this user's personal traces so they don't leak into the next session on a shared
+        // device: cart, recently-viewed, recent searches, and any applied coupon.
         useCartStore.getState().reset();
+        try {
+          localStorage.removeItem("shopnow_recently_viewed");
+          localStorage.removeItem("shopnow_recent_searches");
+          sessionStorage.removeItem("shopnow_coupon");
+        } catch {
+          /* storage unavailable — nothing to clear */
+        }
         // Close the SSE stream so the next user doesn't inherit this one's live connection.
         disconnectRealtime();
         set({ user: null, isLoggedIn: false });
       },
     }),
-    { name: "shopnow-auth" }
+    {
+      name: "shopnow-auth",
+      // Persist only non-sensitive identity for UI rehydration — never the token.
+      partialize: (state) => ({
+        isLoggedIn: state.isLoggedIn,
+        user: state.user ? { ...state.user, token: "" } : null,
+      }),
+    }
   )
 );

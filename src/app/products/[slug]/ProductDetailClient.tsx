@@ -1,11 +1,13 @@
 'use client';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ShoppingCart, Heart, Star, ArrowLeft, Minus, Plus, Package, Shield, Truck, RotateCcw, Flame, MessageCircle, BadgeCheck, ImagePlus, X, Loader2, Ruler } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
+import { useWishlistStore } from '@/store/wishlistStore';
+import { useFocusTrap } from '@/lib/useFocusTrap';
 import { formatPrice, getDiscountPercent } from '@/lib/utils';
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping';
 import { Product, Review, ReviewSummary } from '@/types';
@@ -37,6 +39,8 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   const router = useRouter();
   const { isLoggedIn } = useAuthStore();
   const { addToCart } = useCartStore();
+  const ensureWishlistLoaded = useWishlistStore((s) => s.ensureLoaded);
+  const toggleWishlist = useWishlistStore((s) => s.toggle);
 
   const slug = initialProduct.slug;
   const initialSizes = initialProduct.sizes ? initialProduct.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
@@ -46,7 +50,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistBusy, setWishlistBusy] = useState(false);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState('');
   const [reviewImages, setReviewImages] = useState<string[]>([]);
@@ -62,6 +66,10 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   const [selectedSize, setSelectedSize] = useState(initialSizes[0] || '');
   const [selectedColor, setSelectedColor] = useState(initialColors[0] || '');
   const [soldCount, setSoldCount] = useState(0);
+
+  // Wishlist membership from the shared store, so the heart shows server truth on load.
+  const wishlisted = useWishlistStore((s) => s.ids.has(product.id));
+  const closeLightbox = useCallback(() => setLightbox(null), []);
 
   // Background revalidation + secondary fetches (sold count).
   // Server already provided product+reviews; we just refresh in case stock/price changed.
@@ -100,6 +108,9 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
   // Record this product in the client-side "recently viewed" history.
   useEffect(() => { recordView(initialProduct); }, [initialProduct]);
+
+  // Seed wishlist membership from the server once the shopper is logged in (deduped in the store).
+  useEffect(() => { if (isLoggedIn) ensureWishlistLoaded(); }, [isLoggedIn, ensureWishlistLoaded]);
 
   // For a variant-driven product, default the size/colour selection to the first in-stock variant
   // (falling back to the first). Only rewrites a selection that isn't a valid variant value, so it
@@ -172,11 +183,17 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
   const handleWishlist = async () => {
     if (!isLoggedIn) { toast.error('Please login first!'); return; }
+    if (wishlistBusy) return; // guard against a double-POST that would silently toggle back
+    setWishlistBusy(true);
     try {
-      await api.post(`/api/wishlist/${product.id}`);
-      setWishlisted(w => !w);
-      toast.success(wishlisted ? 'Removed from wishlist' : 'Added to wishlist!');
-    } catch { toast.error('Please try again'); }
+      const nowWishlisted = await toggleWishlist(product.id);
+      // Message driven by the NEW state, so "Added"/"Removed" is always truthful.
+      toast.success(nowWishlisted ? 'Added to wishlist!' : 'Removed from wishlist');
+    } catch {
+      toast.error('Please try again');
+    } finally {
+      setWishlistBusy(false);
+    }
   };
 
   const handleWhatsApp = () => {
@@ -369,7 +386,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                     ))}
                   </div>
                   <span className="font-bold text-sm">{product.averageRating}</span>
-                  <span className="text-gray-400 text-sm">({product.totalReviews} reviews)</span>
+                  <span className="text-gray-500 text-sm">({product.totalReviews} reviews)</span>
                 </div>
               )}
 
@@ -383,18 +400,18 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
               )}
 
               <div className="flex items-baseline gap-3 mb-2">
-                {hasVariants && !selectedVariant && <span className="text-sm text-gray-400 font-semibold">From</span>}
+                {hasVariants && !selectedVariant && <span className="text-sm text-gray-500 font-semibold">From</span>}
                 <span className="text-3xl font-black text-blue-600">{formatPrice(displayPrice)}</span>
                 {displayOriginal != null && (
                   <>
-                    <span className="text-xl text-gray-400 line-through">{formatPrice(displayOriginal)}</span>
+                    <span className="text-xl text-gray-500 line-through">{formatPrice(displayOriginal)}</span>
                     <span className="text-green-600 font-bold text-sm">
                       Save {formatPrice(displayOriginal - displayPrice)}!
                     </span>
                   </>
                 )}
               </div>
-              {activeSku && <p className="text-xs text-gray-400 font-medium mb-4">SKU: {activeSku}</p>}
+              {activeSku && <p className="text-xs text-gray-500 font-medium mb-4">SKU: {activeSku}</p>}
 
               <div className="mb-4">
                 {inStock ? (
@@ -465,11 +482,11 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 <div className="flex items-center gap-4 mb-6">
                   <span className="text-sm font-semibold text-gray-700">Quantity:</span>
                   <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
-                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                    <button onClick={() => setQuantity(q => Math.max(1, q - 1))} aria-label="Decrease quantity" className="w-11 h-11 flex items-center justify-center hover:bg-gray-100 transition-colors">
                       <Minus size={16} />
                     </button>
                     <span className="w-12 text-center font-bold">{quantity}</span>
-                    <button onClick={() => setQuantity(q => Math.min(effStock, q + 1))} className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors">
+                    <button onClick={() => setQuantity(q => Math.min(effStock, q + 1))} aria-label="Increase quantity" className="w-11 h-11 flex items-center justify-center hover:bg-gray-100 transition-colors">
                       <Plus size={16} />
                     </button>
                   </div>
@@ -485,8 +502,9 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                     <><ShoppingCart size={18} /> Add to Cart</>
                   )}
                 </button>
-                <button onClick={handleWishlist}
-                  className={`p-4 rounded-xl border-2 transition-all ${wishlisted ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-600'}`}>
+                <button onClick={handleWishlist} disabled={wishlistBusy}
+                  aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'} aria-pressed={wishlisted}
+                  className={`p-4 rounded-xl border-2 transition-all disabled:opacity-60 ${wishlisted ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-600'}`}>
                   <Heart size={20} fill={wishlisted ? 'currentColor' : 'none'} />
                 </button>
               </div>
@@ -503,7 +521,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                   <Truck size={18} className="text-green-600 flex-shrink-0" />
                   <p className="text-sm text-gray-700">
                     Get it by <span className="font-bold text-gray-900">{deliveryEstimate}</span>
-                    <span className="text-gray-400"> · if you order now</span>
+                    <span className="text-gray-500"> · if you order now</span>
                   </p>
                 </div>
               )}
@@ -546,7 +564,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                     <p>{product.description}</p>
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-400">
+                  <div className="text-center py-8 text-gray-500">
                     <Package size={40} className="mx-auto mb-3 opacity-50" />
                     <p>No description available yet</p>
                   </div>
@@ -576,7 +594,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                             <div className="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden">
                               <div className="h-full rounded-full bg-amber-400 transition-all" style={{ width: `${pct}%` }} />
                             </div>
-                            <span className="text-xs text-gray-400 w-8 text-right">{count}</span>
+                            <span className="text-xs text-gray-500 w-8 text-right">{count}</span>
                           </div>
                         );
                       })}
@@ -618,7 +636,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                           </label>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400 mt-1.5">Add up to 4 photos (optional)</p>
+                      <p className="text-xs text-gray-500 mt-1.5">Add up to 4 photos (optional)</p>
                     </div>
 
                     <button type="submit" disabled={submittingReview || !reviewComment.trim()}
@@ -629,7 +647,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 )}
 
                 {reviews.length === 0 ? (
-                  <div className="text-center py-10 text-gray-400">
+                  <div className="text-center py-10 text-gray-500">
                     <Star size={40} className="mx-auto mb-3 opacity-30" />
                     <p className="font-medium">No reviews yet</p>
                     <p className="text-sm">Be the first to write a review!</p>
@@ -654,7 +672,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                               ))}
                             </div>
                           </div>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-500">
                             {new Date(review.createdAt).toLocaleDateString('en-PK', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </span>
                         </div>
@@ -685,16 +703,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
       <SizeGuideModal open={sizeGuideOpen} onClose={() => setSizeGuideOpen(false)} />
 
-      {lightbox && (
-        <div className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
-          <button onClick={() => setLightbox(null)} aria-label="Close" className="absolute top-4 right-4 text-white/80 hover:text-white">
-            <X size={28} />
-          </button>
-          <div className="relative w-full max-w-3xl h-[80vh]" onClick={(e) => e.stopPropagation()}>
-            <Image src={lightbox} alt="Review photo" fill sizes="768px" className="object-contain" />
-          </div>
-        </div>
-      )}
+      {lightbox && <ImageLightbox src={lightbox} onClose={closeLightbox} />}
 
       <button onClick={handleWhatsApp}
         className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-all flex items-center gap-2 group">
@@ -703,6 +712,32 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
           Chat on WhatsApp
         </span>
       </button>
+    </div>
+  );
+}
+
+// Accessible image lightbox: role="dialog"/aria-modal, Esc-to-close, focus trap + scroll lock, and
+// focus-return on close — mirroring SizeGuideModal via the shared useFocusTrap hook.
+function ImageLightbox({ src, onClose }: { src: string; onClose: () => void }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(true, panelRef, onClose);
+  return (
+    <div
+      className="fixed inset-0 z-[60] bg-black/80 flex items-center justify-center p-4"
+      onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Review photo"
+    >
+      <div ref={panelRef} tabIndex={-1} className="relative outline-none" onClick={(e) => e.stopPropagation()}>
+        <button onClick={onClose} aria-label="Close image"
+          className="absolute top-2 right-2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-1.5 transition-colors">
+          <X size={22} />
+        </button>
+        <div className="relative w-[90vw] max-w-3xl h-[80vh]">
+          <Image src={src} alt="Review photo" fill sizes="768px" className="object-contain" />
+        </div>
+      </div>
     </div>
   );
 }

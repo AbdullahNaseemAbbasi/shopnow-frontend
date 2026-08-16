@@ -1,11 +1,12 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, BarChart3, Package, ShoppingBag, Boxes, Tag, Ticket, RotateCcw, Star, Users, Megaphone, Menu, X, LogOut, ChevronRight } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { formatPrice } from '@/lib/utils';
 import { useRealtimeEvent } from '@/lib/useRealtime';
+import { useFocusTrap } from '@/lib/useFocusTrap';
 import toast from 'react-hot-toast';
 
 const NAV_ITEMS = [
@@ -89,6 +90,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const { user, isLoggedIn, logout } = useAuthStore();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
   useEffect(() => {
     setMounted(true);
@@ -121,6 +124,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     toast(`New ${String(data.type ?? '').toLowerCase()} request · ${data.orderNumber ?? ''}`, { icon: '↩️', duration: 6000 });
   });
 
+  // Mobile nav drawer a11y: Esc closes, background scroll locks, focus is trapped inside, and
+  // returns to the menu button on close.
+  useFocusTrap(sidebarOpen, drawerRef, closeSidebar);
+
   if (!mounted) return null;
   if (!isLoggedIn || user?.role !== 'ADMIN') return null;
 
@@ -141,20 +148,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {sidebarOpen && (
         <div className="lg:hidden fixed inset-0 z-50 flex">
-          <div className="w-60 bg-gray-900 flex flex-col">
+          <div ref={drawerRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label="Admin navigation"
+            className="w-60 bg-gray-900 flex flex-col outline-none">
             {sidebar}
           </div>
-          <div className="flex-1 bg-black/50" onClick={() => setSidebarOpen(false)} />
+          <div className="flex-1 bg-black/50" onClick={closeSidebar} />
         </div>
       )}
 
       <div className="flex-1 lg:ml-60 flex flex-col min-h-screen">
-        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:hidden">
-          <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg hover:bg-gray-100">
+        {/* z-[60] keeps the header (and its close-X) above the z-50 drawer so the control is clickable. */}
+        <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between lg:hidden relative z-[60]">
+          <button onClick={() => setSidebarOpen(true)} aria-label="Open menu" aria-expanded={sidebarOpen} className="p-2 rounded-lg hover:bg-gray-100">
             <Menu size={20} />
           </button>
           <span className="font-black text-gray-900">Admin Panel</span>
-          <button onClick={() => setSidebarOpen(false)} className={sidebarOpen ? 'p-2' : 'hidden'}>
+          <button onClick={closeSidebar} aria-label="Close menu" className={sidebarOpen ? 'p-2 rounded-lg hover:bg-gray-100' : 'hidden'}>
             <X size={20} />
           </button>
         </header>

@@ -4,24 +4,26 @@ import Image from 'next/image';
 import { useCachedFetch } from '@/lib/useCachedFetch';
 import { Category } from '@/types';
 
+// Single-accent premium palette: brand rose shades alternating with neutral slates, rather than a
+// full rainbow, so the store reads as one brand instead of a stock template.
 const CATEGORY_STYLES: Record<string, { color: string; emoji: string }> = {
-  'Electronics':    { color: 'from-blue-500 to-blue-700',     emoji: '📱' },
-  'Fashion':        { color: 'from-pink-500 to-rose-600',     emoji: '👗' },
-  'Home & Living':  { color: 'from-amber-500 to-orange-600',  emoji: '🏠' },
-  'Beauty':         { color: 'from-purple-500 to-violet-600', emoji: '💄' }, 
-  'Sports':         { color: 'from-green-500 to-emerald-600', emoji: '⚽' },
-  'Books':          { color: 'from-indigo-500 to-indigo-700', emoji: '📚' },
-  'Kids':           { color: 'from-yellow-500 to-amber-600',  emoji: '🧸' },
-  'Groceries':      { color: 'from-teal-500 to-cyan-600',     emoji: '🛒' },
+  'Electronics':    { color: 'from-slate-600 to-slate-800',  emoji: '📱' },
+  'Fashion':        { color: 'from-brand-400 to-brand-600',  emoji: '👗' },
+  'Home & Living':  { color: 'from-slate-500 to-slate-700',  emoji: '🏠' },
+  'Beauty':         { color: 'from-brand-500 to-brand-700',  emoji: '💄' },
+  'Sports':         { color: 'from-slate-600 to-slate-800',  emoji: '⚽' },
+  'Books':          { color: 'from-brand-500 to-brand-700',  emoji: '📚' },
+  'Kids':           { color: 'from-brand-300 to-brand-500',  emoji: '🧸' },
+  'Groceries':      { color: 'from-slate-500 to-slate-700',  emoji: '🛒' },
 };
 
 const DEFAULT_COLORS = [
-  'from-red-500 to-rose-600',
-  'from-sky-500 to-blue-600',
-  'from-lime-500 to-green-600',
-  'from-fuchsia-500 to-purple-600',
-  'from-orange-500 to-red-500',
-  'from-cyan-500 to-teal-600',
+  'from-brand-500 to-brand-700',
+  'from-slate-500 to-slate-700',
+  'from-brand-400 to-brand-600',
+  'from-slate-600 to-slate-800',
+  'from-brand-300 to-brand-500',
+  'from-slate-500 to-slate-700',
 ];
 
 const DEFAULT_EMOJIS = ['🛍️', '🎁', '✨', '🔥', '💫', '🎯'];

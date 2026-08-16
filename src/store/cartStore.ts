@@ -25,7 +25,9 @@ export const useCartStore = create<CartState>((set, get) => ({
       const res = await api.get("/api/cart");
       set({ cart: res.data });
     } catch {
-      set({ cart: null });
+      // Keep the last-known cart on a transient failure (500/network/timeout) — nulling it would
+      // flash "empty cart" and drop the navbar badge to 0 for a user who still has items. A 401 is
+      // handled globally by the axios interceptor (it logs out); this only guards blips.
     } finally {
       set({ loading: false });
     }

@@ -240,42 +240,42 @@ export default function AdminProductsPage() {
           <form onSubmit={handleSave}>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
-                <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value, slug: generateSlug(e.target.value) }))}
+                <label htmlFor="product-name" className="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
+                <input id="product-name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value, slug: generateSlug(e.target.value) }))}
                   placeholder="Samsung Galaxy S24" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Slug (auto-generated)</label>
-                <input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
+                <label htmlFor="product-slug" className="block text-xs font-semibold text-gray-600 mb-1">Slug (auto-generated)</label>
+                <input id="product-slug" value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
                   className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 font-mono text-xs" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Category *</label>
-                <select value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
+                <label htmlFor="product-category" className="block text-xs font-semibold text-gray-600 mb-1">Category *</label>
+                <select id="product-category" value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
                   className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required>
                   <option value="">Select a category</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Price (Rs.) *</label>
-                <input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
+                <label htmlFor="product-price" className="block text-xs font-semibold text-gray-600 mb-1">Price (Rs.) *</label>
+                <input id="product-price" type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
                   placeholder="29999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Sale Price (optional)</label>
-                <input type="number" value={form.salePrice} onChange={e => setForm(f => ({ ...f, salePrice: e.target.value }))}
+                <label htmlFor="product-saleprice" className="block text-xs font-semibold text-gray-600 mb-1">Sale Price (optional)</label>
+                <input id="product-saleprice" type="number" value={form.salePrice} onChange={e => setForm(f => ({ ...f, salePrice: e.target.value }))}
                   placeholder="24999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Stock *</label>
-                <input type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
+                <label htmlFor="product-stock" className="block text-xs font-semibold text-gray-600 mb-1">Stock *</label>
+                <input id="product-stock" type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
                   placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
                 {variants.length > 0 && <p className="text-[11px] text-gray-400 mt-1">Ignored at checkout — variant stock applies.</p>}
               </div>
               <div>
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Base SKU (optional)</label>
-                <input value={form.sku} onChange={e => setForm(f => ({ ...f, sku: e.target.value }))}
+                <label htmlFor="product-sku" className="block text-xs font-semibold text-gray-600 mb-1">Base SKU (optional)</label>
+                <input id="product-sku" value={form.sku} onChange={e => setForm(f => ({ ...f, sku: e.target.value }))}
                   placeholder="TSHIRT-001" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-blue-500 font-mono text-xs" />
               </div>
 
@@ -319,8 +319,8 @@ export default function AdminProductsPage() {
 
               {/* SIZES */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Sizes (comma separated)</label>
-                <input value={form.sizes} onChange={e => setForm(f => ({ ...f, sizes: e.target.value }))}
+                <label htmlFor="product-sizes" className="block text-xs font-semibold text-gray-600 mb-1">Sizes (comma separated)</label>
+                <input id="product-sizes" value={form.sizes} onChange={e => setForm(f => ({ ...f, sizes: e.target.value }))}
                   placeholder="S, M, L, XL, XXL"
                   className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
                 <div className="flex gap-2 mt-2">
@@ -346,8 +346,8 @@ export default function AdminProductsPage() {
 
               {/* COLORS */}
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Colors (click to select or type custom)</label>
-                <input value={form.colors} onChange={e => setForm(f => ({ ...f, colors: e.target.value }))}
+                <label htmlFor="product-colors" className="block text-xs font-semibold text-gray-600 mb-1">Colors (click to select or type custom)</label>
+                <input id="product-colors" value={form.colors} onChange={e => setForm(f => ({ ...f, colors: e.target.value }))}
                   placeholder="Red, Blue, Green, Black, White..."
                   className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 mb-2" />
                 <div className="flex gap-2 flex-wrap">
@@ -384,18 +384,18 @@ export default function AdminProductsPage() {
                     </div>
                     {variants.map((v, i) => (
                       <div key={i} className="grid grid-cols-12 gap-2 items-center">
-                        <input value={v.size} onChange={e => updateVariant(i, 'size', e.target.value)} placeholder="M"
+                        <input aria-label={`Variant ${i + 1} size`} value={v.size} onChange={e => updateVariant(i, 'size', e.target.value)} placeholder="M"
                           className="col-span-6 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
-                        <input value={v.color} onChange={e => updateVariant(i, 'color', e.target.value)} placeholder="Black"
+                        <input aria-label={`Variant ${i + 1} colour`} value={v.color} onChange={e => updateVariant(i, 'color', e.target.value)} placeholder="Black"
                           className="col-span-6 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
-                        <input value={v.sku} onChange={e => updateVariant(i, 'sku', e.target.value)} placeholder="SKU (optional)"
+                        <input aria-label={`Variant ${i + 1} SKU`} value={v.sku} onChange={e => updateVariant(i, 'sku', e.target.value)} placeholder="SKU (optional)"
                           className="col-span-5 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500 font-mono" />
-                        <input type="number" value={v.price} onChange={e => updateVariant(i, 'price', e.target.value)} placeholder="—"
+                        <input aria-label={`Variant ${i + 1} price`} type="number" value={v.price} onChange={e => updateVariant(i, 'price', e.target.value)} placeholder="—"
                           title="Leave blank to inherit the product price"
                           className="col-span-3 sm:col-span-1 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
-                        <input type="number" value={v.stock} onChange={e => updateVariant(i, 'stock', e.target.value)} placeholder="0"
+                        <input aria-label={`Variant ${i + 1} stock`} type="number" value={v.stock} onChange={e => updateVariant(i, 'stock', e.target.value)} placeholder="0"
                           className="col-span-3 sm:col-span-1 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
-                        <button type="button" onClick={() => removeVariant(i)}
+                        <button type="button" onClick={() => removeVariant(i)} aria-label={`Remove variant ${i + 1}`}
                           className="col-span-1 flex items-center justify-center text-gray-400 hover:text-red-600 p-1">
                           <Trash2 size={14} />
                         </button>
@@ -407,8 +407,8 @@ export default function AdminProductsPage() {
               </div>
 
               <div className="sm:col-span-2">
-                <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
-                <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                <label htmlFor="product-description" className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
+                <textarea id="product-description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   rows={3} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 resize-none" />
               </div>
               <div className="flex items-center gap-6">

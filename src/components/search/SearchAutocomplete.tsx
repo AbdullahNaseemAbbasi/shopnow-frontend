@@ -112,6 +112,16 @@ export default function SearchAutocomplete({ className = "", onNavigate, autoFoc
 
   const dropdownOpen = open && (showSuggestions || recent.length > 0);
 
+  // id of the currently-highlighted option, mirrored onto the input via aria-activedescendant so
+  // screen readers announce the active row while focus stays in the text field.
+  const activeDescendant = showSuggestions
+    ? active <= 0
+      ? "search-opt-all"
+      : suggestions[active - 1]
+        ? `search-opt-${suggestions[active - 1].id}`
+        : undefined
+    : undefined;
+
   return (
     <div ref={boxRef} className={`relative ${className}`}>
       <form
@@ -132,6 +142,7 @@ export default function SearchAutocomplete({ className = "", onNavigate, autoFoc
           aria-expanded={dropdownOpen}
           aria-controls="search-suggestions"
           aria-autocomplete="list"
+          aria-activedescendant={activeDescendant}
         />
         <button type="submit" aria-label="Search" className="bg-brand hover:bg-brand-700 px-5 text-white transition-colors">
           <Search size={18} />
@@ -148,6 +159,9 @@ export default function SearchAutocomplete({ className = "", onNavigate, autoFoc
             <>
               <button
                 type="button"
+                id="search-opt-all"
+                role="option"
+                aria-selected={active <= 0}
                 onMouseEnter={() => setActive(0)}
                 onClick={() => runSearch(query)}
                 className={`flex items-center gap-2 w-full px-4 py-2.5 text-left text-sm ${active <= 0 ? "bg-brand-50" : "hover:bg-gray-50"}`}
@@ -165,6 +179,9 @@ export default function SearchAutocomplete({ className = "", onNavigate, autoFoc
                   <button
                     key={s.id}
                     type="button"
+                    id={`search-opt-${s.id}`}
+                    role="option"
+                    aria-selected={active === i + 1}
                     onMouseEnter={() => setActive(i + 1)}
                     onClick={() => goToProduct(s)}
                     className={`flex items-center gap-3 w-full px-4 py-2 text-left ${active === i + 1 ? "bg-brand-50" : "hover:bg-gray-50"}`}
@@ -174,7 +191,7 @@ export default function SearchAutocomplete({ className = "", onNavigate, autoFoc
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">{s.name}</p>
-                      <p className="text-xs text-gray-400 truncate">{s.categoryName}</p>
+                      <p className="text-xs text-gray-500 truncate">{s.categoryName}</p>
                     </div>
                     <span className="text-sm font-bold text-brand flex-shrink-0">{formatPrice(price)}</span>
                   </button>
@@ -182,37 +199,41 @@ export default function SearchAutocomplete({ className = "", onNavigate, autoFoc
               })}
 
               {!loading && suggestions.length === 0 && q.length >= 2 && (
-                <p className="px-4 py-3 text-sm text-gray-400">No products match — press Enter to search everything.</p>
+                <p className="px-4 py-3 text-sm text-gray-500">No products match — press Enter to search everything.</p>
               )}
             </>
           ) : (
             <>
               <div className="flex items-center justify-between px-4 py-1.5">
-                <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Recent searches</span>
-                <button type="button" onClick={clearRecent} className="text-xs text-gray-400 hover:text-brand">Clear</button>
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Recent searches</span>
+                <button type="button" onClick={clearRecent} className="text-xs text-gray-500 hover:text-brand">Clear</button>
               </div>
               {recent.map((term) => (
-                <button
+                // A row is two sibling buttons (search + remove), not a button nested in a button —
+                // the remove control is a real, keyboard-focusable button with its own label.
+                <div
                   key={term}
-                  type="button"
-                  onClick={() => runSearch(term)}
-                  className="flex items-center gap-2 w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
+                  className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 >
-                  <Clock size={14} className="text-gray-300 flex-shrink-0" />
-                  <span className="truncate">{term}</span>
-                  <X
-                    size={13}
-                    className="ml-auto text-gray-300 hover:text-gray-600 flex-shrink-0"
-                    onClick={(e) => {
-                      e.stopPropagation();
+                  <Clock size={14} className="text-gray-400 flex-shrink-0" />
+                  <button type="button" onClick={() => runSearch(term)} className="flex-1 min-w-0 text-left truncate">
+                    {term}
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={`Remove “${term}” from recent searches`}
+                    onClick={() => {
                       setRecent((prev) => {
                         const next = prev.filter((x) => x !== term);
                         try { localStorage.setItem(RECENT_KEY, JSON.stringify(next)); } catch { /* ignore */ }
                         return next;
                       });
                     }}
-                  />
-                </button>
+                    className="ml-auto flex-shrink-0 p-1 -mr-1 rounded text-gray-500 hover:text-gray-700"
+                  >
+                    <X size={13} />
+                  </button>
+                </div>
               ))}
             </>
           )}

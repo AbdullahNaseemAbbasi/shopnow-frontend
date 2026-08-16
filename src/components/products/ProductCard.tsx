@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Product } from "@/types";
 import { formatPrice, getDiscountPercent } from "@/lib/utils";
 import { useCartStore } from "@/store/cartStore";
 import { useAuthStore } from "@/store/authStore";
-import api from "@/lib/axios";
+import { useWishlistStore } from "@/store/wishlistStore";
 import { prefetch } from "@/lib/useCachedFetch";
 import toast from "react-hot-toast";
 import ProductImage from "@/components/ui/ProductImage";
@@ -22,8 +22,18 @@ interface Props {
 export default function ProductCard({ product, priority = false }: Props) {
   const { addToCart } = useCartStore();
   const { isLoggedIn } = useAuthStore();
-  const [wishlisted, setWishlisted] = useState(false);
+  // Wishlist membership comes from the shared store (single source of truth), so the heart reflects
+  // server truth on load and stays in sync across every card / the PDP.
+  const wishlisted = useWishlistStore((s) => s.ids.has(product.id));
+  const ensureWishlistLoaded = useWishlistStore((s) => s.ensureLoaded);
+  const toggleWishlist = useWishlistStore((s) => s.toggle);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [wishlistBusy, setWishlistBusy] = useState(false);
+
+  // Seed wishlist membership from the server once the shopper is logged in (deduped in the store).
+  useEffect(() => {
+    if (isLoggedIn) ensureWishlistLoaded();
+  }, [isLoggedIn, ensureWishlistLoaded]);
 
   // Variant-driven products can't be quick-added from a card (the customer must pick a size/colour),
   // and their base price/stock are not authoritative — derive both from the variants.
@@ -55,12 +65,16 @@ export default function ProductCard({ product, priority = false }: Props) {
   const handleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     if (!isLoggedIn) { toast.error("Please login first!"); return; }
+    if (wishlistBusy) return; // guard against a double-POST that would silently toggle back
+    setWishlistBusy(true);
     try {
-      await api.post(`/api/wishlist/${product.id}`);
-      setWishlisted(!wishlisted);
-      toast.success(wishlisted ? "Removed from wishlist" : "Added to wishlist!");
+      const nowWishlisted = await toggleWishlist(product.id);
+      // Message driven by the NEW state, so "Added"/"Removed" is always truthful.
+      toast.success(nowWishlisted ? "Added to wishlist!" : "Removed from wishlist");
     } catch {
       toast.error("Please try again");
+    } finally {
+      setWishlistBusy(false);
     }
   };
 
@@ -69,84 +83,92 @@ export default function ProductCard({ product, priority = false }: Props) {
   };
 
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      className="block h-full"
+    // The card is a plain container (not an anchor) so the add-to-cart / wishlist buttons aren't
+    // interactive descendants of a link (invalid HTML). Navigation is a stretched-link overlay.
+    <div
+      className="relative bg-white rounded-2xl border border-line overflow-hidden group cursor-pointer h-full flex flex-col shadow-card transition-all duration-300 hover:shadow-card-hover hover:border-brand-200"
       onMouseEnter={handlePrefetch}
       onTouchStart={handlePrefetch}
     >
-      <div className="bg-white rounded-2xl border border-line overflow-hidden group cursor-pointer h-full flex flex-col shadow-card transition-all duration-300 hover:shadow-card-hover hover:border-brand-200">
+      <Link
+        href={`/products/${product.slug}`}
+        aria-label={product.name}
+        className="absolute inset-0 z-10 rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+      >
+        <span className="sr-only">{product.name}</span>
+      </Link>
 
-        <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>
-          <ProductImage src={product.imageUrl} alt={product.name} imgClassName="group-hover:scale-105" priority={priority} />
+      <div className="relative w-full bg-slate-50 overflow-hidden" style={{ paddingBottom: '60%' }}>
+        <ProductImage src={product.imageUrl} alt={product.name} imgClassName="group-hover:scale-105" priority={priority} />
 
-          {!inStock ? (
-            <Badge tone="ink" className="absolute top-2.5 left-2.5 z-10 shadow-sm">Out of Stock</Badge>
-          ) : discount > 0 ? (
-            <Badge tone="brandSolid" className="absolute top-2.5 left-2.5 z-10 shadow-sm">-{discount}%</Badge>
-          ) : null}
+        {!inStock ? (
+          <Badge tone="ink" className="absolute top-2.5 left-2.5 z-10 shadow-sm">Out of Stock</Badge>
+        ) : discount > 0 ? (
+          <Badge tone="brandSolid" className="absolute top-2.5 left-2.5 z-10 shadow-sm">-{discount}%</Badge>
+        ) : null}
 
-          <button
-            onClick={handleWishlist}
-            aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
-            className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200
-              ${wishlisted ? "bg-brand text-white" : "bg-white text-slate-400 hover:text-brand"}
-              opacity-0 group-hover:opacity-100`}
-          >
-            <Heart size={14} fill={wishlisted ? "currentColor" : "none"} />
-          </button>
-        </div>
-
-        <div className="p-3 flex flex-col flex-1">
-          <p className="text-xs text-slate-400 font-medium mb-1 truncate">{product.categoryName}</p>
-          <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 flex-1 leading-snug mb-2">
-            {product.name}
-          </h3>
-
-          {product.totalReviews > 0 && (
-            <div className="flex items-center gap-1 mb-2">
-              <div className="flex">
-                {[1,2,3,4,5].map((s) => (
-                  <Star key={s} size={11}
-                    className={s <= Math.round(product.averageRating) ? "text-amber-400 fill-amber-400" : "text-slate-200 fill-slate-200"}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-slate-400">({product.totalReviews})</span>
-            </div>
-          )}
-
-          <div className="flex items-center gap-2 mb-2">
-            {hasVariants && <span className="text-[11px] text-slate-400 font-medium">From</span>}
-            <span className="text-sm font-bold text-brand">{formatPrice(displayPrice)}</span>
-            {!hasVariants && product.salePrice && (
-              <span className="text-xs text-slate-400 line-through">{formatPrice(product.price)}</span>
-            )}
-          </div>
-
-          {inStock && effStock <= 5 && (
-            <p className="text-xs font-bold text-brand mb-3 flex items-center gap-1">🔥 Only {effStock} left!</p>
-          )}
-
-          {hasVariants ? (
-            // Variant products can't be quick-added — the whole card is a Link, so this span just
-            // lets the click through to the PDP where a size/colour is chosen.
-            <span className="w-full flex items-center justify-center gap-2 bg-surface-subtle group-hover:bg-brand text-ink-soft group-hover:text-white text-xs font-semibold py-2.5 rounded-xl border border-line transition-all duration-200">
-              <ShoppingCart size={14} />
-              {inStock ? "Select options" : "Out of Stock"}
-            </span>
-          ) : (
-          <button
-            onClick={handleAddToCart}
-            disabled={addingToCart || !inStock}
-            className="w-full flex items-center justify-center gap-2 bg-surface-subtle hover:bg-brand text-ink-soft hover:text-white text-xs font-semibold py-2.5 rounded-xl border border-line transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <ShoppingCart size={14} />
-            {addingToCart ? "Adding..." : !inStock ? "Out of Stock" : "Add to Cart"}
-          </button>
-          )}
-        </div>
+        <button
+          onClick={handleWishlist}
+          disabled={wishlistBusy}
+          aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
+          aria-pressed={wishlisted}
+          className={`absolute top-2.5 right-2.5 z-20 w-8 h-8 rounded-full flex items-center justify-center shadow-md transition-all duration-200 disabled:opacity-60
+            ${wishlisted ? "bg-brand text-white" : "bg-white text-slate-500 hover:text-brand"}
+            opacity-100 sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100`}
+        >
+          <Heart size={14} fill={wishlisted ? "currentColor" : "none"} />
+        </button>
       </div>
-    </Link>
+
+      <div className="p-3 flex flex-col flex-1">
+        <p className="text-xs text-slate-500 font-medium mb-1 truncate">{product.categoryName}</p>
+        <h3 className="text-sm font-semibold text-slate-800 line-clamp-2 flex-1 leading-snug mb-2">
+          {product.name}
+        </h3>
+
+        {product.totalReviews > 0 && (
+          <div className="flex items-center gap-1 mb-2">
+            <div className="flex">
+              {[1,2,3,4,5].map((s) => (
+                <Star key={s} size={11}
+                  className={s <= Math.round(product.averageRating) ? "text-amber-400 fill-amber-400" : "text-slate-200 fill-slate-200"}
+                />
+              ))}
+            </div>
+            <span className="text-xs text-slate-500">({product.totalReviews})</span>
+          </div>
+        )}
+
+        <div className="flex items-center gap-2 mb-2">
+          {hasVariants && <span className="text-[11px] text-slate-500 font-medium">From</span>}
+          <span className="text-sm font-bold text-brand">{formatPrice(displayPrice)}</span>
+          {!hasVariants && product.salePrice && (
+            <span className="text-xs text-slate-500 line-through">{formatPrice(product.price)}</span>
+          )}
+        </div>
+
+        {inStock && effStock <= 5 && (
+          <p className="text-xs font-bold text-brand mb-3 flex items-center gap-1">🔥 Only {effStock} left!</p>
+        )}
+
+        {hasVariants ? (
+          // Variant products can't be quick-added — this sits BELOW the stretched-link overlay so a
+          // click falls through to the overlay and navigates to the PDP where a size/colour is chosen.
+          <span className="w-full flex items-center justify-center gap-2 bg-surface-subtle group-hover:bg-brand text-ink-soft group-hover:text-white text-xs font-semibold py-2.5 rounded-xl border border-line transition-all duration-200">
+            <ShoppingCart size={14} />
+            {inStock ? "Select options" : "Out of Stock"}
+          </span>
+        ) : (
+        <button
+          onClick={handleAddToCart}
+          disabled={addingToCart || !inStock}
+          className="relative z-20 w-full flex items-center justify-center gap-2 bg-surface-subtle hover:bg-brand text-ink-soft hover:text-white text-xs font-semibold py-2.5 rounded-xl border border-line transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <ShoppingCart size={14} />
+          {addingToCart ? "Adding..." : !inStock ? "Out of Stock" : "Add to Cart"}
+        </button>
+        )}
+      </div>
+    </div>
   );
 }

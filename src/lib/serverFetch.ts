@@ -19,6 +19,8 @@ export async function serverFetch<T>(
     const res = await fetch(`${API_URL}${path}`, {
       next: { revalidate, tags: options.tags },
       headers: { Accept: "application/json" },
+      // Don't let a hung backend hold the server render open until the platform kills it.
+      signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
