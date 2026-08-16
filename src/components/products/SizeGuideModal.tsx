@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X, Ruler } from "lucide-react";
 
 interface Props {
@@ -23,17 +23,42 @@ const toCm = (inches: number) => Math.round(inches * 2.54);
 
 export default function SizeGuideModal({ open, onClose }: Props) {
   const [unit, setUnit] = useState<"in" | "cm">("in");
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  // Esc to close + lock background scroll while open (basic dialog a11y).
+  // Full dialog a11y: Esc closes, background scroll locks, focus moves INTO the dialog and is
+  // trapped (Tab cycles within it, never escaping to the page behind the overlay), and focus
+  // returns to whatever opened it on close.
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+
+    const focusablesIn = (el: HTMLElement) =>
+      Array.from(el.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )).filter((n) => !n.hasAttribute("disabled"));
+
+    // Move focus into the dialog on open.
+    const panel = panelRef.current;
+    (panel ? (focusablesIn(panel)[0] ?? panel) : null)?.focus();
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") { onClose(); return; }
+      if (e.key !== "Tab" || !panelRef.current) return;
+      const items = focusablesIn(panelRef.current);
+      if (items.length === 0) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
+      previouslyFocused?.focus();
     };
   }, [open, onClose]);
 
@@ -49,7 +74,7 @@ export default function SizeGuideModal({ open, onClose }: Props) {
       aria-modal="true"
       aria-label="Size guide"
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+      <div ref={panelRef} tabIndex={-1} className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto outline-none" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white">
           <h3 className="font-black text-gray-900 flex items-center gap-2">
             <Ruler size={18} className="text-brand" /> Size Guide
