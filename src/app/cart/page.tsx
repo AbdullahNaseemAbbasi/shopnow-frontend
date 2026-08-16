@@ -88,7 +88,7 @@ export default function CartPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-          <ShoppingBag size={24} className="text-blue-600" /> My Cart
+          <ShoppingBag size={24} className="text-brand-600" /> My Cart
           {cart && cart.items.length > 0 && (
             <span className="text-sm font-normal text-gray-500 ml-2">({cart.totalItems} items)</span>
           )}
@@ -96,7 +96,7 @@ export default function CartPage() {
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <div className="w-10 h-10 border-4 border-brand-600 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : !cart || cart.items.length === 0 ? (
           <div className="text-center py-20 bg-white rounded-2xl shadow-sm">
@@ -117,7 +117,7 @@ export default function CartPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <Link href={`/products/${item.productSlug}`}>
-                      <h3 className="font-semibold text-gray-900 text-sm hover:text-blue-600 transition-colors line-clamp-2">{item.productName}</h3>
+                      <h3 className="font-semibold text-gray-900 text-sm hover:text-brand-600 transition-colors line-clamp-2">{item.productName}</h3>
                     </Link>
                     {item.variantLabel && (
                       <span className="inline-block mt-1 text-xs font-semibold text-gray-600 bg-gray-100 rounded-full px-2 py-0.5">
@@ -125,7 +125,7 @@ export default function CartPage() {
                       </span>
                     )}
                     <div className="flex items-center gap-2 mt-1">
-                      <span className="font-black text-blue-600 text-sm">{formatPrice(item.salePrice || item.price)}</span>
+                      <span className="font-black text-brand-600 text-sm">{formatPrice(item.salePrice || item.price)}</span>
                       {item.salePrice && <span className="text-xs text-gray-500 line-through">{formatPrice(item.price)}</span>}
                     </div>
                     <div className="flex items-center justify-between mt-3">
@@ -146,7 +146,7 @@ export default function CartPage() {
                       </div>
                       <div className="flex items-center gap-3">
                         <span className="font-bold text-gray-900 text-sm">{formatPrice(item.subtotal)}</span>
-                        <button onClick={() => removeItem(item.cartItemId)} aria-label="Remove item" className="text-gray-500 hover:text-blue-600 transition-colors p-2">
+                        <button onClick={() => removeItem(item.cartItemId)} aria-label="Remove item" className="text-gray-500 hover:text-brand-600 transition-colors p-2">
                           <Trash2 size={16} />
                         </button>
                       </div>
@@ -158,19 +158,19 @@ export default function CartPage() {
 
             <div className="space-y-4">
               <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
-                <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2"><Tag size={16} className="text-blue-600" /> Coupon Code</h3>
+                <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2"><Tag size={16} className="text-brand-600" /> Coupon Code</h3>
                 {couponApplied ? (
                   <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-3">
                     <div>
                       <p className="text-sm font-bold text-green-700">{couponApplied}</p>
                       <p className="text-xs text-green-600">-{formatPrice(discount)} discount</p>
                     </div>
-                    <button onClick={() => { setCouponApplied(''); setDiscount(0); setCouponCode(''); sessionStorage.removeItem('shopnow_coupon'); }} className="text-xs text-blue-600 font-semibold">Remove</button>
+                    <button onClick={() => { setCouponApplied(''); setDiscount(0); setCouponCode(''); sessionStorage.removeItem('shopnow_coupon'); }} className="text-xs text-brand-600 font-semibold">Remove</button>
                   </div>
                 ) : (
                   <div className="flex gap-2">
                     <input type="text" placeholder="EID2026" value={couponCode} onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                      className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-blue-500 uppercase" />
+                      className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:border-brand-500 uppercase" />
                     <button onClick={handleApplyCoupon} disabled={applyingCoupon || !couponCode.trim()}
                       className="btn-primary text-white px-4 py-2 rounded-xl text-sm font-bold disabled:opacity-60">
                       {applyingCoupon ? '...' : 'Apply'}
@@ -198,7 +198,7 @@ export default function CartPage() {
                   </div>
                   <div className="border-t pt-3 flex justify-between font-black text-lg">
                     <span>Total</span>
-                    <span className="text-blue-600">{formatPrice(finalAmount + shippingFeeFor(total))}</span>
+                    <span className="text-brand-600">{formatPrice(finalAmount + shippingFeeFor(total))}</span>
                   </div>
                 </div>
                 {total < FREE_SHIPPING_THRESHOLD && (
@@ -210,7 +210,7 @@ export default function CartPage() {
                   className="w-full btn-primary text-white py-4 rounded-xl font-bold text-sm mt-4 flex items-center justify-center gap-2">
                   Proceed to Checkout <ArrowRight size={16} />
                 </button>
-                <Link href="/products" className="block text-center text-sm text-gray-500 hover:text-blue-600 mt-3 font-medium">
+                <Link href="/products" className="block text-center text-sm text-gray-500 hover:text-brand-600 mt-3 font-medium">
                   Continue Shopping
                 </Link>
               </div>

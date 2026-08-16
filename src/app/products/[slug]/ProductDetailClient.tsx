@@ -46,7 +46,9 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   const initialSizes = initialProduct.sizes ? initialProduct.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
   const initialColors = initialProduct.colors ? initialProduct.colors.split(',').map(c => c.trim()).filter(Boolean) : [];
 
-  const [product, setProduct] = useState<Product>(initialProduct);
+  // Product is fully embedded by the server (ISR, <60s old) and never changes client-side, so it
+  // stays a plain value rather than re-fetched state — no redundant on-mount request for it.
+  const product = initialProduct;
   const [reviews, setReviews] = useState<Review[]>(initialReviews);
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
@@ -71,32 +73,17 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
   const wishlisted = useWishlistStore((s) => s.ids.has(product.id));
   const closeLightbox = useCallback(() => setLightbox(null), []);
 
-  // Background revalidation + secondary fetches (sold count).
-  // Server already provided product+reviews; we just refresh in case stock/price changed.
+  // Seed the client cache with the server-embedded payloads (so client-side navigations back to
+  // this product reuse them) and fetch ONLY the data the SSR props don't already contain: the
+  // live "sold in last 24h" count and the rating summary/histogram. Product + reviews were just
+  // ISR-fetched (<60s old) and passed as props, so we deliberately don't re-request them here.
   useEffect(() => {
     let cancelled = false;
-    const productKey = `product:slug:${slug}`;
-    setCached(productKey, initialProduct);
+    setCached(`product:slug:${slug}`, initialProduct);
     setCached(`reviews:product:${initialProduct.id}`, initialReviews);
 
     api.get(`/api/products/${initialProduct.id}/sold-recently`)
       .then(r => { if (!cancelled) setSoldCount(r.data.soldCount || 0); })
-      .catch(() => {});
-
-    api.get<Product>(`/api/products/slug/${slug}`)
-      .then(res => {
-        if (cancelled) return;
-        setProduct(res.data);
-        setCached(productKey, res.data);
-      })
-      .catch(() => {});
-
-    api.get<Review[]>(`/api/reviews/product/${initialProduct.id}`)
-      .then(res => {
-        if (cancelled) return;
-        setReviews(res.data || []);
-        setCached(`reviews:product:${initialProduct.id}`, res.data || []);
-      })
       .catch(() => {});
 
     api.get<ReviewSummary>(`/api/reviews/product/${initialProduct.id}/summary`)
@@ -321,16 +308,16 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-          <Link href="/" className="hover:text-blue-600">Home</Link>
+          <Link href="/" className="hover:text-brand-600">Home</Link>
           <span>/</span>
-          <Link href="/products" className="hover:text-blue-600">Products</Link>
+          <Link href="/products" className="hover:text-brand-600">Products</Link>
           <span>/</span>
-          <Link href={`/products?category=${encodeURIComponent(product.categoryName)}`} className="hover:text-blue-600">{product.categoryName}</Link>
+          <Link href={`/products?category=${encodeURIComponent(product.categoryName)}`} className="hover:text-brand-600">{product.categoryName}</Link>
           <span>/</span>
           <span className="text-gray-900 font-medium line-clamp-1">{product.name}</span>
         </div>
 
-        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-4 text-sm font-medium transition-colors">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-gray-600 hover:text-brand-600 mb-4 text-sm font-medium transition-colors">
           <ArrowLeft size={16} /> Go Back
         </button>
 
@@ -352,7 +339,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 )}
               </div>
               {disc > 0 && (
-                <span className="absolute top-4 left-4 bg-blue-600 text-white text-sm font-black px-3 py-1.5 rounded-xl">
+                <span className="absolute top-4 left-4 bg-brand-600 text-white text-sm font-black px-3 py-1.5 rounded-xl">
                   -{disc}% OFF
                 </span>
               )}
@@ -375,7 +362,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
             </div>
 
             <div className="flex flex-col">
-              <p className="text-blue-600 font-semibold text-sm mb-1">{product.categoryName}</p>
+              <p className="text-brand-600 font-semibold text-sm mb-1">{product.categoryName}</p>
               <h1 className="text-2xl md:text-3xl font-black text-gray-900 mb-3 leading-tight">{product.name}</h1>
 
               {product.totalReviews > 0 && (
@@ -401,7 +388,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
               <div className="flex items-baseline gap-3 mb-2">
                 {hasVariants && !selectedVariant && <span className="text-sm text-gray-500 font-semibold">From</span>}
-                <span className="text-3xl font-black text-blue-600">{formatPrice(displayPrice)}</span>
+                <span className="text-3xl font-black text-brand-600">{formatPrice(displayPrice)}</span>
                 {displayOriginal != null && (
                   <>
                     <span className="text-xl text-gray-500 line-through">{formatPrice(displayOriginal)}</span>
@@ -446,7 +433,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                       return (
                         <button key={size} onClick={() => pickSize(size)} disabled={soldOut}
                           title={soldOut ? 'Out of stock' : undefined}
-                          className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${selectedSize === size ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 text-gray-700 hover:border-blue-400'} ${soldOut ? 'opacity-40 line-through cursor-not-allowed hover:border-gray-200' : ''}`}>
+                          className={`px-4 py-2 rounded-xl text-sm font-bold border-2 transition-all ${selectedSize === size ? 'border-brand-600 bg-brand-600 text-white' : 'border-gray-200 text-gray-700 hover:border-brand-400'} ${soldOut ? 'opacity-40 line-through cursor-not-allowed hover:border-gray-200' : ''}`}>
                           {size}
                         </button>
                       );
@@ -457,13 +444,13 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
               {colors.length > 0 && (
                 <div className="mb-4">
-                  <p className="text-sm font-semibold text-gray-700 mb-2">Color: <span className="text-blue-600">{selectedColor}</span></p>
+                  <p className="text-sm font-semibold text-gray-700 mb-2">Color: <span className="text-brand-600">{selectedColor}</span></p>
                   <div className="flex flex-wrap gap-2">
                     {colors.map(color => {
                       const soldOut = hasVariants && colorSoldOut(color);
                       return (
                       <button key={color} onClick={() => pickColor(color)} disabled={soldOut}
-                        className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${selectedColor === color ? 'border-blue-600 ring-2 ring-blue-300 ring-offset-1' : 'border-gray-300 hover:border-gray-500'} ${soldOut ? 'opacity-40 cursor-not-allowed' : ''}`}
+                        className={`w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${selectedColor === color ? 'border-brand-600 ring-2 ring-brand-300 ring-offset-1' : 'border-gray-300 hover:border-gray-500'} ${soldOut ? 'opacity-40 cursor-not-allowed' : ''}`}
                         style={{ backgroundColor: color.toLowerCase() }}
                         title={soldOut ? `${color} — out of stock` : color}>
                         {selectedColor === color && (
@@ -504,14 +491,14 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                 </button>
                 <button onClick={handleWishlist} disabled={wishlistBusy}
                   aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'} aria-pressed={wishlisted}
-                  className={`p-4 rounded-xl border-2 transition-all disabled:opacity-60 ${wishlisted ? 'bg-blue-600 border-blue-600 text-white' : 'border-gray-200 text-gray-500 hover:border-blue-500 hover:text-blue-600'}`}>
+                  className={`p-4 rounded-xl border-2 transition-all disabled:opacity-60 ${wishlisted ? 'bg-brand-600 border-brand-600 text-white' : 'border-gray-200 text-gray-500 hover:border-brand-500 hover:text-brand-600'}`}>
                   <Heart size={20} fill={wishlisted ? 'currentColor' : 'none'} />
                 </button>
               </div>
 
               {inStock && (
                 <button onClick={handleBuyNow}
-                  className="w-full border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white py-4 rounded-xl font-bold transition-all text-sm mb-4">
+                  className="w-full border-2 border-brand-600 text-brand-600 hover:bg-brand-600 hover:text-white py-4 rounded-xl font-bold transition-all text-sm mb-4">
                   Buy Now
                 </button>
               )}
@@ -528,15 +515,15 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
 
               <div className="pt-4 border-t border-gray-100 grid grid-cols-3 gap-3">
                 <div className="flex flex-col items-center text-center gap-1">
-                  <Truck size={20} className="text-blue-600" />
+                  <Truck size={20} className="text-brand-600" />
                   <span className="text-xs text-gray-600 font-medium">Free Delivery<br />Rs. {FREE_SHIPPING_THRESHOLD.toLocaleString('en-PK')}+</span>
                 </div>
                 <div className="flex flex-col items-center text-center gap-1">
-                  <RotateCcw size={20} className="text-blue-600" />
+                  <RotateCcw size={20} className="text-brand-600" />
                   <span className="text-xs text-gray-600 font-medium">7 Day<br />Return</span>
                 </div>
                 <div className="flex flex-col items-center text-center gap-1">
-                  <Shield size={20} className="text-blue-600" />
+                  <Shield size={20} className="text-brand-600" />
                   <span className="text-xs text-gray-600 font-medium">100%<br />Original</span>
                 </div>
               </div>
@@ -547,11 +534,11 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex border-b border-gray-100">
             <button onClick={() => setActiveTab('details')}
-              className={`flex-1 py-4 font-bold text-sm transition-colors ${activeTab === 'details' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
+              className={`flex-1 py-4 font-bold text-sm transition-colors ${activeTab === 'details' ? 'text-brand-600 border-b-2 border-brand-600' : 'text-gray-500 hover:text-gray-700'}`}>
               Product Details
             </button>
             <button onClick={() => setActiveTab('reviews')}
-              className={`flex-1 py-4 font-bold text-sm transition-colors ${activeTab === 'reviews' ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500 hover:text-gray-700'}`}>
+              className={`flex-1 py-4 font-bold text-sm transition-colors ${activeTab === 'reviews' ? 'text-brand-600 border-b-2 border-brand-600' : 'text-gray-500 hover:text-gray-700'}`}>
               Reviews ({reviews.length})
             </button>
           </div>
@@ -615,7 +602,7 @@ export default function ProductDetailClient({ initialProduct, initialReviews }: 
                     </div>
                     <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)}
                       placeholder="Share your experience with this product..."
-                      rows={3} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 resize-none mb-3" />
+                      rows={3} className="w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-500 resize-none mb-3" />
 
                     <div className="mb-4">
                       <div className="flex flex-wrap gap-2">

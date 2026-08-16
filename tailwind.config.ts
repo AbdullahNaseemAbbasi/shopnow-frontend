@@ -2,9 +2,7 @@ import type { Config } from 'tailwindcss'
 
 // ShopNow Design System — "Premium Rose"
 // Single source of truth for colour. The brand accent is a rose-red anchored on #E40046.
-// NOTE: Tailwind's built-in `blue` scale is deliberately remapped onto the brand scale so the
-// ~300 legacy `blue-*` utilities across the app instantly render on-brand. New code should
-// prefer the semantic tokens (`brand`, `ink`, `surface`, `success`…) rather than `blue-*`.
+// Use the semantic tokens (`brand`, `ink`, `surface`, `success`…) for all colour utilities.
 const brand = {
   50: '#FFF1F4',
   100: '#FFE0E7',
@@ -32,8 +30,6 @@ const config: Config = {
         brand: { ...brand, DEFAULT: brand[600] },
         // Back-compat alias kept for the `primary` name used in a few places.
         primary: { DEFAULT: brand[600], dark: brand[700], light: brand[500] },
-        // Legacy re-skin: every existing blue-* utility now resolves to the brand scale.
-        blue: brand,
         // Ink = near-black text / premium dark surfaces.
         ink: {
           DEFAULT: '#0F172A',

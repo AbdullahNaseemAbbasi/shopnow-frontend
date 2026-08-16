@@ -41,10 +41,10 @@ export default function RegisterPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-brand-600 rounded-2xl flex items-center justify-center shadow-lg">
               <ShoppingBag size={24} className="text-white" />
             </div>
-            <span className="text-3xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
+            <span className="text-3xl font-black text-gray-900">Shop<span className="text-brand-600">Now</span></span>
           </Link>
           <p className="text-gray-500 mt-2">Pakistan&apos;s #1 Online Store</p>
         </div>
@@ -57,23 +57,23 @@ export default function RegisterPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="reg-firstName" className="block text-sm font-medium text-gray-700 mb-1.5">First Name</label>
-                <input id="reg-firstName" name="firstName" autoComplete="given-name" value={form.firstName} onChange={handleChange} placeholder="Abdullah" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm" required />
+                <input id="reg-firstName" name="firstName" autoComplete="given-name" value={form.firstName} onChange={handleChange} placeholder="Abdullah" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition-all text-sm" required />
               </div>
               <div>
                 <label htmlFor="reg-lastName" className="block text-sm font-medium text-gray-700 mb-1.5">Last Name</label>
-                <input id="reg-lastName" name="lastName" autoComplete="family-name" value={form.lastName} onChange={handleChange} placeholder="Naseem" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm" />
+                <input id="reg-lastName" name="lastName" autoComplete="family-name" value={form.lastName} onChange={handleChange} placeholder="Naseem" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition-all text-sm" />
               </div>
             </div>
 
             <div>
               <label htmlFor="reg-email" className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-              <input id="reg-email" name="email" type="email" autoComplete="email" value={form.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm" required />
+              <input id="reg-email" name="email" type="email" autoComplete="email" value={form.email} onChange={handleChange} placeholder="your@email.com" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition-all text-sm" required />
             </div>
 
             <div>
               <label htmlFor="reg-password" className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
               <div className="relative">
-                <input id="reg-password" name="password" type={showPass ? 'text' : 'password'} autoComplete="new-password" value={form.password} onChange={handleChange} placeholder="••••••••" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm pr-12" required />
+                <input id="reg-password" name="password" type={showPass ? 'text' : 'password'} autoComplete="new-password" value={form.password} onChange={handleChange} placeholder="••••••••" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition-all text-sm pr-12" required />
                 <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                   {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -93,7 +93,7 @@ export default function RegisterPage() {
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-sm">
               Already have an account?{' '}
-              <Link href="/auth/login" className="text-blue-600 font-semibold hover:underline">Login</Link>
+              <Link href="/auth/login" className="text-brand-600 font-semibold hover:underline">Login</Link>
             </p>
           </div>
         </div>

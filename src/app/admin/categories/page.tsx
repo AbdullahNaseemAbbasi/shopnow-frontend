@@ -132,7 +132,7 @@ export default function AdminCategoriesPage() {
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Category Name *</label>
                 <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder="Electronics" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
+                  placeholder="Electronics" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" required />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Category Image</label>
@@ -147,13 +147,13 @@ export default function AdminCategoriesPage() {
                   <div className="flex-1 space-y-2">
                     <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                     <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                      className="flex items-center gap-2 w-full border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-3 py-2 text-xs font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
+                      className="flex items-center gap-2 w-full border-2 border-dashed border-gray-300 hover:border-brand-400 rounded-xl px-3 py-2 text-xs font-semibold text-gray-600 hover:text-brand-600 transition-colors disabled:opacity-60">
                       <Upload size={13} /> {uploading ? 'Uploading...' : 'Upload'}
                     </button>
                     <div className="flex items-center gap-2">
                       <Link size={12} className="text-gray-400 flex-shrink-0" />
                       <input value={form.imageUrl} onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
-                        placeholder="or paste URL here..." className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-1.5 text-xs outline-none focus:border-blue-500" />
+                        placeholder="or paste URL here..." className="flex-1 border-2 border-gray-200 rounded-xl px-3 py-1.5 text-xs outline-none focus:border-brand-500" />
                     </div>
                   </div>
                 </div>
@@ -161,7 +161,7 @@ export default function AdminCategoriesPage() {
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  rows={2} placeholder="Category description..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 resize-none" />
+                  rows={2} placeholder="Category description..." className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500 resize-none" />
               </div>
             </div>
             <div className="flex gap-3">
@@ -188,7 +188,7 @@ export default function AdminCategoriesPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {categories.map(cat => (
-            <div key={cat.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex items-center justify-between gap-3 hover:border-blue-200 hover:shadow-md transition-all">
+            <div key={cat.id} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 flex items-center justify-between gap-3 hover:border-brand-200 hover:shadow-md transition-all">
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
                   {cat.imageUrl ? (
@@ -204,7 +204,7 @@ export default function AdminCategoriesPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <button onClick={() => handleOpenEdit(cat)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+                <button onClick={() => handleOpenEdit(cat)} className="p-1.5 text-gray-400 hover:text-brand-600 rounded-lg hover:bg-brand-50 transition-colors">
                   <Pencil size={15} />
                 </button>
                 <button onClick={() => handleDelete(cat.id)} disabled={deletingId === cat.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40">

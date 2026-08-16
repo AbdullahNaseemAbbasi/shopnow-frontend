@@ -257,7 +257,7 @@ export default function OrderDetailPage() {
 
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h2 className="font-black text-gray-900 mb-4 flex items-center gap-2">
-              <MapPin size={16} className="text-blue-600" /> Shipping Address
+              <MapPin size={16} className="text-brand-600" /> Shipping Address
             </h2>
             <p className="text-sm text-gray-700 leading-relaxed">{order.shippingAddress}</p>
             {order.trackingNumber && (
@@ -274,7 +274,7 @@ export default function OrderDetailPage() {
         </div>
 
         <div className="mt-6 text-center">
-          <Link href="/orders" className="text-blue-600 font-semibold text-sm hover:underline">
+          <Link href="/orders" className="text-brand-600 font-semibold text-sm hover:underline">
             ← View All Orders
           </Link>
         </div>

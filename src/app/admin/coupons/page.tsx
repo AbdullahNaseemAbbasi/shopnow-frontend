@@ -108,12 +108,12 @@ export default function AdminCouponsPage() {
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Coupon Code *</label>
                 <input value={form.code} onChange={e => setForm(f => ({ ...f, code: e.target.value.toUpperCase() }))}
-                  placeholder="EID2026" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 uppercase font-mono font-bold tracking-widest" required />
+                  placeholder="EID2026" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500 uppercase font-mono font-bold tracking-widest" required />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Discount Type *</label>
                 <select value={form.discountType} onChange={e => setForm(f => ({ ...f, discountType: e.target.value as 'PERCENTAGE' | 'FIXED' }))}
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500">
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500">
                   <option value="PERCENTAGE">Percentage (%)</option>
                   <option value="FIXED">Fixed Amount (Rs.)</option>
                 </select>
@@ -123,32 +123,32 @@ export default function AdminCouponsPage() {
                   Discount Value * {form.discountType === 'PERCENTAGE' ? '(%)' : '(Rs.)'}
                 </label>
                 <input type="number" value={form.discountValue} onChange={e => setForm(f => ({ ...f, discountValue: e.target.value }))}
-                  placeholder={form.discountType === 'PERCENTAGE' ? '20' : '500'} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
+                  placeholder={form.discountType === 'PERCENTAGE' ? '20' : '500'} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" required />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Minimum Order Amount (Rs.)</label>
                 <input type="number" value={form.minimumAmount} onChange={e => setForm(f => ({ ...f, minimumAmount: e.target.value }))}
-                  placeholder="1000" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
+                  placeholder="1000" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Max Discount (Rs.) — For percentage type</label>
                 <input type="number" value={form.maximumDiscount} onChange={e => setForm(f => ({ ...f, maximumDiscount: e.target.value }))}
-                  placeholder="2000" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
+                  placeholder="2000" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Usage Limit</label>
                 <input type="number" value={form.usageLimit} onChange={e => setForm(f => ({ ...f, usageLimit: e.target.value }))}
-                  placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
+                  placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Expires At</label>
                 <input type="datetime-local" value={form.expiresAt} onChange={e => setForm(f => ({ ...f, expiresAt: e.target.value }))}
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" />
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
                 <input value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  placeholder="EID sale - 20% off on all products" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
+                  placeholder="EID sale - 20% off on all products" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" />
               </div>
             </div>
             <div className="flex gap-3">
@@ -177,16 +177,16 @@ export default function AdminCouponsPage() {
           {coupons.map(coupon => {
             const expired = isExpired(coupon.expiresAt);
             return (
-              <div key={coupon.id} className={`bg-white rounded-2xl border shadow-sm p-5 ${expired ? 'border-gray-200 opacity-60' : 'border-gray-200 hover:border-blue-200 transition-colors'}`}>
+              <div key={coupon.id} className={`bg-white rounded-2xl border shadow-sm p-5 ${expired ? 'border-gray-200 opacity-60' : 'border-gray-200 hover:border-brand-200 transition-colors'}`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 flex-1">
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Ticket size={20} className="text-blue-600" />
+                    <div className="w-12 h-12 bg-brand-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Ticket size={20} className="text-brand-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-1">
                         <span className="font-black text-gray-900 text-lg font-mono tracking-widest">{coupon.code}</span>
-                        <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${coupon.discountType === 'PERCENTAGE' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                        <span className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${coupon.discountType === 'PERCENTAGE' ? 'bg-brand-50 text-brand-700' : 'bg-gray-100 text-gray-700'}`}>
                           {coupon.discountType === 'PERCENTAGE' ? <Percent size={11} /> : <Banknote size={11} />}
                           {coupon.discountType === 'PERCENTAGE' ? `${coupon.discountValue}% OFF` : `${formatPrice(coupon.discountValue)} OFF`}
                         </span>

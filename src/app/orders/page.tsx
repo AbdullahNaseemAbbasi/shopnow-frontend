@@ -30,7 +30,7 @@ export default function OrdersPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <h1 className="text-2xl font-black text-gray-900 mb-6 flex items-center gap-2">
-          <Package size={24} className="text-blue-600" /> My Orders
+          <Package size={24} className="text-brand-600" /> My Orders
         </h1>
 
         {loading ? (
@@ -72,7 +72,7 @@ export default function OrdersPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="font-black text-lg text-blue-600">{formatPrice(order.totalAmount)}</p>
+                        <p className="font-black text-lg text-brand-600">{formatPrice(order.totalAmount)}</p>
                         <p className="text-xs text-gray-400">{order.totalItems} item{order.totalItems > 1 ? 's' : ''}</p>
                       </div>
                     </div>
@@ -97,7 +97,7 @@ export default function OrdersPage() {
                           </span>
                         )}
                       </div>
-                      <Link href={`/orders/${order.id}`} className="flex items-center gap-1 text-blue-600 text-sm font-semibold hover:underline">
+                      <Link href={`/orders/${order.id}`} className="flex items-center gap-1 text-brand-600 text-sm font-semibold hover:underline">
                         Details <ChevronRight size={14} />
                       </Link>
                     </div>

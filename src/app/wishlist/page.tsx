@@ -51,7 +51,7 @@ export default function WishlistPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <h1 className="text-2xl font-black text-gray-900 mb-1 flex items-center gap-2">
-          <Heart size={24} className="text-blue-600 fill-red-600" /> My Wishlist
+          <Heart size={24} className="text-brand-600 fill-red-600" /> My Wishlist
           {items.length > 0 && <span className="text-sm font-normal text-gray-500 ml-1">({items.length} items)</span>}
         </h1>
         {items.some(i => !i.inStock) ? (
@@ -104,10 +104,10 @@ export default function WishlistPage() {
                 </Link>
                 <div className="p-3">
                   <Link href={item.productSlug ? `/products/${item.productSlug}` : '/products'}>
-                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 hover:text-blue-600 transition-colors mb-2">{item.productName}</h3>
+                    <h3 className="font-semibold text-gray-900 text-sm line-clamp-2 hover:text-brand-600 transition-colors mb-2">{item.productName}</h3>
                   </Link>
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="font-black text-blue-600 text-sm">{formatPrice(item.salePrice || item.price)}</span>
+                    <span className="font-black text-brand-600 text-sm">{formatPrice(item.salePrice || item.price)}</span>
                     {item.salePrice && <span className="text-gray-400 line-through text-xs">{formatPrice(item.price)}</span>}
                   </div>
                   <div className="flex gap-2">
@@ -125,7 +125,7 @@ export default function WishlistPage() {
                       </button>
                     )}
                     <button onClick={() => handleRemove(item.productId)}
-                      className="p-2 rounded-xl border border-gray-200 text-gray-400 hover:text-blue-600 hover:border-red-300 transition-colors">
+                      className="p-2 rounded-xl border border-gray-200 text-gray-400 hover:text-brand-600 hover:border-red-300 transition-colors">
                       <Trash2 size={14} />
                     </button>
                   </div>

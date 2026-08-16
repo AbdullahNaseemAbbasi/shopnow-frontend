@@ -2,9 +2,9 @@ import { Truck, Shield, RotateCcw, Headphones } from 'lucide-react';
 import { FREE_SHIPPING_THRESHOLD } from '@/lib/shipping';
 
 const promos = [
-  { icon: Truck, title: 'Free Delivery', desc: `On orders above Rs. ${FREE_SHIPPING_THRESHOLD.toLocaleString('en-PK')}`, color: 'text-blue-600' },
+  { icon: Truck, title: 'Free Delivery', desc: `On orders above Rs. ${FREE_SHIPPING_THRESHOLD.toLocaleString('en-PK')}`, color: 'text-brand-600' },
   { icon: Shield, title: '100% Secure', desc: 'Safe & secure payments', color: 'text-green-600' },
-  { icon: RotateCcw, title: 'Easy Returns', desc: '7-day return policy', color: 'text-blue-600' },
+  { icon: RotateCcw, title: 'Easy Returns', desc: '7-day return policy', color: 'text-brand-600' },
   { icon: Headphones, title: '24/7 Support', desc: 'Always here to help', color: 'text-brand' },
 ];
 

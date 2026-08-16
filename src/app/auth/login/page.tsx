@@ -37,10 +37,10 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2">
-            <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg">
+            <div className="w-12 h-12 bg-brand-600 rounded-2xl flex items-center justify-center shadow-lg">
               <ShoppingBag size={24} className="text-white" />
             </div>
-            <span className="text-3xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
+            <span className="text-3xl font-black text-gray-900">Shop<span className="text-brand-600">Now</span></span>
           </Link>
           <p className="text-gray-500 mt-2">Pakistan&apos;s #1 Online Store</p>
         </div>
@@ -59,7 +59,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition-all text-sm"
                 required
               />
             </div>
@@ -74,7 +74,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all text-sm pr-12"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition-all text-sm pr-12"
                   required
                 />
                 <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
@@ -100,7 +100,7 @@ export default function LoginPage() {
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-sm">
               Don&apos;t have an account?{' '}
-              <Link href="/auth/register" className="text-blue-600 font-semibold hover:underline">
+              <Link href="/auth/register" className="text-brand-600 font-semibold hover:underline">
                 Register
               </Link>
             </p>

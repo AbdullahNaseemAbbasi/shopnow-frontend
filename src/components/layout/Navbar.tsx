@@ -55,7 +55,7 @@ export default function Navbar() {
           <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
             <span>Free delivery on orders above Rs. 2,000</span>
             <div className="flex gap-4"> 
-              <Link href="/orders" className="hover:text-blue-400 transition-colors">Track Order</Link>
+              <Link href="/orders" className="hover:text-brand-400 transition-colors">Track Order</Link>
             </div>
           </div>
         </div>
@@ -66,10 +66,10 @@ export default function Navbar() {
           <div className="flex items-center justify-between h-16 gap-4"> 
 
             <Link href={isAdmin ? '/admin' : '/'} className="flex items-center gap-1 flex-shrink-0">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center"> 
+              <div className="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center"> 
                 <span className="text-white font-black text-sm">S</span>
               </div> 
-              <span className="text-xl font-black text-gray-900">Shop<span className="text-blue-600">Now</span></span>
+              <span className="text-xl font-black text-gray-900">Shop<span className="text-brand-600">Now</span></span>
             </Link>
 
             {!isAdmin && (
@@ -78,14 +78,14 @@ export default function Navbar() {
 
             {isAdmin && ( 
               <div className="hidden md:flex items-center gap-3 ml-auto">
-                <Link href="/admin" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-blue-700 transition-colors">
+                <Link href="/admin" className="flex items-center gap-2 bg-brand-600 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-brand-700 transition-colors">
                   <LayoutDashboard size={16} /> Admin Panel
                 </Link>
                 <NotificationBell />
                 <div className="relative">
                   <button onClick={() => setAccountOpen(!accountOpen)}
-                    className="flex items-center gap-2 p-2 hover:text-blue-600 transition-colors">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                    className="flex items-center gap-2 p-2 hover:text-brand-600 transition-colors">
+                    <div className="w-8 h-8 bg-brand-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                       {user?.firstName?.[0]} 
                     </div> 
                     <ChevronDown size={14} className="text-gray-400" />  
@@ -95,12 +95,12 @@ export default function Navbar() {
                       <div className="px-4 py-2 border-b border-gray-100">
                         <p className="font-semibold text-sm">{user?.firstName}</p>
                         <p className="text-xs text-gray-400">{user?.email}</p>
-                        <span className="text-xs bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded-full">ADMIN</span>
+                        <span className="text-xs bg-brand-100 text-brand-700 font-bold px-2 py-0.5 rounded-full">ADMIN</span>
                       </div>
-                      <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
+                      <Link href="/admin" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-brand-600" onClick={() => setAccountOpen(false)}>
                         <LayoutDashboard size={15} /> Dashboard
                       </Link>
-                      <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-blue-50 text-blue-600 w-full text-left">
+                      <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-brand-50 text-brand-600 w-full text-left">
                         <LogOut size={15} /> Logout
                       </button>
                     </div>
@@ -112,14 +112,14 @@ export default function Navbar() {
             {!isAdmin && (
               <div className="hidden md:flex items-center gap-1">
                 {isLoggedIn && <NotificationBell />}
-                <Link href="/wishlist" className="flex flex-col items-center p-2 hover:text-blue-600 transition-colors group">
+                <Link href="/wishlist" className="flex flex-col items-center p-2 hover:text-brand-600 transition-colors group">
                   <Heart size={22} className="group-hover:scale-110 transition-transform" />
                   <span className="text-xs mt-0.5">Wishlist</span>
                 </Link>
 
                 <div className="relative">
                   <button onClick={() => setAccountOpen(!accountOpen)}
-                    className="flex flex-col items-center p-2 hover:text-blue-600 transition-colors group">
+                    className="flex flex-col items-center p-2 hover:text-brand-600 transition-colors group">
                     <User size={22} className="group-hover:scale-110 transition-transform" />
                     <span className="text-xs mt-0.5">{isLoggedIn ? user?.firstName : 'Account'}</span>
                   </button>
@@ -131,31 +131,31 @@ export default function Navbar() {
                             <p className="font-semibold text-sm">{user?.firstName}</p>
                             <p className="text-xs text-gray-400">{user?.email}</p>
                           </div>
-                          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
+                          <Link href="/dashboard" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-brand-600" onClick={() => setAccountOpen(false)}>
                             <UserCircle size={15} /> My Dashboard
                           </Link>
-                          <Link href="/orders" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
+                          <Link href="/orders" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-brand-600" onClick={() => setAccountOpen(false)}>
                             <Package size={15} /> My Orders
                           </Link>
-                          <Link href="/returns" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
+                          <Link href="/returns" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-brand-600" onClick={() => setAccountOpen(false)}>
                             <RotateCcw size={15} /> My Returns
                           </Link>
-                          <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
+                          <Link href="/wishlist" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-brand-600" onClick={() => setAccountOpen(false)}>
                             <Heart size={15} /> Wishlist
                           </Link>
-                          <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
+                          <Link href="/profile" className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-gray-50 hover:text-brand-600" onClick={() => setAccountOpen(false)}>
                             <MapPin size={15} /> My Addresses
                           </Link>
-                          <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-blue-50 text-blue-600 w-full text-left">
+                          <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 text-sm hover:bg-brand-50 text-brand-600 w-full text-left">
                             <LogOut size={15} /> Logout
                           </button>
                         </>
                       ) : (
                         <>
-                          <Link href="/auth/login" className="block px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600 font-medium" onClick={() => setAccountOpen(false)}>
+                          <Link href="/auth/login" className="block px-4 py-2 text-sm hover:bg-gray-50 hover:text-brand-600 font-medium" onClick={() => setAccountOpen(false)}>
                             Login
                           </Link>
-                          <Link href="/auth/register" className="block px-4 py-2 text-sm hover:bg-gray-50 hover:text-blue-600" onClick={() => setAccountOpen(false)}>
+                          <Link href="/auth/register" className="block px-4 py-2 text-sm hover:bg-gray-50 hover:text-brand-600" onClick={() => setAccountOpen(false)}>
                             Create Account
                           </Link>
                         </>
@@ -164,11 +164,11 @@ export default function Navbar() {
                   )}
                 </div>
 
-                <Link href="/cart" className="flex flex-col items-center p-2 hover:text-blue-600 transition-colors group relative">
+                <Link href="/cart" className="flex flex-col items-center p-2 hover:text-brand-600 transition-colors group relative">
                   <div className="relative">
                     <ShoppingCart size={22} className="group-hover:scale-110 transition-transform" />
                     {count > 0 && (
-                      <span className="absolute -top-2 -right-2 bg-blue-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold animate-bounce-in">
+                      <span className="absolute -top-2 -right-2 bg-brand-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold animate-bounce-in">
                         {count > 99 ? '99+' : count}
                       </span>
                     )}
@@ -201,7 +201,7 @@ export default function Navbar() {
               <div className="relative flex-shrink-0 pr-6 border-r border-gray-200 mr-6">
                 <button
                   onClick={() => setCategoriesOpen(o => !o)}
-                  className="flex items-center gap-1.5 font-semibold text-blue-600 hover:text-blue-700 transition-colors whitespace-nowrap"
+                  className="flex items-center gap-1.5 font-semibold text-brand-600 hover:text-brand-700 transition-colors whitespace-nowrap"
                 >
                   <Menu size={16} /> All Categories
                   <ChevronDown size={14} className={`transition-transform duration-200 ${categoriesOpen ? 'rotate-180' : ''}`} />
@@ -211,7 +211,7 @@ export default function Navbar() {
                   <div className="absolute left-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 max-h-80 overflow-y-auto">
                     <Link
                       href="/products"
-                      className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-blue-600 hover:bg-blue-50 transition-colors"
+                      className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-brand-600 hover:bg-brand-50 transition-colors"
                       onClick={() => setCategoriesOpen(false)}
                     >
                       <Menu size={14} /> All Products
@@ -221,7 +221,7 @@ export default function Navbar() {
                       <Link
                         key={cat.id}
                         href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`}
-                        className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-blue-600 transition-colors"
+                        className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-brand-600 transition-colors"
                         onClick={() => setCategoriesOpen(false)}
                       >
                         {cat.name}
@@ -234,7 +234,7 @@ export default function Navbar() {
               <div className="flex items-center gap-5 overflow-x-auto no-scrollbar">
                 {categories.slice(0, 9).map((cat) => (
                   <Link key={cat.id} href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`}
-                    className="text-gray-600 hover:text-blue-600 transition-colors whitespace-nowrap font-medium text-sm">
+                    className="text-gray-600 hover:text-brand-600 transition-colors whitespace-nowrap font-medium text-sm">
                     {cat.name}
                   </Link>
                 ))}
@@ -249,19 +249,19 @@ export default function Navbar() {
 
               {isAdmin ? (
                 <>
-                  <div className="flex items-center gap-3 py-2 px-2 bg-blue-50 rounded-xl mb-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  <div className="flex items-center gap-3 py-2 px-2 bg-brand-50 rounded-xl mb-3">
+                    <div className="w-8 h-8 bg-brand-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                       {user?.firstName?.[0]}
                     </div>
                     <div>
                       <p className="font-semibold text-sm">{user?.firstName}</p>
-                      <span className="text-xs bg-blue-100 text-blue-700 font-bold px-2 py-0.5 rounded-full">ADMIN</span>
+                      <span className="text-xs bg-brand-100 text-brand-700 font-bold px-2 py-0.5 rounded-full">ADMIN</span>
                     </div>
                   </div>
-                  <Link href="/admin" className="flex items-center gap-3 py-2 px-2 text-blue-600 font-semibold text-sm" onClick={() => setMobileOpen(false)}>
+                  <Link href="/admin" className="flex items-center gap-3 py-2 px-2 text-brand-600 font-semibold text-sm" onClick={() => setMobileOpen(false)}>
                     <LayoutDashboard size={18} /> Admin Panel
                   </Link>
-                  <button onClick={handleLogout} className="flex items-center gap-3 py-2 px-2 text-blue-600 text-sm w-full text-left">
+                  <button onClick={handleLogout} className="flex items-center gap-3 py-2 px-2 text-brand-600 text-sm w-full text-left">
                     <LogOut size={18} /> Logout
                   </button>
                 </>
@@ -271,8 +271,8 @@ export default function Navbar() {
 
                   {isLoggedIn ? (
                     <>
-                      <div className="flex items-center gap-3 py-2 px-2 bg-blue-50 rounded-xl mb-2">
-                        <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                      <div className="flex items-center gap-3 py-2 px-2 bg-brand-50 rounded-xl mb-2">
+                        <div className="w-8 h-8 bg-brand-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
                           {user?.firstName?.[0]}
                         </div>
                         <div>
@@ -280,26 +280,26 @@ export default function Navbar() {
                           <p className="text-xs text-gray-400">{user?.email}</p>
                         </div>
                       </div>
-                      <Link href="/dashboard" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><UserCircle size={18} /> My Dashboard</Link>
-                      <Link href="/orders" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><Package size={18} /> My Orders</Link>
-                      <Link href="/returns" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><RotateCcw size={18} /> My Returns</Link>
-                      <Link href="/wishlist" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><Heart size={18} /> Wishlist</Link>
-                      <Link href="/profile" className="flex items-center gap-3 py-2 px-2 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}><MapPin size={18} /> My Addresses</Link>
-                      <button onClick={handleLogout} className="flex items-center gap-3 py-2 px-2 text-blue-600 text-sm w-full text-left">
+                      <Link href="/dashboard" className="flex items-center gap-3 py-2 px-2 hover:text-brand-600 text-sm" onClick={() => setMobileOpen(false)}><UserCircle size={18} /> My Dashboard</Link>
+                      <Link href="/orders" className="flex items-center gap-3 py-2 px-2 hover:text-brand-600 text-sm" onClick={() => setMobileOpen(false)}><Package size={18} /> My Orders</Link>
+                      <Link href="/returns" className="flex items-center gap-3 py-2 px-2 hover:text-brand-600 text-sm" onClick={() => setMobileOpen(false)}><RotateCcw size={18} /> My Returns</Link>
+                      <Link href="/wishlist" className="flex items-center gap-3 py-2 px-2 hover:text-brand-600 text-sm" onClick={() => setMobileOpen(false)}><Heart size={18} /> Wishlist</Link>
+                      <Link href="/profile" className="flex items-center gap-3 py-2 px-2 hover:text-brand-600 text-sm" onClick={() => setMobileOpen(false)}><MapPin size={18} /> My Addresses</Link>
+                      <button onClick={handleLogout} className="flex items-center gap-3 py-2 px-2 text-brand-600 text-sm w-full text-left">
                         <LogOut size={18} /> Logout
                       </button>
                     </>
                   ) : (
                     <div className="flex gap-2 mb-2">
-                      <Link href="/auth/login" className="flex-1 bg-blue-600 text-white text-center py-2 rounded-xl text-sm font-medium" onClick={() => setMobileOpen(false)}>Login</Link>
-                      <Link href="/auth/register" className="flex-1 border border-blue-600 text-blue-600 text-center py-2 rounded-xl text-sm font-medium" onClick={() => setMobileOpen(false)}>Register</Link>
+                      <Link href="/auth/login" className="flex-1 bg-brand-600 text-white text-center py-2 rounded-xl text-sm font-medium" onClick={() => setMobileOpen(false)}>Login</Link>
+                      <Link href="/auth/register" className="flex-1 border border-brand-600 text-brand-600 text-center py-2 rounded-xl text-sm font-medium" onClick={() => setMobileOpen(false)}>Register</Link>
                     </div>
                   )}
 
                   <div className="border-t pt-3">
                     <p className="text-xs text-gray-400 font-semibold uppercase mb-2 px-2">Categories</p>
                     {categories.map((cat) => (
-                      <Link key={cat.id} href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`} className="block py-2 px-2 text-gray-600 hover:text-blue-600 text-sm" onClick={() => setMobileOpen(false)}>
+                      <Link key={cat.id} href={`/products?categoryId=${cat.id}&categoryName=${encodeURIComponent(cat.name)}`} className="block py-2 px-2 text-gray-600 hover:text-brand-600 text-sm" onClick={() => setMobileOpen(false)}>
                         {cat.name}
                       </Link>
                     ))}

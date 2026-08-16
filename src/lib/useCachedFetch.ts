@@ -35,12 +35,26 @@ export function useCachedFetch<T>(
     let cancelled = false;
 
     const cached = getCached<T>(key, ttl);
+    // True when we already hold data that is fresh within the TTL window: either a still-valid
+    // cache entry, or the server seed we write below (its timestamp is "now").
+    let haveFreshData = cached !== null;
     if (cached) {
       setData(cached);
       setLoading(false);
     } else if (options.initialData !== undefined) {
       // Seed the client cache so other components on the same key benefit.
       setCached(key, options.initialData);
+      haveFreshData = true;
+    }
+
+    // When the caller supplied server-rendered seed data AND we're holding fresh (<TTL) data,
+    // skip the redundant on-mount network revalidate — it would just re-fetch what the server
+    // already embedded. Later runs (key/url/ttl change) still revalidate normally, and callers
+    // without initialData keep their usual stale-while-revalidate behaviour.
+    if (options.initialData !== undefined && haveFreshData) {
+      return () => {
+        cancelled = true;
+      };
     }
 
     let promise = getInflight<T>(key);

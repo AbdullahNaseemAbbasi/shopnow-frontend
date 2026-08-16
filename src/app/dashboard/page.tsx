@@ -36,9 +36,9 @@ export default function DashboardPage() {
   const recentOrders = orders.slice(0, 3);
 
   const stats = [
-    { label: 'Total Orders',  value: orders.length,    icon: Package,    color: 'bg-blue-50 text-blue-600',   href: '/orders' },
+    { label: 'Total Orders',  value: orders.length,    icon: Package,    color: 'bg-brand-50 text-brand-600',   href: '/orders' },
     { label: 'Total Spent',   value: formatPrice(totalSpent), icon: ShoppingBag, color: 'bg-green-50 text-green-600', href: '/orders' },
-    { label: 'Wishlist Items', value: wishlist.length,  icon: Heart,      color: 'bg-blue-50 text-blue-600',   href: '/wishlist' },
+    { label: 'Wishlist Items', value: wishlist.length,  icon: Heart,      color: 'bg-brand-50 text-brand-600',   href: '/wishlist' },
   ];
 
   return (
@@ -75,15 +75,15 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
-            { href: '/products',  label: 'Shop Now',     icon: ShoppingBag, bg: 'bg-blue-600 text-white' },
+            { href: '/products',  label: 'Shop Now',     icon: ShoppingBag, bg: 'bg-brand-600 text-white' },
             { href: '/orders',    label: 'My Orders',    icon: Package,     bg: 'bg-white border border-gray-100' },
             { href: '/wishlist',  label: 'Wishlist',     icon: Heart,       bg: 'bg-white border border-gray-100' },
             { href: '/profile',   label: 'My Addresses', icon: MapPin,      bg: 'bg-white border border-gray-100' },
           ].map(({ href, label, icon: Icon, bg }) => (
             <Link key={href} href={href}
               className={`${bg} rounded-2xl p-4 flex flex-col items-center text-center gap-2 shadow-sm hover:shadow-md transition-shadow`}>
-              <Icon size={22} className={bg.includes('blue-600') ? 'text-white' : 'text-blue-600'} />
-              <span className={`text-xs font-bold ${bg.includes('blue-600') ? 'text-white' : 'text-gray-700'}`}>{label}</span>
+              <Icon size={22} className={bg.includes('brand-600') ? 'text-white' : 'text-brand-600'} />
+              <span className={`text-xs font-bold ${bg.includes('brand-600') ? 'text-white' : 'text-gray-700'}`}>{label}</span>
             </Link>
           ))}
         </div>
@@ -91,9 +91,9 @@ export default function DashboardPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-black text-gray-900 flex items-center gap-2">
-              <Package size={18} className="text-blue-600" /> Recent Orders
+              <Package size={18} className="text-brand-600" /> Recent Orders
             </h2>
-            <Link href="/orders" className="text-blue-600 text-sm font-semibold hover:underline flex items-center gap-1">
+            <Link href="/orders" className="text-brand-600 text-sm font-semibold hover:underline flex items-center gap-1">
               View All <ChevronRight size={14} />
             </Link>
           </div>
@@ -131,8 +131,8 @@ export default function DashboardPage() {
                       <span className={`flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full border ${meta.badge}`}>
                         <StatusIcon size={10} /> {meta.label}
                       </span>
-                      <span className="font-black text-blue-600 text-sm">{formatPrice(order.totalAmount)}</span>
-                      <ChevronRight size={14} className="text-gray-300 group-hover:text-blue-600 transition-colors" />
+                      <span className="font-black text-brand-600 text-sm">{formatPrice(order.totalAmount)}</span>
+                      <ChevronRight size={14} className="text-gray-300 group-hover:text-brand-600 transition-colors" />
                     </div>
                   </Link>
                 );

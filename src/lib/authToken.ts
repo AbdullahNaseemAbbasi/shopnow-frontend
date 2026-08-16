@@ -6,7 +6,7 @@
 // trip while the tab is alive and is cleared on logout.
 let token: string | null = null;
 
-export function setAuthToken(next: string | null) {
+export function setAuthToken(next: string | null | undefined) {
   token = next && next.length > 0 ? next : null;
 }
 

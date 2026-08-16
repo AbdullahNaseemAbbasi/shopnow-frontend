@@ -44,7 +44,7 @@ export default function CategorySection({ initialData }: { initialData?: Categor
             <h2 className="text-2xl md:text-3xl font-black text-gray-900">Shop by Category</h2>
             <p className="text-gray-500 text-sm mt-1">Find exactly what you are looking for</p>
           </div>
-          <Link href="/products" className="text-blue-600 font-semibold text-sm hover:underline">View All</Link>
+          <Link href="/products" className="text-brand-600 font-semibold text-sm hover:underline">View All</Link>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-8 gap-4">

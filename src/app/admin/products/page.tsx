@@ -242,17 +242,17 @@ export default function AdminProductsPage() {
               <div className="sm:col-span-2">
                 <label htmlFor="product-name" className="block text-xs font-semibold text-gray-600 mb-1">Product Name *</label>
                 <input id="product-name" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value, slug: generateSlug(e.target.value) }))}
-                  placeholder="Samsung Galaxy S24" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
+                  placeholder="Samsung Galaxy S24" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" required />
               </div>
               <div>
                 <label htmlFor="product-slug" className="block text-xs font-semibold text-gray-600 mb-1">Slug (auto-generated)</label>
                 <input id="product-slug" value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))}
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 font-mono text-xs" />
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500 font-mono text-xs" />
               </div>
               <div>
                 <label htmlFor="product-category" className="block text-xs font-semibold text-gray-600 mb-1">Category *</label>
                 <select id="product-category" value={form.categoryId} onChange={e => setForm(f => ({ ...f, categoryId: e.target.value }))}
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required>
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" required>
                   <option value="">Select a category</option>
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
@@ -260,23 +260,23 @@ export default function AdminProductsPage() {
               <div>
                 <label htmlFor="product-price" className="block text-xs font-semibold text-gray-600 mb-1">Price (Rs.) *</label>
                 <input id="product-price" type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))}
-                  placeholder="29999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
+                  placeholder="29999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" required />
               </div>
               <div>
                 <label htmlFor="product-saleprice" className="block text-xs font-semibold text-gray-600 mb-1">Sale Price (optional)</label>
                 <input id="product-saleprice" type="number" value={form.salePrice} onChange={e => setForm(f => ({ ...f, salePrice: e.target.value }))}
-                  placeholder="24999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
+                  placeholder="24999" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" />
               </div>
               <div>
                 <label htmlFor="product-stock" className="block text-xs font-semibold text-gray-600 mb-1">Stock *</label>
                 <input id="product-stock" type="number" value={form.stock} onChange={e => setForm(f => ({ ...f, stock: e.target.value }))}
-                  placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" required />
+                  placeholder="100" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" required />
                 {variants.length > 0 && <p className="text-[11px] text-gray-400 mt-1">Ignored at checkout — variant stock applies.</p>}
               </div>
               <div>
                 <label htmlFor="product-sku" className="block text-xs font-semibold text-gray-600 mb-1">Base SKU (optional)</label>
                 <input id="product-sku" value={form.sku} onChange={e => setForm(f => ({ ...f, sku: e.target.value }))}
-                  placeholder="TSHIRT-001" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-blue-500 font-mono text-xs" />
+                  placeholder="TSHIRT-001" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 outline-none focus:border-brand-500 font-mono text-xs" />
               </div>
 
               {/* MULTI IMAGE UPLOAD */}
@@ -286,11 +286,11 @@ export default function AdminProductsPage() {
                   <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleMultiImageUpload} className="hidden" />
                   <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" onChange={handleMultiImageUpload} className="hidden" />
                   <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading || imageUrls.length >= 15}
-                    className="flex items-center gap-2 flex-1 border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-3 py-3 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
+                    className="flex items-center gap-2 flex-1 border-2 border-dashed border-gray-300 hover:border-brand-400 rounded-xl px-3 py-3 text-sm font-semibold text-gray-600 hover:text-brand-600 transition-colors disabled:opacity-60">
                     <Upload size={16} /> {uploading ? 'Uploading...' : 'Upload Images'}
                   </button>
                   <button type="button" onClick={() => cameraInputRef.current?.click()} disabled={uploading || imageUrls.length >= 15}
-                    className="flex items-center gap-2 border-2 border-dashed border-gray-300 hover:border-blue-400 rounded-xl px-4 py-3 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-60">
+                    className="flex items-center gap-2 border-2 border-dashed border-gray-300 hover:border-brand-400 rounded-xl px-4 py-3 text-sm font-semibold text-gray-600 hover:text-brand-600 transition-colors disabled:opacity-60">
                     <Camera size={16} /> Take Photo
                   </button>
                 </div>
@@ -303,12 +303,12 @@ export default function AdminProductsPage() {
                           className="absolute -top-1.5 -right-1.5 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
                           <X size={12} />
                         </button>
-                        {i === 0 && <span className="absolute bottom-0.5 left-0.5 bg-blue-600 text-white text-[9px] px-1 rounded font-bold">Main</span>}
+                        {i === 0 && <span className="absolute bottom-0.5 left-0.5 bg-brand-600 text-white text-[9px] px-1 rounded font-bold">Main</span>}
                       </div>
                     ))}
                     {imageUrls.length < 15 && (
                       <button type="button" onClick={() => fileInputRef.current?.click()}
-                        className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 hover:text-blue-600 hover:border-blue-400 transition-colors">
+                        className="w-20 h-20 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center text-gray-400 hover:text-brand-600 hover:border-brand-400 transition-colors">
                         <ImageIcon size={20} />
                       </button>
                     )}
@@ -322,7 +322,7 @@ export default function AdminProductsPage() {
                 <label htmlFor="product-sizes" className="block text-xs font-semibold text-gray-600 mb-1">Sizes (comma separated)</label>
                 <input id="product-sizes" value={form.sizes} onChange={e => setForm(f => ({ ...f, sizes: e.target.value }))}
                   placeholder="S, M, L, XL, XXL"
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500" />
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" />
                 <div className="flex gap-2 mt-2">
                   {['S', 'M', 'L', 'XL', 'XXL'].map(size => {
                     const current = form.sizes ? form.sizes.split(',').map(s => s.trim()) : [];
@@ -336,7 +336,7 @@ export default function AdminProductsPage() {
                             setForm(f => ({ ...f, sizes: [...current, size].filter(Boolean).join(', ') }));
                           }
                         }}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold border-2 transition-all ${isSelected ? 'border-blue-600 bg-blue-600 text-white' : 'border-gray-200 text-gray-600 hover:border-blue-400'}`}>
+                        className={`px-3 py-1 rounded-lg text-xs font-bold border-2 transition-all ${isSelected ? 'border-brand-600 bg-brand-600 text-white' : 'border-gray-200 text-gray-600 hover:border-brand-400'}`}>
                         {size}
                       </button>
                     );
@@ -349,11 +349,11 @@ export default function AdminProductsPage() {
                 <label htmlFor="product-colors" className="block text-xs font-semibold text-gray-600 mb-1">Colors (click to select or type custom)</label>
                 <input id="product-colors" value={form.colors} onChange={e => setForm(f => ({ ...f, colors: e.target.value }))}
                   placeholder="Red, Blue, Green, Black, White..."
-                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 mb-2" />
+                  className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500 mb-2" />
                 <div className="flex gap-2 flex-wrap">
                   {PRESET_COLORS.map(color => (
                     <button key={color} type="button" onClick={() => toggleColor(color)}
-                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border-2 transition-all ${selectedColors.includes(color) ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>
+                      className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold border-2 transition-all ${selectedColors.includes(color) ? 'border-brand-600 bg-brand-50 text-brand-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>
                       <span className="w-3 h-3 rounded-full border border-gray-300" style={{ backgroundColor: color.toLowerCase() }} />
                       {color}
                     </button>
@@ -366,7 +366,7 @@ export default function AdminProductsPage() {
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-xs font-semibold text-gray-600">Variants (own SKU &amp; stock per size/colour)</label>
                   <button type="button" onClick={addVariant}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline">
+                    className="inline-flex items-center gap-1 text-xs font-bold text-brand-600 hover:underline">
                     <Plus size={13} /> Add variant
                   </button>
                 </div>
@@ -385,16 +385,16 @@ export default function AdminProductsPage() {
                     {variants.map((v, i) => (
                       <div key={i} className="grid grid-cols-12 gap-2 items-center">
                         <input aria-label={`Variant ${i + 1} size`} value={v.size} onChange={e => updateVariant(i, 'size', e.target.value)} placeholder="M"
-                          className="col-span-6 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                          className="col-span-6 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-500" />
                         <input aria-label={`Variant ${i + 1} colour`} value={v.color} onChange={e => updateVariant(i, 'color', e.target.value)} placeholder="Black"
-                          className="col-span-6 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                          className="col-span-6 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-500" />
                         <input aria-label={`Variant ${i + 1} SKU`} value={v.sku} onChange={e => updateVariant(i, 'sku', e.target.value)} placeholder="SKU (optional)"
-                          className="col-span-5 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500 font-mono" />
+                          className="col-span-5 sm:col-span-3 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-500 font-mono" />
                         <input aria-label={`Variant ${i + 1} price`} type="number" value={v.price} onChange={e => updateVariant(i, 'price', e.target.value)} placeholder="—"
                           title="Leave blank to inherit the product price"
-                          className="col-span-3 sm:col-span-1 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                          className="col-span-3 sm:col-span-1 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-500" />
                         <input aria-label={`Variant ${i + 1} stock`} type="number" value={v.stock} onChange={e => updateVariant(i, 'stock', e.target.value)} placeholder="0"
-                          className="col-span-3 sm:col-span-1 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-blue-500" />
+                          className="col-span-3 sm:col-span-1 border-2 border-gray-200 rounded-lg px-2 py-1.5 text-xs outline-none focus:border-brand-500" />
                         <button type="button" onClick={() => removeVariant(i)} aria-label={`Remove variant ${i + 1}`}
                           className="col-span-1 flex items-center justify-center text-gray-400 hover:text-red-600 p-1">
                           <Trash2 size={14} />
@@ -409,15 +409,15 @@ export default function AdminProductsPage() {
               <div className="sm:col-span-2">
                 <label htmlFor="product-description" className="block text-xs font-semibold text-gray-600 mb-1">Description</label>
                 <textarea id="product-description" value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  rows={3} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-blue-500 resize-none" />
+                  rows={3} className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500 resize-none" />
               </div>
               <div className="flex items-center gap-6">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.featured} onChange={e => setForm(f => ({ ...f, featured: e.target.checked }))} className="w-4 h-4 accent-blue-600" />
+                  <input type="checkbox" checked={form.featured} onChange={e => setForm(f => ({ ...f, featured: e.target.checked }))} className="w-4 h-4 accent-brand-600" />
                   <span className="text-sm font-semibold text-gray-700">Featured</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="w-4 h-4 accent-blue-600" />
+                  <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="w-4 h-4 accent-brand-600" />
                   <span className="text-sm font-semibold text-gray-700">Active</span>
                 </label>
               </div>
@@ -435,7 +435,7 @@ export default function AdminProductsPage() {
       )}
 
       <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 mb-4">
-        <div className="flex items-center gap-3 border-2 border-gray-200 rounded-xl px-3 py-2 focus-within:border-blue-500 transition-colors">
+        <div className="flex items-center gap-3 border-2 border-gray-200 rounded-xl px-3 py-2 focus-within:border-brand-500 transition-colors">
           <Search size={16} className="text-gray-400" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search products..."
             className="flex-1 text-sm outline-none" />
@@ -487,19 +487,19 @@ export default function AdminProductsPage() {
                       {product.salePrice && <p className="text-xs text-gray-400 line-through">{formatPrice(product.price)}</p>}
                     </td>
                     <td className="px-4 py-3 hidden sm:table-cell">
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${product.stock === 0 ? 'bg-red-50 text-red-600' : product.stock <= 10 ? 'bg-gray-200 text-gray-700' : 'bg-blue-50 text-blue-700'}`}>
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${product.stock === 0 ? 'bg-red-50 text-red-600' : product.stock <= 10 ? 'bg-gray-200 text-gray-700' : 'bg-brand-50 text-brand-700'}`}>
                         {product.stock === 0 ? 'Out of Stock' : `${product.stock} units`}
                       </span>
                     </td>
                     <td className="px-4 py-3 hidden lg:table-cell">
                       <div className="flex gap-1.5">
-                        {product.active && <span className="text-xs bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-medium">Active</span>}
+                        {product.active && <span className="text-xs bg-brand-50 text-brand-600 px-2 py-0.5 rounded-full font-medium">Active</span>}
                         {product.featured && <span className="text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full font-medium">Featured</span>}
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => handleOpenEdit(product)} className="p-1.5 text-gray-400 hover:text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
+                        <button onClick={() => handleOpenEdit(product)} className="p-1.5 text-gray-400 hover:text-brand-600 rounded-lg hover:bg-brand-50 transition-colors">
                           <Pencil size={15} />
                         </button>
                         <button onClick={() => handleDelete(product.id)} disabled={deletingId === product.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-40">
@@ -517,10 +517,10 @@ export default function AdminProductsPage() {
         {totalPages > 1 && (
           <div className="flex justify-center gap-2 p-4 border-t border-gray-200">
             <button onClick={() => setPage(p => Math.max(0, p - 1))} disabled={page === 0}
-              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-blue-500 hover:text-blue-600 transition-colors">Prev</button>
+              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-brand-500 hover:text-brand-600 transition-colors">Prev</button>
             <span className="px-3 py-1.5 text-xs font-bold text-gray-600">{page + 1} / {totalPages}</span>
             <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} disabled={page >= totalPages - 1}
-              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-blue-500 hover:text-blue-600 transition-colors">Next</button>
+              className="px-3 py-1.5 rounded-lg border-2 border-gray-200 text-xs font-semibold disabled:opacity-40 hover:border-brand-500 hover:text-brand-600 transition-colors">Next</button>
           </div>
         )}
       </div>
