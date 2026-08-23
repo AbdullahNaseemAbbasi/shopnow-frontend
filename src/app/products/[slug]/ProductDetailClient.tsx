@@ -28,7 +28,7 @@ const EMOJIS: Record<string, string> = {
   'Beauty': '✨', 'Home & Living': '🏠', 'Sports': '⚽', 'Books': '📚', 'Kids': '🧸', 'Groceries': '🛒',
 };
 
-const WHATSAPP_NUMBER = '923248234639';
+const WHATSAPP_NUMBER = '923072243897';
 
 interface Props {
   initialProduct: Product;

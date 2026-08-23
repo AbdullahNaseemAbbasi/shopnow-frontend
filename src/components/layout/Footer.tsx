@@ -25,7 +25,7 @@ const SOCIALS = [
   { Icon: Youtube, href: 'https://youtube.com/@shopnowpk', label: 'YouTube' },
 ];
 
-const WHATSAPP = 'https://wa.me/923248234639';
+const WHATSAPP = 'https://wa.me/923072243897';
 
 export default function Footer() {
   return (
@@ -107,7 +107,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone size={15} className="text-brand-400 flex-shrink-0" />
-                <a href="tel:+923248234639" className="text-sm text-slate-400 hover:text-brand-400 transition-colors">03072243897</a>
+                <a href="tel:+923072243897" className="text-sm text-slate-400 hover:text-brand-400 transition-colors">0307-2243897</a>
               </li>
               <li className="flex items-center gap-3">
                 <Mail size={15} className="text-brand-400 flex-shrink-0" />
