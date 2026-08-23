@@ -56,7 +56,7 @@ export default function Invoice({ order, mode = "invoice" }: Props) {
             </div>
             <p className="text-xs text-gray-400 mt-2 leading-relaxed">
               Pakistan-based fashion &amp; clothing store<br />
-              support@shopnow.pk
+              elafqazi1407@gmail.com
             </p>
           </div>
           <div className="text-right">

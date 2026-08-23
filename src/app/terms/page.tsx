@@ -30,7 +30,7 @@ export default function TermsPage() {
           </section>
           <section>
             <h2 className="font-black text-gray-900 mb-2">Governing law</h2>
-            <p>These terms are governed by the laws of Pakistan. Questions? Email <a href="mailto:support@shopnow.pk" className="text-brand font-semibold">support@shopnow.pk</a>.</p>
+            <p>These terms are governed by the laws of Pakistan. Questions? Email <a href="mailto:elafqazi1407@gmail.com" className="text-brand font-semibold">elafqazi1407@gmail.com</a>.</p>
           </section>
         </div>
       </div>

@@ -154,7 +154,7 @@ export default function ProfilePage() {
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">City *</label>
                   <input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))}
-                    placeholder="Lahore" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" required />
+                    placeholder="Karachi" className="w-full border-2 border-gray-200 rounded-xl px-3 py-2.5 text-sm outline-none focus:border-brand-500" required />
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-gray-600 mb-1">State / Province</label>

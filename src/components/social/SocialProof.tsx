@@ -2,13 +2,16 @@
 
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useAuthStore } from '@/store/authStore';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 // Storefront social proof, driven by the backend's public SSE channel (no auth).
-// Shows a live "viewing now" badge and toasts real "someone just bought X" sales.
+// The "viewing now" badge is shown to admins only; the real "someone just bought X" sale toasts
+// still fire for every shopper.
 export default function SocialProof() {
   const [viewers, setViewers] = useState(0);
+  const isAdmin = useAuthStore((s) => s.user?.role === 'ADMIN');
   const lastSale = useRef(0);
 
   useEffect(() => {
@@ -40,7 +43,8 @@ export default function SocialProof() {
     return () => es.close();
   }, []);
 
-  if (viewers < 1) return null;
+  // Admin-only badge (shoppers don't see the live viewer count).
+  if (!isAdmin || viewers < 1) return null;
 
   return (
     <div className="fixed bottom-4 left-4 z-40 flex items-center gap-2 bg-ink text-white text-xs font-semibold px-3 py-2 rounded-full shadow-lg">

@@ -53,7 +53,7 @@ export default function Navbar() {
       {!isAdmin && (
         <div className="bg-gray-900 text-white text-xs py-2 hidden md:block">
           <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-            <span>Free delivery on orders above Rs. 2,000</span>
+            <span>Free delivery on orders above Rs. 5,000</span>
             <div className="flex gap-4"> 
               <Link href="/orders" className="hover:text-brand-400 transition-colors">Track Order</Link>
             </div>

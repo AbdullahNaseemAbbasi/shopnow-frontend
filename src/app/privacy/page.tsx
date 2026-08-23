@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           </section>
           <section>
             <h2 className="font-black text-gray-900 mb-2">Your choices</h2>
-            <p>You may access, update or request deletion of your account information, subject to records we must retain for legal and operational reasons. Contact us at <a href="mailto:support@shopnow.pk" className="text-brand font-semibold">support@shopnow.pk</a>.</p>
+            <p>You may access, update or request deletion of your account information, subject to records we must retain for legal and operational reasons. Contact us at <a href="mailto:elafqazi1407@gmail.com" className="text-brand font-semibold">elafqazi1407@gmail.com</a>.</p>
           </section>
         </div>
       </div>

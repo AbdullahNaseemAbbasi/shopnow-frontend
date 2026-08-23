@@ -14,7 +14,7 @@ export default function ShippingReturnsPage() {
           </section>
           <section>
             <h2 className="font-black text-gray-900 mb-2">Charges</h2>
-            <p>Delivery is <span className="font-semibold text-gray-800">free on orders of Rs 2,000 and above</span>. A flat Rs 200 delivery fee applies below that. Cash on Delivery (COD) and online payment are both supported.</p>
+            <p>Delivery is <span className="font-semibold text-gray-800">free on orders of Rs 5,000 and above</span> across Karachi. A flat Rs 300 delivery fee applies below that. Cash on Delivery (COD) and online payment are both supported.</p>
           </section>
           <section>
             <h2 className="font-black text-gray-900 mb-2">Returns &amp; exchanges</h2>
@@ -26,7 +26,7 @@ export default function ShippingReturnsPage() {
           </section>
           <section>
             <h2 className="font-black text-gray-900 mb-2">Refunds</h2>
-            <p>Once your return is received and inspected, an eligible refund is processed to your original payment method or as store credit. Need help? Email <a href="mailto:support@shopnow.pk" className="text-brand font-semibold">support@shopnow.pk</a>.</p>
+            <p>Once your return is received and inspected, an eligible refund is processed to your original payment method or as store credit. Need help? Email <a href="mailto:elafqazi1407@gmail.com" className="text-brand font-semibold">elafqazi1407@gmail.com</a>.</p>
           </section>
         </div>
       </div>
