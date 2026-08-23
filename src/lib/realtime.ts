@@ -1,11 +1,12 @@
 "use client";
 
 // Client-side Server-Sent Events manager. Opens ONE EventSource for the logged-in user and
-// fans named events out to subscribers. EventSource can't set an Authorization header, so it
-// authenticates with the HttpOnly session cookie via `withCredentials` — no token in the URL
-// (query strings leak into access logs, history and Referer headers).
+// fans named events out to subscribers. EventSource can't set an Authorization header, and the
+// HttpOnly session cookie is blocked cross-domain (third-party), so the token rides as a ?token=
+// query param — the backend accepts it ONLY on /api/realtime/ routes.
 
 import { useAuthStore } from "@/store/authStore";
+import { getAuthToken } from "@/lib/authToken";
 
 type Payload = Record<string, unknown>;
 type Handler = (data: Payload) => void;
@@ -38,10 +39,12 @@ export function connectRealtime() {
   // Only stream for a logged-in user — the endpoint requires auth, so attempting it while logged
   // out just produces 401 → retry churn.
   if (!useAuthStore.getState().isLoggedIn) return;
+  const token = getAuthToken();
+  if (!token) return;
 
   const base = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-  // withCredentials sends the HttpOnly session cookie on this cross-origin stream.
-  const es = new EventSource(`${base}/api/realtime/stream`, { withCredentials: true });
+  // Authenticate the stream with the token as a query param (the cross-domain cookie is blocked).
+  const es = new EventSource(`${base}/api/realtime/stream?token=${encodeURIComponent(token)}`);
   source = es;
 
   const onUp = () => { failures = 0; setConnected(true); };
